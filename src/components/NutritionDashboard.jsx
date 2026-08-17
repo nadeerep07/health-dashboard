@@ -17,9 +17,11 @@ import {
   Moon, 
   Info,
   Zap,
-  Check
+  Check,
+  Key,
+  ExternalLink
 } from 'lucide-react';
-import { estimateNutritionWithAI } from '../utils/nutritionAi';
+import { estimateNutritionWithAI, getGeminiApiKey, setGeminiApiKey } from '../utils/nutritionAi';
 
 export default function NutritionDashboard({ 
   foodLogs = { breakfast: [], lunch: [], snack: [], dinner: [] }, 
@@ -28,6 +30,9 @@ export default function NutritionDashboard({
   onResetFoodLogs 
 }) {
   const [showAiModal, setShowAiModal] = useState(false);
+  const [showKeyModal, setShowKeyModal] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState(() => getGeminiApiKey());
+  const [hasApiKey, setHasApiKey] = useState(() => !!getGeminiApiKey());
   const [targetCategory, setTargetCategory] = useState('breakfast');
   
   // AI Modal input state
@@ -44,13 +49,14 @@ export default function NutritionDashboard({
   // Escape key listener for modal
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && showAiModal) {
-        setShowAiModal(false);
+      if (e.key === 'Escape') {
+        if (showKeyModal) setShowKeyModal(false);
+        if (showAiModal) setShowAiModal(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showAiModal]);
+  }, [showAiModal, showKeyModal]);
 
   // Aggregate all logged foods across 4 meals
   const allItems = [
@@ -87,20 +93,23 @@ export default function NutritionDashboard({
     }
   };
 
-  const handleAnalyzeQuery = (queryText) => {
+  const handleAnalyzeQuery = async (queryText) => {
     const q = queryText || foodQuery;
     if (!q.trim()) return;
 
     setIsAnalyzing(true);
-    setTimeout(() => {
-      const result = estimateNutritionWithAI(q);
+    try {
+      const result = await estimateNutritionWithAI(q);
       setAiResult(result);
       setCustomCal(String(result.calories));
       setCustomProtein(String(result.protein));
       setCustomCarbs(String(result.carbs));
       setCustomFat(String(result.fat));
+    } catch (err) {
+      console.error(err);
+    } finally {
       setIsAnalyzing(false);
-    }, 200);
+    }
   };
 
   const handleSaveFood = (e) => {
@@ -157,6 +166,13 @@ export default function NutritionDashboard({
     }
   };
 
+  const handleSaveApiKey = (e) => {
+    e.preventDefault();
+    setGeminiApiKey(apiKeyInput.trim());
+    setHasApiKey(!!apiKeyInput.trim());
+    setShowKeyModal(false);
+  };
+
   const mealCategories = [
     { key: 'breakfast', label: 'Breakfast', icon: Sun, color: '#f59e0b', desc: '08:00 AM – 09:30 AM' },
     { key: 'lunch', label: 'Lunch', icon: Utensils, color: '#10b981', desc: '01:00 PM – 02:30 PM' },
@@ -173,8 +189,30 @@ export default function NutritionDashboard({
             <Utensils size={20} />
           </div>
           <div>
-            <h2 className="card-title">AI Food & Calorie Tracker</h2>
-            <p className="card-subtitle">Track custom meals, calculate kcal using AI, & hit your protein goal</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <h2 className="card-title">AI Food & Calorie Tracker</h2>
+              <button
+                type="button"
+                onClick={() => setShowKeyModal(true)}
+                style={{
+                  background: hasApiKey ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255, 215, 0, 0.1)',
+                  border: hasApiKey ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(255, 215, 0, 0.25)',
+                  color: hasApiKey ? '#34d399' : 'var(--gold-primary)',
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  padding: '0.2rem 0.5rem',
+                  borderRadius: 'var(--radius-pill)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.25rem'
+                }}
+                title="Configure Google Gemini AI Key"
+              >
+                <Sparkles size={11} /> {hasApiKey ? 'Live Gemini AI' : 'AI Engine'}
+              </button>
+            </div>
+            <p className="card-subtitle">Calculate calories & macros for ANY food in the world</p>
           </div>
         </div>
 
@@ -300,9 +338,37 @@ export default function NutritionDashboard({
       {/* 1-Tap Quick Staples for Fast Logging */}
       <div style={{ marginBottom: '1.5rem' }}>
         <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <Zap size={14} color="var(--gold-primary)" /> 1-Tap Kerala Staples (Fast Add)
+          <Zap size={14} color="var(--gold-primary)" /> 1-Tap Favorites & Snacks
         </div>
         <div style={{ display: 'flex', gap: '0.45rem', overflowX: 'auto', paddingBottom: '0.4rem', scrollbarWidth: 'none' }}>
+          <button 
+            type="button"
+            onClick={() => handleQuickAdd('snack', '1 Boiled Sweet Corn', 130, 4.5, 28.0, 1.8)}
+            className="category-pill"
+          >
+            + Boiled Corn (130 kcal • 4.5g P)
+          </button>
+          <button 
+            type="button"
+            onClick={() => handleQuickAdd('snack', '1 Fresh Orange', 62, 1.2, 15.4, 0.2)}
+            className="category-pill"
+          >
+            + Orange (62 kcal • 1.2g P)
+          </button>
+          <button 
+            type="button"
+            onClick={() => handleQuickAdd('dinner', 'Shawaya Chicken (1/4 chicken)', 280, 38.0, 0.5, 14.0)}
+            className="category-pill"
+          >
+            + Shawaya Chicken (280 kcal • 38g P)
+          </button>
+          <button 
+            type="button"
+            onClick={() => handleQuickAdd('lunch', '1 Crispy Fried Chicken Piece', 320, 21.0, 14.0, 21.0)}
+            className="category-pill"
+          >
+            + Fried Chicken (320 kcal • 21g P)
+          </button>
           <button 
             type="button"
             onClick={() => handleQuickAdd('breakfast', '2 Dosa + 2 Boiled Eggs', 388, 18.2, 44.8, 15.0)}
@@ -312,38 +378,10 @@ export default function NutritionDashboard({
           </button>
           <button 
             type="button"
-            onClick={() => handleQuickAdd('breakfast', '1 Puttu + Kadala Curry', 325, 10.7, 57.0, 6.3)}
-            className="category-pill"
-          >
-            + Puttu & Kadala (325 kcal • 11g P)
-          </button>
-          <button 
-            type="button"
             onClick={() => handleQuickAdd('lunch', '180g Matta Rice + 140g Fish Curry', 425, 32.2, 52.0, 8.2)}
             className="category-pill"
           >
             + Rice & Fish Curry (425 kcal • 32g P)
-          </button>
-          <button 
-            type="button"
-            onClick={() => handleQuickAdd('dinner', '2 Chapati + 180g Chicken Curry', 487, 48.4, 40.0, 15.0)}
-            className="category-pill"
-          >
-            + Chapati & Chicken (487 kcal • 48g P)
-          </button>
-          <button 
-            type="button"
-            onClick={() => handleQuickAdd('lunch', 'Chicken Mandi Portion (250g)', 480, 32.0, 55.0, 15.0)}
-            className="category-pill"
-          >
-            + Chicken Mandi (480 kcal • 32g P)
-          </button>
-          <button 
-            type="button"
-            onClick={() => handleQuickAdd('snack', 'Pomegranate & Grapes (200g)', 152, 2.4, 37.0, 1.4)}
-            className="category-pill"
-          >
-            + Fresh Fruits (152 kcal)
           </button>
         </div>
       </div>
@@ -454,62 +492,6 @@ export default function NutritionDashboard({
         })}
       </div>
 
-      {/* Social Dining Strategy Banner */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(22, 25, 36, 0.95) 100%)',
-        border: '1px solid rgba(239, 68, 68, 0.25)',
-        borderRadius: 'var(--radius-md)',
-        padding: '1.25rem',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-          <Sparkles size={18} color="var(--gold-primary)" />
-          <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-white)' }}>
-            Real Life Meals & Social Dining
-          </h3>
-        </div>
-
-        <p style={{ fontSize: '0.82rem', color: 'var(--text-primary)', marginBottom: '0.85rem', lineHeight: 1.4 }}>
-          Occasional foods like <strong>Chicken Biryani</strong> and <strong>Chicken Mandi</strong> can fit comfortably into your plan:
-        </p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '0.75rem' }}>
-          <div style={{ background: 'rgba(0,0,0,0.4)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
-            <div style={{ fontWeight: 700, color: 'var(--gold-primary)', fontSize: '0.85rem' }}>
-              Chicken Mandi Strategy
-            </div>
-            <ul style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.3rem', paddingLeft: '1rem', lineHeight: 1.4 }}>
-              <li>Eat full chicken portion for protein</li>
-              <li>Limit rice portion to ~200g</li>
-              <li>Skip calorie-heavy mayonnaise</li>
-            </ul>
-          </div>
-
-          <div style={{ background: 'rgba(0,0,0,0.4)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
-            <div style={{ fontWeight: 700, color: 'var(--gold-primary)', fontSize: '0.85rem' }}>
-              Chicken Biryani Strategy
-            </div>
-            <ul style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.3rem', paddingLeft: '1rem', lineHeight: 1.4 }}>
-              <li>Portion ~250–300g biryani rice</li>
-              <li>Include 100–150g chicken</li>
-              <li>Pair with onion raita</li>
-            </ul>
-          </div>
-        </div>
-
-        <div style={{
-          background: 'rgba(255, 215, 0, 0.08)',
-          border: '1px solid rgba(255, 215, 0, 0.2)',
-          borderRadius: 'var(--radius-sm)',
-          padding: '0.6rem',
-          textAlign: 'center',
-          fontWeight: 800,
-          fontSize: '0.85rem',
-          color: 'var(--gold-primary)'
-        }}>
-          "One meal doesn't ruin your progress. Consistency over time is what builds results."
-        </div>
-      </div>
-
       {/* AI Log Food Modal */}
       {showAiModal && (
         <div className="modal-overlay" onClick={() => setShowAiModal(false)}>
@@ -571,12 +553,12 @@ export default function NutritionDashboard({
               {/* Natural language query input */}
               <div>
                 <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
-                  What did you eat? (with quantity)
+                  What did you eat? (e.g. "1 boiled corn", "2 oranges", "half shawaya chicken")
                 </label>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <input
                     type="text"
-                    placeholder="e.g. 2 Dosa and 2 boiled eggs, or 200g Mandi"
+                    placeholder="e.g. 1 boiled sweet corn, or 2 oranges, or 1/4 shawaya"
                     className="form-input"
                     value={foodQuery}
                     onChange={(e) => setFoodQuery(e.target.value)}
@@ -588,9 +570,9 @@ export default function NutritionDashboard({
                     onClick={() => handleAnalyzeQuery(foodQuery)}
                     className="btn-gold"
                     style={{ padding: '0.6rem 0.9rem', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
-                    disabled={!foodQuery.trim()}
+                    disabled={!foodQuery.trim() || isAnalyzing}
                   >
-                    <Sparkles size={14} /> Calculate
+                    <Sparkles size={14} /> {isAnalyzing ? 'Calculating...' : 'Calculate'}
                   </button>
                 </div>
               </div>
@@ -613,8 +595,8 @@ export default function NutritionDashboard({
                   gap: '0.6rem'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--gold-primary)', textTransform: 'uppercase' }}>
-                      AI Nutrition Estimate
+                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--gold-primary)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <Sparkles size={12} /> {aiResult.isAiGenerated ? 'Gemini AI Estimate' : 'Nutrition Estimate'}
                     </span>
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Fine-tune below if needed</span>
                   </div>
@@ -681,6 +663,83 @@ export default function NutritionDashboard({
                 </button>
                 <button type="submit" className="btn-gold" style={{ flex: 1 }}>
                   Save to {mealCategories.find(c => c.key === targetCategory)?.label}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* GEMINI AI API KEY CONFIG MODAL */}
+      {showKeyModal && (
+        <div className="modal-overlay" onClick={() => setShowKeyModal(false)}>
+          <div className="modal-content" style={{ maxWidth: '480px' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '0.45rem', borderRadius: '10px', display: 'flex' }}>
+                  <Key size={20} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-white)' }}>
+                    Google Gemini AI Key (Optional)
+                  </h3>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Connect free live Gemini AI to analyze ANY custom dish in the world
+                  </p>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowKeyModal(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '0.85rem',
+              fontSize: '0.78rem',
+              color: 'var(--text-primary)',
+              marginBottom: '1rem',
+              lineHeight: 1.4
+            }}>
+              <p style={{ marginBottom: '0.4rem' }}>
+                <strong>How it works:</strong> The app already includes 300+ foods offline. By adding a free Google Gemini API key, you can analyze <em>any complex custom recipe or rare dish</em> with live LLM reasoning.
+              </p>
+              <a 
+                href="https://aistudio.google.com/app/apikey" 
+                target="_blank" 
+                rel="noreferrer"
+                style={{ color: 'var(--gold-primary)', textDecoration: 'underline', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontWeight: 700 }}
+              >
+                Get a Free Gemini API Key from Google AI Studio <ExternalLink size={12} />
+              </a>
+            </div>
+
+            <form onSubmit={handleSaveApiKey} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
+                  Gemini API Key
+                </label>
+                <input
+                  type="password"
+                  placeholder="AIzaSy..."
+                  className="form-input"
+                  value={apiKeyInput}
+                  onChange={(e) => setApiKeyInput(e.target.value)}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <button type="button" onClick={() => setShowKeyModal(false)} className="btn-secondary" style={{ flex: 1 }}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-gold" style={{ flex: 1 }}>
+                  Save Key
                 </button>
               </div>
             </form>
