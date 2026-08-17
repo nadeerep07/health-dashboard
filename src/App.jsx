@@ -38,6 +38,7 @@ import MobileNavigation from './components/MobileNavigation';
 import SupabaseSyncModal from './components/SupabaseSyncModal';
 import PinLockScreen from './components/PinLockScreen';
 import ChangePinModal from './components/ChangePinModal';
+import WhatsAppSyncModal from './components/WhatsAppSyncModal';
 
 import { 
   Activity, 
@@ -85,6 +86,7 @@ export default function App() {
   const [activeScreen, setActiveScreen] = useState('home');
   const [showSyncModal, setShowSyncModal] = useState(false);
   const [showChangePinModal, setShowChangePinModal] = useState(false);
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
   const [syncStatus, setSyncStatus] = useState('idle'); // 'idle', 'syncing', 'saved'
   const [isCloudConfigured, setIsCloudConfigured] = useState(() => getSupabaseConfig().isConfigured);
 
@@ -528,8 +530,31 @@ export default function App() {
             })}
           </nav>
 
-          {/* Header Action Buttons (Sync, PIN, Lock) */}
+          {/* Header Action Buttons (WhatsApp AI, Sync, PIN, Lock) */}
           <div className="header-actions">
+            {/* WhatsApp AI Coach Button */}
+            <button
+              onClick={() => setShowWhatsAppModal(true)}
+              style={{
+                background: 'rgba(37, 211, 102, 0.12)',
+                border: '1px solid rgba(37, 211, 102, 0.35)',
+                color: '#25d366',
+                padding: '0.38rem 0.65rem',
+                borderRadius: 'var(--radius-pill)',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                transition: 'all 0.2s ease'
+              }}
+              title="Open WhatsApp AI Coach"
+            >
+              <MessageSquare size={14} />
+              <span>WhatsApp AI</span>
+            </button>
+
             {/* Cloud Sync Button */}
             <button
               onClick={() => setShowSyncModal(true)}
@@ -807,6 +832,12 @@ export default function App() {
         onClose={() => setShowChangePinModal(false)}
         currentPin={dashboardPin}
         onChangePin={handleChangePin}
+      />
+
+      {/* WHATSAPP AI COACH MODAL */}
+      <WhatsAppSyncModal
+        isOpen={showWhatsAppModal}
+        onClose={() => setShowWhatsAppModal(false)}
       />
     </div>
   );
