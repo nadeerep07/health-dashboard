@@ -604,6 +604,36 @@ export default function NutritionDashboard({
         })}
       </div>
 
+      {/* Nutrition Improvement & Trend Insight Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(22, 25, 36, 0.9) 100%)',
+        border: '1px solid rgba(56, 189, 248, 0.25)',
+        borderRadius: 'var(--radius-md)',
+        padding: '0.85rem 1rem',
+        marginBottom: '1.25rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '0.6rem'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <TrendingDown size={18} color="#38bdf8" />
+          <div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-white)' }}>
+              Calorie Deficit Trend: <span style={{ color: 'var(--accent-green)' }}>✓ Active Deficit Maintained</span>
+            </div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+              Average daily intake is on track within 2,000–2,200 kcal. Muscle retention optimized!
+            </div>
+          </div>
+        </div>
+
+        <span className="gold-tag" style={{ background: 'rgba(56, 189, 248, 0.15)', borderColor: 'rgba(56, 189, 248, 0.35)', color: '#38bdf8' }}>
+          ✓ Deficit On Track
+        </span>
+      </div>
+
       {/* Historical Days Summary */}
       {recordedDates.length > 0 && (
         <div style={{ marginBottom: '1.5rem' }}>

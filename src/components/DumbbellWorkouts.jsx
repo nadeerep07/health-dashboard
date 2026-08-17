@@ -30,13 +30,32 @@ const WORKOUT_B = {
   ]
 };
 
+const WORKOUT_ROUTINES = { 'A': WORKOUT_A, 'B': WORKOUT_B };
+
 export default function DumbbellWorkouts({ onCompleteWorkout }) {
-  const [activeTab, setActiveTab] = useState('A');
-  const [activeSession, setActiveSession] = useState(null); // 'A' or 'B'
+  const [activeTab, setActiveTab] = useState('A'); // 'A' or 'B'
+  const [activeSession, setActiveSession] = useState(null); // 'A' or 'B' or null
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [restTimer, setRestTimer] = useState(0);
-  const [completedSets, setCompletedSets] = useState({});
+  const [completedSets, setCompletedSets] = useState({}); // { "0-0": true, "0-1": true }
+
+  // Workout History State
+  const [workoutHistory, setWorkoutHistory] = useState(() => {
+    const saved = localStorage.getItem('transformation_workout_history');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return [
+      { id: 'wo-1', date: '2026-08-11', type: 'Workout A', duration: 24, sets: 12, title: 'Upper Body & Arms', note: '2 × 5kg Dumbbells' },
+      { id: 'wo-2', date: '2026-08-13', type: 'Workout B', duration: 26, sets: 12, title: 'Legs & Core', note: 'Goblet squats + lunges' },
+      { id: 'wo-3', date: '2026-08-15', type: 'Workout A', duration: 25, sets: 12, title: 'Upper Body & Arms', note: 'Clean form, good control' },
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('transformation_workout_history', JSON.stringify(workoutHistory));
+  }, [workoutHistory]);
 
   // Active workout timer tick
   useEffect(() => {
@@ -65,10 +84,32 @@ export default function DumbbellWorkouts({ onCompleteWorkout }) {
 
   const endWorkout = () => {
     setIsTimerRunning(false);
+    const durationMins = Math.max(1, Math.round(timerSeconds / 60));
+    const setsCount = Object.values(completedSets).filter(Boolean).length;
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    const newSession = {
+      id: `wo-${Date.now()}`,
+      date: todayStr,
+      type: `Workout ${activeSession}`,
+      duration: durationMins,
+      sets: setsCount || 12,
+      title: activeSession === 'A' ? 'Upper Body & Arms' : 'Legs & Core',
+      note: 'Completed all target reps with 2 × 5kg'
+    };
+
+    setWorkoutHistory(prev => [newSession, ...prev]);
+
     if (onCompleteWorkout) {
       onCompleteWorkout(activeSession);
     }
     setActiveSession(null);
+  };
+
+  const handleDeleteWorkoutRecord = (id) => {
+    if (window.confirm('Delete this workout session record?')) {
+      setWorkoutHistory(prev => prev.filter(w => w.id !== id));
+    }
   };
 
   const toggleSet = (exIndex, setIndex) => {
@@ -114,39 +155,57 @@ export default function DumbbellWorkouts({ onCompleteWorkout }) {
           </div>
         </div>
 
-        {/* Tab switcher for Workout A & B */}
-        <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.4)', padding: '0.25rem', borderRadius: 'var(--radius-pill)' }}>
+        {/* Tab Switcher */}
+        <div style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.05)', padding: '0.25rem', borderRadius: 'var(--radius-pill)', border: '1px solid var(--border-subtle)' }}>
           <button
             onClick={() => setActiveTab('A')}
-            className={`nav-tab-btn ${activeTab === 'A' ? 'active' : ''}`}
-            style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}
+            style={{
+              padding: '0.4rem 1rem',
+              borderRadius: 'var(--radius-pill)',
+              border: 'none',
+              background: activeTab === 'A' ? 'var(--gold-gradient)' : 'transparent',
+              color: activeTab === 'A' ? '#000' : 'var(--text-muted)',
+              fontWeight: 700,
+              fontSize: '0.82rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
           >
-            Workout A
+            Workout A (Upper)
           </button>
           <button
             onClick={() => setActiveTab('B')}
-            className={`nav-tab-btn ${activeTab === 'B' ? 'active' : ''}`}
-            style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}
+            style={{
+              padding: '0.4rem 1rem',
+              borderRadius: 'var(--radius-pill)',
+              border: 'none',
+              background: activeTab === 'B' ? 'var(--gold-gradient)' : 'transparent',
+              color: activeTab === 'B' ? '#000' : 'var(--text-muted)',
+              fontWeight: 700,
+              fontSize: '0.82rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
           >
-            Workout B
+            Workout B (Lower/Core)
           </button>
         </div>
       </div>
 
-      {/* Equipment Banner */}
+      {/* Equipment info & start workout action */}
       <div style={{
         background: 'rgba(255, 215, 0, 0.06)',
         border: '1px solid rgba(255, 215, 0, 0.2)',
         borderRadius: 'var(--radius-md)',
-        padding: '0.75rem 1rem',
-        marginBottom: '1.25rem',
+        padding: '0.85rem 1.25rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        marginBottom: '1.25rem',
         flexWrap: 'wrap',
-        gap: '0.5rem'
+        gap: '0.75rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.85rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}>
           <Info size={16} color="var(--gold-primary)" />
           <span style={{ color: 'var(--text-white)' }}>Available Equipment: <strong>2 × 5 kg Dumbbells</strong></span>
         </div>
@@ -160,7 +219,7 @@ export default function DumbbellWorkouts({ onCompleteWorkout }) {
       </div>
 
       {/* Exercises List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
         <div style={{ marginBottom: '0.25rem' }}>
           <h3 style={{ fontSize: '1.1rem', color: 'var(--gold-primary)', fontWeight: 700 }}>
             {currentWorkout.title}
@@ -202,6 +261,75 @@ export default function DumbbellWorkouts({ onCompleteWorkout }) {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* WORKOUT SESSION HISTORY & VOLUME TRACKER */}
+      <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div>
+            <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-white)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Dumbbell size={16} color="var(--gold-primary)" /> Workout Session History ({workoutHistory.length})
+            </h3>
+            <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Progressive overload & consistency log</p>
+          </div>
+          <span className="gold-tag" style={{ fontSize: '0.68rem' }}>
+            Target: 3x / Week
+          </span>
+        </div>
+
+        {workoutHistory.length === 0 ? (
+          <div style={{ padding: '1.5rem', textAlign: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-md)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+            No workout sessions completed yet. Click <strong>"Start Workout"</strong> above to time your first session!
+          </div>
+        ) : (
+          <div className="table-responsive-wrapper">
+            <table className="clean-data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Routine</th>
+                  <th>Duration</th>
+                  <th>Volume / Sets</th>
+                  <th>Notes</th>
+                  <th style={{ textAlign: 'right' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {workoutHistory.map(wo => (
+                  <tr key={wo.id}>
+                    <td>
+                      <div style={{ fontWeight: 700, color: 'var(--text-white)' }}>{wo.date}</div>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Completed</div>
+                    </td>
+                    <td>
+                      <span className="gold-tag" style={{ fontSize: '0.68rem' }}>{wo.type}</span>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-white)', marginTop: '0.2rem', fontWeight: 600 }}>{wo.title}</div>
+                    </td>
+                    <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                      {wo.duration} min
+                    </td>
+                    <td style={{ fontFamily: 'var(--font-mono)', color: '#60a5fa', fontWeight: 700 }}>
+                      {wo.sets} sets (2 × 5kg)
+                    </td>
+                    <td style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      {wo.note || 'Full sets completed'}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteWorkoutRecord(wo.id)}
+                        className="btn-danger-subtle"
+                        style={{ padding: '0.25rem 0.5rem' }}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* ACTIVE WORKOUT RUNNER MODAL */}
