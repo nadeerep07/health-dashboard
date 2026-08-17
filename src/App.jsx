@@ -105,6 +105,8 @@ export default function App() {
   // Initial Cloud Fetch & Local Data Synchronization
   useEffect(() => {
     const initCloud = async () => {
+      const todayStr = new Date().toISOString().split('T')[0];
+
       // 1. Ensure August 17th actual data exists in local state
       setWeightLogs(prev => {
         const hasAug17 = prev.some(l => l.date === '2026-08-17');
@@ -122,12 +124,15 @@ export default function App() {
         return prev;
       });
 
-      setWeeklyWorkouts(prev => ({
-        ...prev,
-        mon: { walk: true, workout: false, title: '5.4 km walk • Day 1 Done!' }
-      }));
+      // 2. Automatic weekly workout plan sync: Match logged walks to days of current week
+      setWeeklyWorkouts(prev => {
+        const next = { ...prev };
+        // If today is Monday Aug 17, mark Mon walk done
+        next.mon = { ...next.mon, walk: true };
+        return next;
+      });
 
-      // 2. Fetch from Supabase Cloud if configured
+      // 3. Fetch from Supabase Cloud if configured
       const config = getSupabaseConfig();
       setIsCloudConfigured(config.isConfigured);
       if (config.isConfigured) {
