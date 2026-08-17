@@ -193,19 +193,24 @@ export async function estimateNutritionWithAI(inputString) {
   }
 
   // 2. Intelligent Offline Fallback Engine with Fuzzy Match and Multi-item Support
-  const rawQuery = inputString.toLowerCase().trim();
+  const rawQuery = inputString
+    .replace(/\b(?:overall|approx|total|of lunch|for lunch|of dinner|for dinner|of breakfast|for breakfast)\b/gi, '')
+    .toLowerCase()
+    .trim();
+
   let totalCalories = 0;
   let totalProtein = 0;
   let totalCarbs = 0;
   let totalFat = 0;
   let tips = [];
+  const matchedDishes = new Set();
 
-  // Split by comma, 'and', '+', '&', '\n'
-  const subQueries = rawQuery.split(/,|\band\b|\+|\&|\n/);
+  // Split by comma, 'and', '+', '&', '\n', 'with', 'contains', 'also called', 'or'
+  const subQueries = rawQuery.split(/,|\band\b|\+|\&|\n|\bwith\b|\bcontains\b|\balso called\b|\bor\b/i);
 
   for (const part of subQueries) {
     const cleanPart = sanitizeFoodInput(part);
-    if (!cleanPart) continue;
+    if (!cleanPart || cleanPart.length < 2) continue;
 
     // Detect portion/quantity
     let quantity = 1;
