@@ -12,6 +12,27 @@ const STORAGE_KEYS = {
   WATER_INTAKE: 'transformation_water_intake',
   DASHBOARD_PIN: 'transformation_dashboard_pin',
   DEVICE_AUTH_EXPIRY: 'transformation_auth_expiry',
+  FOOD_LOGS: 'transformation_food_logs',
+};
+
+// Initial default daily food logs
+const DEFAULT_FOOD_LOGS = {
+  breakfast: [
+    { id: 'f-1', name: '2 Dosa with Green Peas Curry', calories: 355, protein: 11.4, carbs: 60.0, fat: 8.5, time: '08:45 AM' },
+    { id: 'f-2', name: '2 Whole Boiled Eggs', calories: 148, protein: 12.6, carbs: 0.8, fat: 10.0, time: '09:00 AM' }
+  ],
+  lunch: [
+    { id: 'f-3', name: '180g Matta Rice + 140g Fish Curry', calories: 425, protein: 32.2, carbs: 52.0, fat: 8.2, time: '01:30 PM' },
+    { id: 'f-4', name: 'Mixed Vegetable Salad & Thoran', calories: 120, protein: 3.7, carbs: 15.0, fat: 4.8, time: '01:45 PM' }
+  ],
+  snack: [
+    { id: 'f-5', name: '100g Pomegranate + 100g Grapes', calories: 152, protein: 2.4, carbs: 37.0, fat: 1.4, time: '04:45 PM' },
+    { id: 'f-6', name: 'Black Coffee (No Sugar)', calories: 2, protein: 0.2, carbs: 0.2, fat: 0.0, time: '05:00 PM' }
+  ],
+  dinner: [
+    { id: 'f-7', name: '2 Whole Wheat Chapati', calories: 190, protein: 6.4, carbs: 36.0, fat: 3.0, time: '08:15 PM' },
+    { id: 'f-8', name: '180g Cooked Chicken Breast Curry', calories: 297, protein: 42.0, carbs: 4.0, fat: 12.0, time: '08:30 PM' }
+  ]
 };
 
 // Initial default water intake (in ml)
@@ -124,4 +145,5 @@ export {
   DEFAULT_MEASUREMENTS,
   DEFAULT_NIGHT_ROUTINE,
   DEFAULT_WATER_INTAKE,
+  DEFAULT_FOOD_LOGS,
 };

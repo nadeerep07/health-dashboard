@@ -9,6 +9,7 @@ import {
   DEFAULT_MEASUREMENTS,
   DEFAULT_NIGHT_ROUTINE,
   DEFAULT_WATER_INTAKE,
+  DEFAULT_FOOD_LOGS,
   getStoredData,
   setStoredData
 } from './utils/storage';
@@ -55,7 +56,8 @@ import {
   ChevronRight,
   Plus,
   Flame,
-  CheckCircle2
+  CheckCircle2,
+  Beef
 } from 'lucide-react';
 
 const MASTER_PIN = import.meta.env.VITE_MASTER_PIN || '68356';
@@ -77,6 +79,7 @@ export default function App() {
   const [sleepLogs, setSleepLogs] = useState(() => getStoredData(STORAGE_KEYS.SLEEP_LOGS, DEFAULT_SLEEP_LOGS));
   const [nightRoutine, setNightRoutine] = useState(() => getStoredData(STORAGE_KEYS.NIGHT_ROUTINE, DEFAULT_NIGHT_ROUTINE));
   const [measurements, setMeasurements] = useState(() => getStoredData(STORAGE_KEYS.BODY_MEASUREMENTS, DEFAULT_MEASUREMENTS));
+  const [foodLogs, setFoodLogs] = useState(() => getStoredData(STORAGE_KEYS.FOOD_LOGS, DEFAULT_FOOD_LOGS));
 
   // Active screen state: 'home', 'walk', 'workout', 'nutrition', 'hydration', 'progress', 'sleep'
   const [activeScreen, setActiveScreen] = useState('home');
@@ -97,6 +100,7 @@ export default function App() {
   useEffect(() => setStoredData(STORAGE_KEYS.SLEEP_LOGS, sleepLogs), [sleepLogs]);
   useEffect(() => setStoredData(STORAGE_KEYS.NIGHT_ROUTINE, nightRoutine), [nightRoutine]);
   useEffect(() => setStoredData(STORAGE_KEYS.BODY_MEASUREMENTS, measurements), [measurements]);
+  useEffect(() => setStoredData(STORAGE_KEYS.FOOD_LOGS, foodLogs), [foodLogs]);
 
   // Initial Cloud Fetch on Mount (if Supabase is configured)
   useEffect(() => {
@@ -115,6 +119,7 @@ export default function App() {
           if (cloudData.sleepLogs) setSleepLogs(cloudData.sleepLogs);
           if (cloudData.nightRoutine) setNightRoutine(cloudData.nightRoutine);
           if (cloudData.measurements) setMeasurements(cloudData.measurements);
+          if (cloudData.foodLogs) setFoodLogs(cloudData.foodLogs);
           if (cloudData.customPin) {
             setDashboardPin(cloudData.customPin);
             setStoredData(STORAGE_KEYS.DASHBOARD_PIN, cloudData.customPin);
@@ -145,6 +150,7 @@ export default function App() {
         sleepLogs,
         nightRoutine,
         measurements,
+        foodLogs,
         customPin: dashboardPin,
       };
       await saveCloudDashboardData(payload);
@@ -154,7 +160,7 @@ export default function App() {
     return () => {
       if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
     };
-  }, [weightLogs, habits, waterData, weeklyWorkouts, walkingLogs, sleepLogs, nightRoutine, measurements, dashboardPin]);
+  }, [weightLogs, habits, waterData, weeklyWorkouts, walkingLogs, sleepLogs, nightRoutine, measurements, foodLogs, dashboardPin]);
 
   // PIN Lock Handlers
   const handleUnlock = (rememberDevice) => {
@@ -179,6 +185,7 @@ export default function App() {
       sleepLogs,
       nightRoutine,
       measurements,
+      foodLogs,
       customPin: newPin,
     };
     saveCloudDashboardData(payload);
@@ -200,6 +207,7 @@ export default function App() {
       sleepLogs,
       nightRoutine,
       measurements,
+      foodLogs,
       customPin: dashboardPin,
     };
     await saveCloudDashboardData(payload);
@@ -223,6 +231,7 @@ export default function App() {
       sleepLogs,
       nightRoutine,
       measurements,
+      foodLogs,
       exportDate: new Date().toISOString(),
     };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
@@ -250,6 +259,7 @@ export default function App() {
           if (json.sleepLogs) setSleepLogs(json.sleepLogs);
           if (json.nightRoutine) setNightRoutine(json.nightRoutine);
           if (json.measurements) setMeasurements(json.measurements);
+          if (json.foodLogs) setFoodLogs(json.foodLogs);
           alert('✓ Data restored successfully!');
           setShowSyncModal(false);
         } catch (err) {
@@ -366,6 +376,39 @@ export default function App() {
     });
   };
 
+  // Food Handlers
+  const handleAddFoodItem = (category, newItem) => {
+    setFoodLogs(prev => {
+      const updatedCat = [newItem, ...(prev[category] || [])];
+      const next = { ...prev, [category]: updatedCat };
+
+      const all = Object.values(next).flat();
+      const totalCal = all.reduce((sum, item) => sum + (Number(item.calories) || 0), 0);
+      const totalProt = all.reduce((sum, item) => sum + (Number(item.protein) || 0), 0);
+
+      if (totalCal >= 1900 && totalCal <= 2300) {
+        handleHabitSync('calories', true);
+      }
+      if (totalProt >= 120) {
+        handleHabitSync('protein', true);
+      }
+      return next;
+    });
+  };
+
+  const handleDeleteFoodItem = (category, itemId) => {
+    setFoodLogs(prev => ({
+      ...prev,
+      [category]: (prev[category] || []).filter(item => item.id !== itemId)
+    }));
+  };
+
+  const handleResetFoodLogs = () => {
+    setFoodLogs({ breakfast: [], lunch: [], snack: [], dinner: [] });
+    handleHabitSync('calories', false);
+    handleHabitSync('protein', false);
+  };
+
   const handleToggleNightRoutine = (id) => {
     setNightRoutine(prev => prev.map(item => item.id === id ? { ...item, completed: !item.completed } : item));
   };
@@ -401,6 +444,10 @@ export default function App() {
   const waterTargetL = ((waterData?.targetMl || 3500) / 1000).toFixed(1);
   const totalWeightLost = (110.25 - currentWeight).toFixed(2);
   const lastSleep = sleepLogs.length > 0 ? sleepLogs[sleepLogs.length - 1] : { duration: 8.0 };
+
+  const allFoodItems = Object.values(foodLogs).flat();
+  const totalTodayCalories = allFoodItems.reduce((sum, i) => sum + (Number(i.calories) || 0), 0);
+  const totalTodayProtein = allFoodItems.reduce((sum, i) => sum + (Number(i.protein) || 0), 0);
 
   return (
     <div className="app-container">
@@ -524,7 +571,7 @@ export default function App() {
             {/* Hero Transformation Progress */}
             <TransformationHero currentWeight={currentWeight} startWeight={110.25} targetWeight={100} />
 
-            {/* At-a-Glance Live Cards Grid (Tap any card to jump to its full screen) */}
+            {/* At-a-Glance Live Cards Grid */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                 <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-white)' }}>
@@ -553,7 +600,26 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 2. Hydration Glance */}
+                {/* 2. Nutrition Glance */}
+                <div className="home-quick-card" onClick={() => navigateToScreen('nutrition')}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="card-icon-pill" style={{ width: '28px', height: '28px', background: 'rgba(255, 215, 0, 0.15)', color: 'var(--gold-primary)', border: '1px solid rgba(255, 215, 0, 0.3)' }}>
+                      <Flame size={15} />
+                    </div>
+                    <ChevronRight size={15} color="var(--text-muted)" />
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Calories & Protein
+                  </div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--gold-primary)', fontFamily: 'var(--font-mono)' }}>
+                    {totalTodayCalories} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>/ 2100 kcal</span>
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#60a5fa', fontWeight: 600 }}>
+                    Protein: {totalTodayProtein.toFixed(1)}g / 130g
+                  </div>
+                </div>
+
+                {/* 3. Hydration Glance */}
                 <div className="home-quick-card" onClick={() => navigateToScreen('hydration')}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div className="card-icon-pill" style={{ width: '28px', height: '28px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
@@ -572,7 +638,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 3. Weight Glance */}
+                {/* 4. Weight Glance */}
                 <div className="home-quick-card" onClick={() => navigateToScreen('progress')}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div className="card-icon-pill" style={{ width: '28px', height: '28px' }}>
@@ -588,25 +654,6 @@ export default function App() {
                   </div>
                   <div style={{ fontSize: '0.7rem', color: 'var(--accent-green)', fontWeight: 600 }}>
                     {totalWeightLost > 0 ? `-${totalWeightLost} kg lost` : 'Baseline'}
-                  </div>
-                </div>
-
-                {/* 4. Sleep Glance */}
-                <div className="home-quick-card" onClick={() => navigateToScreen('sleep')}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div className="card-icon-pill" style={{ width: '28px', height: '28px', background: 'rgba(139, 92, 246, 0.1)', color: '#a78bfa', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
-                      <Moon size={15} />
-                    </div>
-                    <ChevronRight size={15} color="var(--text-muted)" />
-                  </div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
-                    Sleep Target
-                  </div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#c4b5fd', fontFamily: 'var(--font-mono)' }}>
-                    {lastSleep.duration} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>hrs</span>
-                  </div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                    Target: 11:30 PM
                   </div>
                 </div>
               </div>
@@ -644,7 +691,12 @@ export default function App() {
         {/* ================= SCREEN 4: NUTRITION ================= */}
         {activeScreen === 'nutrition' && (
           <>
-            <NutritionDashboard />
+            <NutritionDashboard 
+              foodLogs={foodLogs}
+              onAddFoodItem={handleAddFoodItem}
+              onDeleteFoodItem={handleDeleteFoodItem}
+              onResetFoodLogs={handleResetFoodLogs}
+            />
             <SugarCutTracker />
           </>
         )}
