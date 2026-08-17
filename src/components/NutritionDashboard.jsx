@@ -634,83 +634,97 @@ export default function NutritionDashboard({
         </span>
       </div>
 
-      {/* Historical Days Summary */}
+      {/* Historical Days Summary - Scalable Responsive Cards */}
       {recordedDates.length > 0 && (
         <div style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.75rem' }}>
             <History size={16} color="var(--gold-primary)" />
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-white)' }}>
-              Past Days Nutrition Records
+            <h3 style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-white)' }}>
+              Past Days Nutrition Records ({recordedDates.length} days logged)
             </h3>
           </div>
 
-          <div className="table-responsive-wrapper">
-            <table className="clean-data-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Total Calories</th>
-                  <th>Protein</th>
-                  <th>Deficit Status</th>
-                  <th style={{ textAlign: 'right' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recordedDates.map(dateKey => {
-                  const dayObj = foodLogs[dateKey] || {};
-                  const dayItems = [
-                    ...(dayObj.breakfast || []),
-                    ...(dayObj.lunch || []),
-                    ...(dayObj.snack || []),
-                    ...(dayObj.dinner || [])
-                  ];
-                  const dayCal = dayItems.reduce((sum, i) => sum + (Number(i.calories) || 0), 0);
-                  const dayProt = dayItems.reduce((sum, i) => sum + (Number(i.protein) || 0), 0);
-                  const isDeficit = dayCal > 0 && dayCal <= 2200;
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {recordedDates.map(dateKey => {
+              const dayObj = foodLogs[dateKey] || {};
+              const dayItems = [
+                ...(dayObj.breakfast || []),
+                ...(dayObj.lunch || []),
+                ...(dayObj.snack || []),
+                ...(dayObj.dinner || [])
+              ];
+              const dayCal = dayItems.reduce((sum, i) => sum + (Number(i.calories) || 0), 0);
+              const dayProt = dayItems.reduce((sum, i) => sum + (Number(i.protein) || 0), 0);
+              const isDeficit = dayCal > 0 && dayCal <= 2200;
+              const isCurrentSelected = selectedDate === dateKey;
 
-                  return (
-                    <tr key={dateKey} style={{ background: selectedDate === dateKey ? 'rgba(255, 215, 0, 0.06)' : 'transparent' }}>
-                      <td>
-                        <div style={{ fontWeight: 700, color: 'var(--text-white)' }}>{formatDateDisplay(dateKey)}</div>
-                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{dayItems.length} items logged</div>
-                      </td>
-                      <td>
-                        <span style={{ fontWeight: 800, color: 'var(--gold-primary)', fontFamily: 'var(--font-mono)' }}>
-                          {dayCal} kcal
+              return (
+                <div 
+                  key={dateKey} 
+                  style={{
+                    background: isCurrentSelected ? 'rgba(255, 215, 0, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+                    border: isCurrentSelected ? '1px solid rgba(255, 215, 0, 0.35)' : '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '0.85rem 1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '0.6rem',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <div style={{ minWidth: '130px' }}>
+                    <div style={{ fontWeight: 800, color: 'var(--text-white)', fontSize: '0.9rem' }}>
+                      {formatDateDisplay(dateKey)}
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                      {dayItems.length} items logged
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.4)', padding: '0.25rem 0.6rem', borderRadius: 'var(--radius-xs)', fontSize: '0.78rem' }}>
+                      <span style={{ color: 'var(--gold-primary)', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
+                        {dayCal} kcal
+                      </span>
+                    </div>
+
+                    <div style={{ background: 'rgba(0,0,0,0.4)', padding: '0.25rem 0.6rem', borderRadius: 'var(--radius-xs)', fontSize: '0.78rem' }}>
+                      <span style={{ color: '#60a5fa', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
+                        {dayProt.toFixed(1)}g P
+                      </span>
+                    </div>
+
+                    <div>
+                      {dayCal === 0 ? (
+                        <span style={{ color: 'var(--text-dim)', fontSize: '0.72rem' }}>No data</span>
+                      ) : isDeficit ? (
+                        <span style={{ color: 'var(--accent-green)', fontWeight: 700, fontSize: '0.72rem', background: 'rgba(16, 185, 129, 0.12)', padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-pill)' }}>
+                          ✓ Deficit Met
                         </span>
-                      </td>
-                      <td>
-                        <span style={{ fontWeight: 700, color: '#60a5fa', fontFamily: 'var(--font-mono)' }}>
-                          {dayProt.toFixed(1)}g
+                      ) : (
+                        <span style={{ color: '#f87171', fontWeight: 700, fontSize: '0.72rem', background: 'rgba(239, 68, 68, 0.12)', padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-pill)' }}>
+                          Over Budget
                         </span>
-                      </td>
-                      <td>
-                        {dayCal === 0 ? (
-                          <span style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>No data</span>
-                        ) : isDeficit ? (
-                          <span style={{ color: 'var(--accent-green)', fontWeight: 700, fontSize: '0.75rem' }}>✓ Deficit Met</span>
-                        ) : (
-                          <span style={{ color: '#f87171', fontWeight: 700, fontSize: '0.75rem' }}>Over Budget</span>
-                        )}
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedDate(dateKey);
-                            window.scrollTo({ top: 300, behavior: 'smooth' });
-                          }}
-                          className="btn-secondary"
-                          style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
-                        >
-                          {selectedDate === dateKey ? 'Active' : 'View / Edit'}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedDate(dateKey);
+                        window.scrollTo({ top: 300, behavior: 'smooth' });
+                      }}
+                      className={isCurrentSelected ? 'btn-gold' : 'btn-secondary'}
+                      style={{ padding: '0.35rem 0.75rem', fontSize: '0.72rem', marginLeft: 'auto' }}
+                    >
+                      {isCurrentSelected ? 'Viewing' : 'View / Edit'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
