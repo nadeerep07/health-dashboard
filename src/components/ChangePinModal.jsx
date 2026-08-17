@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { KeyRound, Check, X, ShieldCheck, AlertCircle, Lock } from 'lucide-react';
 
 export default function ChangePinModal({ isOpen, onClose, currentPin, onChangePin }) {
@@ -7,6 +7,16 @@ export default function ChangePinModal({ isOpen, onClose, currentPin, onChangePi
   const [confirmPin, setConfirmPin] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -43,12 +53,21 @@ export default function ChangePinModal({ isOpen, onClose, currentPin, onChangePi
       setConfirmPin('');
       setSuccessMsg('');
       onClose();
-    }, 1500);
+    }, 800);
+  };
+
+  const handleCancel = () => {
+    setOldPin('');
+    setNewPin('');
+    setConfirmPin('');
+    setErrorMsg('');
+    setSuccessMsg('');
+    onClose();
   };
 
   return (
-    <div className="modal-overlay" style={{ zIndex: 300 }}>
-      <div className="modal-content" style={{ maxWidth: '440px' }}>
+    <div className="modal-overlay" style={{ zIndex: 300 }} onClick={handleCancel}>
+      <div className="modal-content" style={{ maxWidth: '440px' }} onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
@@ -66,7 +85,12 @@ export default function ChangePinModal({ isOpen, onClose, currentPin, onChangePi
             </div>
           </div>
 
-          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+          <button 
+            type="button"
+            onClick={handleCancel} 
+            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.2rem' }}
+            aria-label="Close"
+          >
             <X size={20} />
           </button>
         </div>
@@ -103,21 +127,20 @@ export default function ChangePinModal({ isOpen, onClose, currentPin, onChangePi
             alignItems: 'center',
             gap: '0.5rem'
           }}>
-            <ShieldCheck size={15} />
+            <Check size={15} />
             <span>{successMsg}</span>
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
+            <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
               Current Passcode
             </label>
             <input
               type="password"
               inputMode="numeric"
-              placeholder="Enter current passcode"
+              placeholder="Enter current PIN"
               className="form-input"
               value={oldPin}
               onChange={(e) => setOldPin(e.target.value)}
@@ -126,13 +149,13 @@ export default function ChangePinModal({ isOpen, onClose, currentPin, onChangePi
           </div>
 
           <div>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
-              New Passcode (4 to 8 digits)
+            <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
+              New Passcode (4–8 digits)
             </label>
             <input
               type="password"
               inputMode="numeric"
-              placeholder="e.g. 68356"
+              placeholder="Enter new PIN"
               className="form-input"
               value={newPin}
               onChange={(e) => setNewPin(e.target.value)}
@@ -141,13 +164,13 @@ export default function ChangePinModal({ isOpen, onClose, currentPin, onChangePi
           </div>
 
           <div>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
+            <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
               Confirm New Passcode
             </label>
             <input
               type="password"
               inputMode="numeric"
-              placeholder="Re-enter new passcode"
+              placeholder="Confirm new PIN"
               className="form-input"
               value={confirmPin}
               onChange={(e) => setConfirmPin(e.target.value)}
@@ -156,15 +179,14 @@ export default function ChangePinModal({ isOpen, onClose, currentPin, onChangePi
           </div>
 
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-            <button type="button" onClick={onClose} className="btn-secondary" style={{ flex: 1 }}>
+            <button type="button" onClick={handleCancel} className="btn-secondary" style={{ flex: 1 }}>
               Cancel
             </button>
-            <button type="submit" className="btn-gold" style={{ flex: 1.5 }}>
-              <Check size={16} /> Save Passcode
+            <button type="submit" className="btn-gold" style={{ flex: 1 }}>
+              Update PIN
             </button>
           </div>
         </form>
-
       </div>
     </div>
   );

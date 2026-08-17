@@ -389,11 +389,20 @@ export default function WaterIntakeCalculator({ waterData, onUpdateWater, onHabi
 
       {/* Custom Amount Modal */}
       {showCustomModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-white)', marginBottom: '1rem' }}>
-              Log Custom Water Amount
-            </h3>
+        <div className="modal-overlay" onClick={() => setShowCustomModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-white)' }}>
+                Log Custom Water Amount
+              </h3>
+              <button 
+                type="button" 
+                onClick={() => setShowCustomModal(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.2rem' }}
+              >
+                ✕
+              </button>
+            </div>
             <form onSubmit={handleCustomSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem' }}>
@@ -423,7 +432,7 @@ export default function WaterIntakeCalculator({ waterData, onUpdateWater, onHabi
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
                 <button type="button" onClick={() => setShowCustomModal(false)} className="btn-secondary" style={{ flex: 1 }}>
                   Cancel
                 </button>

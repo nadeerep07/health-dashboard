@@ -38,7 +38,25 @@ import SupabaseSyncModal from './components/SupabaseSyncModal';
 import PinLockScreen from './components/PinLockScreen';
 import ChangePinModal from './components/ChangePinModal';
 
-import { Flame, Shield, Trophy, Activity, Moon, Dumbbell, Utensils, Home, TrendingUp, Droplets, Cloud, Database, Lock, KeyRound } from 'lucide-react';
+import { 
+  Activity, 
+  Moon, 
+  Dumbbell, 
+  Utensils, 
+  Home, 
+  TrendingUp, 
+  Droplets, 
+  Cloud, 
+  Lock, 
+  KeyRound, 
+  Footprints,
+  Sparkles,
+  Layers,
+  ChevronRight,
+  Plus,
+  Flame,
+  CheckCircle2
+} from 'lucide-react';
 
 const MASTER_PIN = import.meta.env.VITE_MASTER_PIN || '68356';
 
@@ -60,7 +78,8 @@ export default function App() {
   const [nightRoutine, setNightRoutine] = useState(() => getStoredData(STORAGE_KEYS.NIGHT_ROUTINE, DEFAULT_NIGHT_ROUTINE));
   const [measurements, setMeasurements] = useState(() => getStoredData(STORAGE_KEYS.BODY_MEASUREMENTS, DEFAULT_MEASUREMENTS));
 
-  const [activeTab, setActiveTab] = useState('home');
+  // Active screen state: 'home', 'walk', 'workout', 'nutrition', 'hydration', 'progress', 'sleep'
+  const [activeScreen, setActiveScreen] = useState('home');
   const [showSyncModal, setShowSyncModal] = useState(false);
   const [showChangePinModal, setShowChangePinModal] = useState(false);
   const [syncStatus, setSyncStatus] = useState('idle'); // 'idle', 'syncing', 'saved'
@@ -141,7 +160,6 @@ export default function App() {
   const handleUnlock = (rememberDevice) => {
     setIsLocked(false);
     if (rememberDevice) {
-      // 30 days expiry
       const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
       setStoredData(STORAGE_KEYS.DEVICE_AUTH_EXPIRY, expiry);
     } else {
@@ -152,7 +170,6 @@ export default function App() {
   const handleChangePin = (newPin) => {
     setDashboardPin(newPin);
     setStoredData(STORAGE_KEYS.DASHBOARD_PIN, newPin);
-    // Cloud sync new PIN immediately
     const payload = {
       weightLogs,
       habits,
@@ -244,7 +261,8 @@ export default function App() {
   };
 
   // Current weight derived state
-  const currentWeight = weightLogs.length > 0 ? weightLogs[weightLogs.length - 1].weight : 110.25;
+  const sortedWeightLogs = [...weightLogs].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const currentWeight = sortedWeightLogs.length > 0 ? sortedWeightLogs[sortedWeightLogs.length - 1].weight : 110.25;
 
   // Habit & Activity Handlers
   const handleToggleHabit = (id) => {
@@ -284,38 +302,77 @@ export default function App() {
     }
   };
 
+  // Walk Handlers
   const handleAddWalkLog = (newLog) => {
-    setWalkingLogs(prev => [...prev.slice(1), newLog]);
+    setWalkingLogs(prev => [...prev, newLog]);
     const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     const todayId = dayNames[new Date().getDay()];
     setWeeklyWorkouts(prev => ({
       ...prev,
       [todayId]: { ...prev[todayId], walk: true }
     }));
+    handleHabitSync('walk', true);
   };
 
+  const handleDeleteWalkLog = (idOrIdx) => {
+    setWalkingLogs(prev => {
+      if (typeof idOrIdx === 'string') {
+        return prev.filter(item => item.id !== idOrIdx);
+      }
+      return prev.filter((_, idx) => idx !== idOrIdx);
+    });
+  };
+
+  // Weight Handlers
   const handleAddWeightLog = (newEntry) => {
     setWeightLogs(prev => [...prev, newEntry]);
   };
 
+  const handleDeleteWeightLog = (idOrIdx) => {
+    setWeightLogs(prev => {
+      if (typeof idOrIdx === 'string') {
+        return prev.filter(item => item.id !== idOrIdx);
+      }
+      return prev.filter((_, idx) => idx !== idOrIdx);
+    });
+  };
+
+  // Measurement Handlers
   const handleAddMeasurement = (newEntry) => {
     setMeasurements(prev => [...prev, newEntry]);
   };
 
+  const handleDeleteMeasurement = (idOrIdx) => {
+    setMeasurements(prev => {
+      if (typeof idOrIdx === 'string') {
+        return prev.filter(item => item.id !== idOrIdx);
+      }
+      return prev.filter((_, idx) => idx !== idOrIdx);
+    });
+  };
+
+  // Sleep Handlers
   const handleLogSleep = (newSleep) => {
-    setSleepLogs(prev => [...prev.slice(1), newSleep]);
+    setSleepLogs(prev => [...prev, newSleep]);
+    handleHabitSync('sleep', true);
+  };
+
+  const handleDeleteSleepLog = (idOrIdx) => {
+    setSleepLogs(prev => {
+      if (typeof idOrIdx === 'string') {
+        return prev.filter(item => item.id !== idOrIdx);
+      }
+      return prev.filter((_, idx) => idx !== idOrIdx);
+    });
   };
 
   const handleToggleNightRoutine = (id) => {
     setNightRoutine(prev => prev.map(item => item.id === id ? { ...item, completed: !item.completed } : item));
   };
 
-  const scrollToSection = (sectionId, tabName) => {
-    setActiveTab(tabName);
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const navigateToScreen = (screenId) => {
+    setActiveScreen(screenId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // If app is locked, display the Apple-style PIN screen
@@ -328,65 +385,78 @@ export default function App() {
     );
   }
 
+  const screenNavigationTabs = [
+    { id: 'home', label: 'Overview', icon: Home },
+    { id: 'walk', label: 'Walk', icon: Footprints },
+    { id: 'workout', label: 'Workouts', icon: Dumbbell },
+    { id: 'nutrition', label: 'Nutrition', icon: Utensils },
+    { id: 'hydration', label: 'Hydration', icon: Droplets },
+    { id: 'progress', label: 'Progress', icon: TrendingUp },
+    { id: 'sleep', label: 'Sleep', icon: Moon },
+  ];
+
+  // Derive stats for Home Screen Live Glance Cards
+  const totalWalkKm = walkingLogs.reduce((sum, l) => sum + (Number(l.distance) || 0), 0).toFixed(1);
+  const waterConsumedL = ((waterData?.consumedMl || 0) / 1000).toFixed(2);
+  const waterTargetL = ((waterData?.targetMl || 3500) / 1000).toFixed(1);
+  const totalWeightLost = (110.25 - currentWeight).toFixed(2);
+  const lastSleep = sleepLogs.length > 0 ? sleepLogs[sleepLogs.length - 1] : { duration: 8.0 };
+
   return (
     <div className="app-container">
       {/* Top Header / Branding */}
       <header className="top-header">
         <div className="top-header-content">
-          <div className="brand-badge">
+          <div className="brand-badge" onClick={() => navigateToScreen('home')}>
             <div className="brand-icon">
-              <Activity size={22} strokeWidth={2.5} />
+              <Activity size={20} strokeWidth={2.5} />
             </div>
-            <div>
-              <div className="brand-title">TRANSFORMATION DASHBOARD</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Target: 100 KG • Dec 31, 2026</div>
+            <div className="brand-text-block">
+              <div className="brand-title">APEX 100</div>
+              <div className="brand-subtext">Target: 100 KG • Dec 31</div>
             </div>
           </div>
 
-          {/* Desktop Tab Navigation + Supabase Cloud Button + Change PIN + Lock Button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <nav className="nav-desktop-tabs">
-              <button onClick={() => scrollToSection('hero-section', 'home')} className={`nav-tab-btn ${activeTab === 'home' ? 'active' : ''}`}>
-                <Home size={15} /> Overview
-              </button>
-              <button onClick={() => scrollToSection('weekly-plan', 'workout')} className={`nav-tab-btn ${activeTab === 'workout' ? 'active' : ''}`}>
-                <Dumbbell size={15} /> Workouts
-              </button>
-              <button onClick={() => scrollToSection('water-calculator', 'hydration')} className={`nav-tab-btn ${activeTab === 'hydration' ? 'active' : ''}`}>
-                <Droplets size={15} /> Hydration
-              </button>
-              <button onClick={() => scrollToSection('nutrition-dashboard', 'nutrition')} className={`nav-tab-btn ${activeTab === 'nutrition' ? 'active' : ''}`}>
-                <Utensils size={15} /> Nutrition
-              </button>
-              <button onClick={() => scrollToSection('weight-chart', 'progress')} className={`nav-tab-btn ${activeTab === 'progress' ? 'active' : ''}`}>
-                <TrendingUp size={15} /> Progress
-              </button>
-              <button onClick={() => scrollToSection('sleep-recovery', 'sleep')} className={`nav-tab-btn ${activeTab === 'sleep' ? 'active' : ''}`}>
-                <Moon size={15} /> Sleep
-              </button>
-            </nav>
+          {/* Desktop Tab Navigation (Dedicated Screen Tabs) */}
+          <nav className="nav-desktop-tabs">
+            {screenNavigationTabs.map(tab => {
+              const Icon = tab.icon;
+              const isActive = activeScreen === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => navigateToScreen(tab.id)}
+                  className={`nav-tab-btn ${isActive ? 'active' : ''}`}
+                >
+                  <Icon size={14} /> <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
 
-            {/* Cloud Storage Connect Button */}
+          {/* Header Action Buttons (Sync, PIN, Lock) */}
+          <div className="header-actions">
+            {/* Cloud Sync Button */}
             <button
               onClick={() => setShowSyncModal(true)}
               style={{
                 background: isCloudConfigured ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255, 215, 0, 0.1)',
                 border: isCloudConfigured ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid rgba(255, 215, 0, 0.3)',
                 color: isCloudConfigured ? '#34d399' : 'var(--gold-primary)',
-                padding: '0.42rem 0.8rem',
+                padding: '0.38rem 0.65rem',
                 borderRadius: 'var(--radius-pill)',
-                fontSize: '0.78rem',
+                fontSize: '0.75rem',
                 fontWeight: 700,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.35rem',
+                gap: '0.3rem',
                 transition: 'all 0.2s ease'
               }}
               title="Configure Supabase Cloud Sync"
             >
               <Cloud size={14} />
-              <span>{isCloudConfigured ? (syncStatus === 'syncing' ? 'Syncing...' : 'Cloud Synced') : 'Connect Cloud'}</span>
+              <span>{isCloudConfigured ? (syncStatus === 'syncing' ? 'Syncing...' : 'Synced') : 'Cloud'}</span>
             </button>
 
             {/* Change PIN Button */}
@@ -394,12 +464,12 @@ export default function App() {
               onClick={() => setShowChangePinModal(true)}
               className="btn-secondary"
               style={{
-                padding: '0.42rem 0.75rem',
-                fontSize: '0.78rem',
+                padding: '0.38rem 0.65rem',
+                fontSize: '0.75rem',
                 borderRadius: 'var(--radius-pill)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.35rem'
+                gap: '0.3rem'
               }}
               title="Change Passcode"
             >
@@ -412,12 +482,12 @@ export default function App() {
               onClick={handleLockNow}
               className="btn-secondary"
               style={{
-                padding: '0.42rem 0.75rem',
-                fontSize: '0.78rem',
+                padding: '0.38rem 0.65rem',
+                fontSize: '0.75rem',
                 borderRadius: 'var(--radius-pill)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.35rem'
+                gap: '0.3rem'
               }}
               title="Lock Dashboard Now"
             >
@@ -428,58 +498,198 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Dashboard Content */}
-      <main className="dashboard-body">
-        {/* 1. HERO / TRANSFORMATION HEADER */}
-        <TransformationHero currentWeight={currentWeight} startWeight={110.25} targetWeight={100} />
+      {/* Screen Switcher Bar for Mobile & Tablet */}
+      <div className="category-pill-bar">
+        {screenNavigationTabs.map(tab => {
+          const Icon = tab.icon;
+          const isActive = activeScreen === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => navigateToScreen(tab.id)}
+              className={`category-pill ${isActive ? 'active' : ''}`}
+            >
+              <Icon size={14} />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
 
-        {/* 2. DAILY HABITS */}
-        <DailyHabits habits={habits} onToggleHabit={handleToggleHabit} onResetHabits={handleResetHabits} />
+      {/* MAIN DEDICATED SCREEN VIEW */}
+      <main className="dashboard-screen">
+        {/* ================= SCREEN 1: HOME / OVERVIEW ================= */}
+        {activeScreen === 'home' && (
+          <>
+            {/* Hero Transformation Progress */}
+            <TransformationHero currentWeight={currentWeight} startWeight={110.25} targetWeight={100} />
 
-        {/* WATER DRINKING CALCULATOR */}
-        <WaterIntakeCalculator waterData={waterData} onUpdateWater={handleUpdateWater} onHabitSync={handleHabitSync} />
+            {/* At-a-Glance Live Cards Grid (Tap any card to jump to its full screen) */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-white)' }}>
+                  Today's Live Glance
+                </h3>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Tap to open full screen</span>
+              </div>
 
-        {/* 3. WEEKLY WORKOUT PLAN */}
-        <WeeklyPlan weeklyData={weeklyWorkouts} onToggleWeeklyTask={handleToggleWeeklyTask} />
+              <div className="home-quick-cards-grid">
+                {/* 1. Walk Glance */}
+                <div className="home-quick-card" onClick={() => navigateToScreen('walk')}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="card-icon-pill" style={{ width: '28px', height: '28px' }}>
+                      <Footprints size={15} />
+                    </div>
+                    <ChevronRight size={15} color="var(--text-muted)" />
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Walking
+                  </div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--gold-primary)', fontFamily: 'var(--font-mono)' }}>
+                    5.0 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>km goal</span>
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--accent-green)', fontWeight: 600 }}>
+                    Total: {totalWalkKm} km recorded
+                  </div>
+                </div>
 
-        {/* 4. HOME DUMBBELL WORKOUTS */}
-        <DumbbellWorkouts onCompleteWorkout={handleCompleteDumbbellWorkout} />
+                {/* 2. Hydration Glance */}
+                <div className="home-quick-card" onClick={() => navigateToScreen('hydration')}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="card-icon-pill" style={{ width: '28px', height: '28px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                      <Droplets size={15} />
+                    </div>
+                    <ChevronRight size={15} color="var(--text-muted)" />
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Water Intake
+                  </div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>
+                    {waterConsumedL} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>/ {waterTargetL}L</span>
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: Number(waterConsumedL) >= 3 ? 'var(--accent-green)' : 'var(--text-muted)', fontWeight: 600 }}>
+                    {Number(waterConsumedL) >= 3 ? '✓ Daily Goal Met' : `${(3.5 - Number(waterConsumedL)).toFixed(1)}L remaining`}
+                  </div>
+                </div>
 
-        {/* 5. WALKING TRACKER */}
-        <WalkingTracker walkingLogs={walkingLogs} onAddWalkLog={handleAddWalkLog} />
+                {/* 3. Weight Glance */}
+                <div className="home-quick-card" onClick={() => navigateToScreen('progress')}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="card-icon-pill" style={{ width: '28px', height: '28px' }}>
+                      <TrendingUp size={15} />
+                    </div>
+                    <ChevronRight size={15} color="var(--text-muted)" />
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Weight Progress
+                  </div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)' }}>
+                    {currentWeight.toFixed(2)} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>kg</span>
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--accent-green)', fontWeight: 600 }}>
+                    {totalWeightLost > 0 ? `-${totalWeightLost} kg lost` : 'Baseline'}
+                  </div>
+                </div>
 
-        {/* 6 & 7. NUTRITION DASHBOARD & FLEXIBLE FOODS */}
-        <NutritionDashboard />
+                {/* 4. Sleep Glance */}
+                <div className="home-quick-card" onClick={() => navigateToScreen('sleep')}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="card-icon-pill" style={{ width: '28px', height: '28px', background: 'rgba(139, 92, 246, 0.1)', color: '#a78bfa', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+                      <Moon size={15} />
+                    </div>
+                    <ChevronRight size={15} color="var(--text-muted)" />
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Sleep Target
+                  </div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#c4b5fd', fontFamily: 'var(--font-mono)' }}>
+                    {lastSleep.duration} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>hrs</span>
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                    Target: 11:30 PM
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        {/* 8. SUGAR CUT TRACKER */}
-        <SugarCutTracker />
+            {/* Daily Habits Checklist */}
+            <DailyHabits habits={habits} onToggleHabit={handleToggleHabit} onResetHabits={handleResetHabits} />
 
-        {/* 9. WEIGHT PROGRESS CHART */}
-        <WeightProgressChart weightLogs={weightLogs} onAddWeightLog={handleAddWeightLog} targetWeight={100} />
+            {/* Milestones & Motivation */}
+            <Milestones currentWeight={currentWeight} />
+            <MotivationAndRules />
+            <DisclaimerFooter />
+          </>
+        )}
 
-        {/* 10. BODY TRANSFORMATION TRACKER */}
-        <BodyTransformationTracker measurements={measurements} onAddMeasurement={handleAddMeasurement} />
+        {/* ================= SCREEN 2: WALKING ================= */}
+        {activeScreen === 'walk' && (
+          <>
+            <WalkingTracker 
+              walkingLogs={walkingLogs} 
+              onAddWalkLog={handleAddWalkLog} 
+              onDeleteWalkLog={handleDeleteWalkLog}
+            />
+          </>
+        )}
 
-        {/* SLEEP & RECOVERY TRACKER */}
-        <SleepRecoveryTracker 
-          sleepLogs={sleepLogs} 
-          nightRoutine={nightRoutine} 
-          onToggleNightRoutine={handleToggleNightRoutine} 
-          onLogSleep={handleLogSleep} 
-        />
+        {/* ================= SCREEN 3: WORKOUTS ================= */}
+        {activeScreen === 'workout' && (
+          <>
+            <WeeklyPlan weeklyData={weeklyWorkouts} onToggleWeeklyTask={handleToggleWeeklyTask} />
+            <DumbbellWorkouts onCompleteWorkout={handleCompleteDumbbellWorkout} />
+          </>
+        )}
 
-        {/* 12. MILESTONES */}
-        <Milestones currentWeight={currentWeight} />
+        {/* ================= SCREEN 4: NUTRITION ================= */}
+        {activeScreen === 'nutrition' && (
+          <>
+            <NutritionDashboard />
+            <SugarCutTracker />
+          </>
+        )}
 
-        {/* 11 & 13. MOTIVATION & LIFESTYLE RULES */}
-        <MotivationAndRules />
+        {/* ================= SCREEN 5: HYDRATION ================= */}
+        {activeScreen === 'hydration' && (
+          <>
+            <WaterIntakeCalculator waterData={waterData} onUpdateWater={handleUpdateWater} onHabitSync={handleHabitSync} />
+          </>
+        )}
 
-        {/* 14. DISCLAIMER FOOTER */}
-        <DisclaimerFooter />
+        {/* ================= SCREEN 6: PROGRESS & BODY ================= */}
+        {activeScreen === 'progress' && (
+          <>
+            <WeightProgressChart 
+              weightLogs={weightLogs} 
+              onAddWeightLog={handleAddWeightLog} 
+              onDeleteWeightLog={handleDeleteWeightLog}
+              targetWeight={100} 
+            />
+            <BodyTransformationTracker 
+              measurements={measurements} 
+              onAddMeasurement={handleAddMeasurement} 
+              onDeleteMeasurement={handleDeleteMeasurement}
+            />
+            <Milestones currentWeight={currentWeight} />
+          </>
+        )}
+
+        {/* ================= SCREEN 7: SLEEP & RECOVERY ================= */}
+        {activeScreen === 'sleep' && (
+          <>
+            <SleepRecoveryTracker 
+              sleepLogs={sleepLogs} 
+              nightRoutine={nightRoutine} 
+              onToggleNightRoutine={handleToggleNightRoutine} 
+              onLogSleep={handleLogSleep} 
+              onDeleteSleepLog={handleDeleteSleepLog}
+            />
+          </>
+        )}
       </main>
 
-      {/* 15. MOBILE BOTTOM NAVIGATION */}
-      <MobileNavigation activeTab={activeTab} onTabSelect={setActiveTab} />
+      {/* MOBILE BOTTOM NAVIGATION */}
+      <MobileNavigation activeTab={activeScreen} onTabSelect={navigateToScreen} />
 
       {/* SUPABASE CLOUD SYNC MODAL */}
       <SupabaseSyncModal

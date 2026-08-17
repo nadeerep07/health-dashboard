@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Cloud, Check, Copy, Database, X, RefreshCw, Download, Upload, AlertCircle, ShieldCheck } from 'lucide-react';
 import { getSupabaseConfig, SUPABASE_SQL_SCHEMA } from '../utils/supabaseClient';
 
 export default function SupabaseSyncModal({ isOpen, onClose, onSaveConfig, onManualSync, onExportData, onImportData, syncStatus }) {
   const currentConfig = getSupabaseConfig();
-  const [supabaseUrl, setSupabaseUrl] = useState(currentConfig.url);
-  const [anonKey, setAnonKey] = useState(currentConfig.anonKey);
+  const [supabaseUrl, setSupabaseUrl] = useState(currentConfig.url || '');
+  const [anonKey, setAnonKey] = useState(currentConfig.anonKey || '');
   const [copiedSql, setCopiedSql] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -17,7 +27,10 @@ export default function SupabaseSyncModal({ isOpen, onClose, onSaveConfig, onMan
     localStorage.setItem('transformation_supabase_key', anonKey.trim());
     setSaveSuccess(true);
     if (onSaveConfig) onSaveConfig();
-    setTimeout(() => setSaveSuccess(false), 2500);
+    setTimeout(() => {
+      setSaveSuccess(false);
+      onClose();
+    }, 800);
   };
 
   const handleCopySql = () => {
@@ -27,8 +40,8 @@ export default function SupabaseSyncModal({ isOpen, onClose, onSaveConfig, onMan
   };
 
   return (
-    <div className="modal-overlay" style={{ zIndex: 300 }}>
-      <div className="modal-content" style={{ maxWidth: '620px' }}>
+    <div className="modal-overlay" style={{ zIndex: 300 }} onClick={onClose}>
+      <div className="modal-content" style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
@@ -37,16 +50,21 @@ export default function SupabaseSyncModal({ isOpen, onClose, onSaveConfig, onMan
               <Database size={22} />
             </div>
             <div>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-white)' }}>
+              <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-white)' }}>
                 Supabase Cloud Storage
               </h2>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Synchronize your weight logs & habits across your Phone & Laptop
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Sync logs & habits across your Phone and Computer
               </p>
             </div>
           </div>
 
-          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+          <button 
+            type="button"
+            onClick={onClose} 
+            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.2rem' }}
+            aria-label="Close"
+          >
             <X size={22} />
           </button>
         </div>
@@ -56,7 +74,7 @@ export default function SupabaseSyncModal({ isOpen, onClose, onSaveConfig, onMan
           background: currentConfig.isConfigured ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 215, 0, 0.08)',
           border: currentConfig.isConfigured ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(255, 215, 0, 0.25)',
           borderRadius: 'var(--radius-md)',
-          padding: '0.9rem 1.1rem',
+          padding: '0.85rem 1rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -72,18 +90,19 @@ export default function SupabaseSyncModal({ isOpen, onClose, onSaveConfig, onMan
               background: currentConfig.isConfigured ? '#10b981' : '#f59e0b',
               boxShadow: currentConfig.isConfigured ? '0 0 10px #10b981' : '0 0 10px #f59e0b'
             }} />
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-white)' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-white)' }}>
               {currentConfig.isConfigured ? 'Supabase Connected' : 'Local Storage Mode (Device Only)'}
             </span>
           </div>
 
           {currentConfig.isConfigured && (
             <button
+              type="button"
               onClick={onManualSync}
               className="btn-gold"
-              style={{ padding: '0.35rem 0.8rem', fontSize: '0.75rem' }}
+              style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem' }}
             >
-              <RefreshCw size={13} /> {syncStatus === 'syncing' ? 'Syncing...' : 'Sync Cloud Now'}
+              <RefreshCw size={13} /> {syncStatus === 'syncing' ? 'Syncing...' : 'Sync Now'}
             </button>
           )}
         </div>
@@ -91,7 +110,7 @@ export default function SupabaseSyncModal({ isOpen, onClose, onSaveConfig, onMan
         {/* Credentials Form */}
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
           <div>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
+            <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
               Supabase Project URL
             </label>
             <input
@@ -105,12 +124,12 @@ export default function SupabaseSyncModal({ isOpen, onClose, onSaveConfig, onMan
           </div>
 
           <div>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
-              Supabase Anon / Public Key
+            <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>
+              Supabase Anon Key
             </label>
             <input
               type="password"
-              placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              placeholder="eyJhbGciOiJIUzI1NiIsIn..."
               className="form-input"
               value={anonKey}
               onChange={(e) => setAnonKey(e.target.value)}
@@ -118,79 +137,43 @@ export default function SupabaseSyncModal({ isOpen, onClose, onSaveConfig, onMan
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.75rem', color: saveSuccess ? 'var(--accent-green)' : 'var(--text-dim)', fontWeight: 600 }}>
-              {saveSuccess ? '✓ Credentials saved & connected!' : 'Credentials saved locally in your browser.'}
-            </span>
+          {saveSuccess && (
+            <div style={{ color: 'var(--accent-green)', fontSize: '0.82rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <Check size={16} /> Saved! Syncing in background...
+            </div>
+          )}
 
-            <button type="submit" className="btn-gold" style={{ padding: '0.55rem 1.25rem', fontSize: '0.85rem' }}>
-              <Cloud size={15} /> Save & Connect
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem' }}>
+            <button type="button" onClick={onClose} className="btn-secondary" style={{ flex: 1 }}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-gold" style={{ flex: 1 }}>
+              Save & Connect
             </button>
           </div>
         </form>
 
-        {/* SQL Table Setup Helper */}
+        {/* JSON Backup Export/Import */}
         <div style={{
-          background: 'rgba(0, 0, 0, 0.4)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-md)',
-          padding: '1rem',
-          marginBottom: '1.25rem'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--gold-primary)', textTransform: 'uppercase' }}>
-              1-Minute Supabase Database Setup
-            </span>
-            <button
-              onClick={handleCopySql}
-              className="btn-secondary"
-              style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
-            >
-              {copiedSql ? <Check size={12} color="var(--accent-green)" /> : <Copy size={12} />}
-              {copiedSql ? 'Copied SQL!' : 'Copy SQL'}
-            </button>
-          </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem', lineHeight: 1.4 }}>
-            In your free <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)' }}>Supabase Dashboard</a>, go to the <strong>SQL Editor</strong> tab, paste the SQL below, and click <strong>Run</strong>:
-          </p>
-          <pre style={{
-            background: 'rgba(0, 0, 0, 0.6)',
-            padding: '0.6rem 0.8rem',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.7rem',
-            color: '#a7f3d0',
-            overflowX: 'auto',
-            fontFamily: 'var(--font-mono)'
-          }}>
-            {SUPABASE_SQL_SCHEMA}
-          </pre>
-        </div>
-
-        {/* Backup / Export / Import JSON Options */}
-        <div style={{
+          borderTop: '1px solid var(--border-subtle)',
+          paddingTop: '1rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingTop: '0.75rem',
-          borderTop: '1px solid var(--border-subtle)',
           flexWrap: 'wrap',
           gap: '0.75rem'
         }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Offline Backup:
+          <div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-white)' }}>Local Backup</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Export or restore all data as JSON</div>
           </div>
 
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button
-              onClick={onExportData}
-              className="btn-secondary"
-              style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
-            >
+            <button type="button" onClick={onExportData} className="btn-secondary" style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem' }}>
               <Download size={13} /> Export JSON
             </button>
-
-            <label className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', cursor: 'pointer' }}>
-              <Upload size={13} /> Import JSON
+            <label className="btn-secondary" style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', cursor: 'pointer' }}>
+              <Upload size={13} /> Restore JSON
               <input type="file" accept=".json" onChange={onImportData} style={{ display: 'none' }} />
             </label>
           </div>

@@ -1,21 +1,18 @@
 import React from 'react';
-import { Home, Dumbbell, Utensils, TrendingUp, Moon } from 'lucide-react';
+import { Home, Footprints, Dumbbell, Utensils, TrendingUp } from 'lucide-react';
 
 export default function MobileNavigation({ activeTab, onTabSelect }) {
   const navItems = [
-    { id: 'home', label: 'HOME', icon: Home, targetId: 'hero-section' },
-    { id: 'workout', label: 'WORKOUT', icon: Dumbbell, targetId: 'weekly-plan' },
-    { id: 'nutrition', label: 'NUTRITION', icon: Utensils, targetId: 'nutrition-dashboard' },
-    { id: 'progress', label: 'PROGRESS', icon: TrendingUp, targetId: 'weight-chart' },
-    { id: 'sleep', label: 'SLEEP', icon: Moon, targetId: 'sleep-recovery' },
+    { id: 'home', label: 'HOME', icon: Home },
+    { id: 'walk', label: 'WALK', icon: Footprints },
+    { id: 'workout', label: 'WORKOUT', icon: Dumbbell },
+    { id: 'nutrition', label: 'FOOD', icon: Utensils },
+    { id: 'progress', label: 'PROGRESS', icon: TrendingUp },
   ];
 
-  const handleClick = (item) => {
-    onTabSelect(item.id);
-    const element = document.getElementById(item.targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const handleClick = (id) => {
+    onTabSelect(id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -26,8 +23,9 @@ export default function MobileNavigation({ activeTab, onTabSelect }) {
         return (
           <button
             key={item.id}
-            onClick={() => handleClick(item)}
+            onClick={() => handleClick(item.id)}
             className={`mobile-nav-item ${isActive ? 'active' : ''}`}
+            aria-label={item.label}
           >
             <IconComponent size={20} color={isActive ? 'var(--gold-primary)' : 'var(--text-muted)'} />
             <span>{item.label}</span>

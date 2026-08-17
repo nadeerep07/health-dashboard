@@ -20,18 +20,20 @@ const DEFAULT_WATER_INTAKE = {
   consumedMl: 1750,
   bottleSizeMl: 500,
   history: [
-    { time: '08:30 AM', amount: 500, label: 'Morning Wake-up Glass' },
-    { time: '11:00 AM', amount: 500, label: 'Work Session Bottle' },
-    { time: '01:30 PM', amount: 250, label: 'Post Lunch' },
-    { time: '04:30 PM', amount: 500, label: 'Pre-walk Hydration' },
+    { id: 'w-1', time: '08:30 AM', amount: 500, label: 'Morning Wake-up Glass' },
+    { id: 'w-2', time: '11:00 AM', amount: 500, label: 'Work Session Bottle' },
+    { id: 'w-3', time: '01:30 PM', amount: 250, label: 'Post Lunch' },
+    { id: 'w-4', time: '04:30 PM', amount: 500, label: 'Pre-walk Hydration' },
   ]
 };
 
-// Initial default weight history
+// Initial default weight history (full chronological records)
 const DEFAULT_WEIGHT_LOGS = [
-  { date: '2026-08-10', weight: 111.0 },
-  { date: '2026-08-12', weight: 110.6 },
-  { date: '2026-08-16', weight: 110.25 },
+  { id: 'wt-1', date: '2026-08-01', weight: 111.50, notes: 'Starting Transformation Baseline' },
+  { id: 'wt-2', date: '2026-08-05', weight: 111.10, notes: 'Fasted morning weigh-in' },
+  { id: 'wt-3', date: '2026-08-08', weight: 110.80, notes: 'Post rest-day weigh-in' },
+  { id: 'wt-4', date: '2026-08-12', weight: 110.50, notes: 'Consistent 5 km walk week' },
+  { id: 'wt-5', date: '2026-08-16', weight: 110.25, notes: 'Target on track' },
 ];
 
 // Initial default habits for today
@@ -56,32 +58,32 @@ const DEFAULT_WEEKLY_WORKOUTS = {
   sun: { walk: false, title: '5 km walk (Sunday session)' },
 };
 
-// Walking history (past 7 days distance in km)
+// Walking history (Chronological walk sessions with full details)
 const DEFAULT_WALKING_LOGS = [
-  { day: 'Mon', distance: 5.0, duration: 59, pace: '11:48' },
-  { day: 'Tue', distance: 5.0, duration: 58, pace: '11:36' },
-  { day: 'Wed', distance: 5.2, duration: 61, pace: '11:44' },
-  { day: 'Thu', distance: 5.0, duration: 59, pace: '11:48' },
-  { day: 'Fri', distance: 5.0, duration: 54, pace: '10:48' },
-  { day: 'Sat', distance: 5.0, duration: 60, pace: '12:00' },
-  { day: 'Sun', distance: 5.0, duration: 59, pace: '11:45' },
+  { id: 'wl-1', date: '2026-08-11', day: 'Tue', distance: 5.0, duration: 58, pace: '11:36', calories: 325, notes: 'Comfortable evening pace' },
+  { id: 'wl-2', date: '2026-08-12', day: 'Wed', distance: 5.2, duration: 61, pace: '11:44', calories: 338, notes: 'Extra neighborhood loop' },
+  { id: 'wl-3', date: '2026-08-13', day: 'Thu', distance: 5.0, duration: 59, pace: '11:48', calories: 325, notes: 'Steady tempo' },
+  { id: 'wl-4', date: '2026-08-14', day: 'Fri', distance: 5.0, duration: 54, pace: '10:48', calories: 325, notes: 'Fast brisk walk pace!' },
+  { id: 'wl-5', date: '2026-08-15', day: 'Sat', distance: 5.0, duration: 60, pace: '12:00', calories: 325, notes: 'Morning recovery stride' },
+  { id: 'wl-6', date: '2026-08-16', day: 'Sun', distance: 5.0, duration: 59, pace: '11:45', calories: 325, notes: 'Weekly consistency completed' },
+  { id: 'wl-7', date: '2026-08-17', day: 'Mon', distance: 5.0, duration: 58, pace: '11:36', calories: 325, notes: 'Great energy today' },
 ];
 
 // Sleep logs
 const DEFAULT_SLEEP_LOGS = [
-  { day: 'Mon', bedTime: '23:45', wakeTime: '08:00', duration: 8.25, consistency: 'On Time' },
-  { day: 'Tue', bedTime: '00:15', wakeTime: '08:15', duration: 8.0, consistency: 'Slight Late' },
-  { day: 'Wed', bedTime: '23:30', wakeTime: '07:45', duration: 8.25, consistency: 'On Time' },
-  { day: 'Thu', bedTime: '23:50', wakeTime: '08:00', duration: 8.16, consistency: 'On Time' },
-  { day: 'Fri', bedTime: '00:30', wakeTime: '08:30', duration: 8.0, consistency: 'Late' },
-  { day: 'Sat', bedTime: '23:30', wakeTime: '08:00', duration: 8.5, consistency: 'On Time' },
-  { day: 'Sun', bedTime: '23:45', wakeTime: '08:00', duration: 8.25, consistency: 'On Time' },
+  { id: 'sl-1', date: '2026-08-11', day: 'Tue', bedTime: '23:45', wakeTime: '08:00', duration: 8.25, consistency: 'On Time' },
+  { id: 'sl-2', date: '2026-08-12', day: 'Wed', bedTime: '00:15', wakeTime: '08:15', duration: 8.0, consistency: 'Slight Late' },
+  { id: 'sl-3', date: '2026-08-13', day: 'Thu', bedTime: '23:30', wakeTime: '07:45', duration: 8.25, consistency: 'On Time' },
+  { id: 'sl-4', date: '2026-08-14', day: 'Fri', bedTime: '23:50', wakeTime: '08:00', duration: 8.16, consistency: 'On Time' },
+  { id: 'sl-5', date: '2026-08-15', day: 'Sat', bedTime: '00:30', wakeTime: '08:30', duration: 8.0, consistency: 'Late' },
+  { id: 'sl-6', date: '2026-08-16', day: 'Sun', bedTime: '23:30', wakeTime: '08:00', duration: 8.5, consistency: 'On Time' },
+  { id: 'sl-7', date: '2026-08-17', day: 'Mon', bedTime: '23:45', wakeTime: '08:00', duration: 8.25, consistency: 'On Time' },
 ];
 
 // Body measurements
 const DEFAULT_MEASUREMENTS = [
-  { date: '2026-08-01', weight: 111.5, waist: 108, chest: 114 },
-  { date: '2026-08-16', weight: 110.25, waist: 106.5, chest: 113 },
+  { id: 'bm-1', date: '2026-08-01', weight: 111.5, waist: 108.0, chest: 114.0, notes: 'Starting Baseline' },
+  { id: 'bm-2', date: '2026-08-16', weight: 110.25, waist: 106.5, chest: 113.0, notes: '2-week check-in: -1.5cm waist!' },
 ];
 
 // Night routine

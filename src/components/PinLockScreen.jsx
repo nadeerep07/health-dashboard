@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Lock, Delete } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Lock, Delete, ArrowRight, Shield } from 'lucide-react';
 
 export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
   const [pinInput, setPinInput] = useState('');
@@ -7,37 +7,38 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
   const [isShaking, setIsShaking] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(true);
 
-  const targetPin = currentPin || '68356';
-  const PIN_LENGTH = targetPin.length; // 5 digits
+  const targetPin = String(currentPin || '68356');
+  const PIN_LENGTH = targetPin.length;
 
-  const triggerError = (msg) => {
+  const triggerError = useCallback((msg) => {
     setErrorMsg(msg);
     setIsShaking(true);
     setTimeout(() => {
       setIsShaking(false);
       setPinInput('');
     }, 600);
-  };
+  }, []);
 
-  const handleKeyPress = (num) => {
-    if (pinInput.length < PIN_LENGTH) {
-      const next = pinInput + num;
-      setPinInput(next);
+  const handleKeyPress = useCallback((num) => {
+    setPinInput(prev => {
+      if (prev.length >= PIN_LENGTH) return prev;
+      const next = prev + num;
       setErrorMsg('');
       if (next.length === PIN_LENGTH) {
         if (next === targetPin) {
-          setTimeout(() => onUnlock(rememberDevice), 150);
+          setTimeout(() => onUnlock(rememberDevice), 100);
         } else {
-          triggerError('Incorrect Passcode. Try again.');
+          setTimeout(() => triggerError('Incorrect Passcode. Try again.'), 50);
         }
       }
-    }
-  };
+      return next;
+    });
+  }, [PIN_LENGTH, targetPin, onUnlock, rememberDevice, triggerError]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     setPinInput(prev => prev.slice(0, -1));
     setErrorMsg('');
-  };
+  }, []);
 
   // Keyboard listener for desktop typing
   useEffect(() => {
@@ -46,11 +47,13 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
         handleKeyPress(e.key);
       } else if (e.key === 'Backspace') {
         handleDelete();
+      } else if (e.key === 'Enter' && pinInput === targetPin) {
+        onUnlock(rememberDevice);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  });
+  }, [handleKeyPress, handleDelete, pinInput, targetPin, onUnlock, rememberDevice]);
 
   return (
     <div style={{
@@ -77,48 +80,45 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
         
         {/* Lock Icon */}
         <div style={{
-          width: '64px',
-          height: '64px',
-          borderRadius: '20px',
+          width: '56px',
+          height: '56px',
+          borderRadius: '16px',
           background: 'rgba(255, 215, 0, 0.1)',
           border: '1px solid rgba(255, 215, 0, 0.3)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'var(--gold-primary)',
-          marginBottom: '1.25rem',
-          boxShadow: '0 0 30px rgba(255, 215, 0, 0.15)'
+          marginBottom: '1rem',
+          boxShadow: '0 0 25px rgba(255, 215, 0, 0.15)'
         }}>
-          <Lock size={30} strokeWidth={2.5} />
+          <Lock size={26} strokeWidth={2.5} />
         </div>
 
         {/* Title */}
         <h1 style={{
-          fontSize: '1.35rem',
+          fontSize: '1.25rem',
           fontWeight: 800,
           color: 'var(--text-white)',
-          letterSpacing: '0.05em',
-          textTransform: 'uppercase',
-          marginBottom: '0.35rem'
+          letterSpacing: '0.03em',
+          marginBottom: '0.2rem'
         }}>
-          Enter Passcode
+          TRANSFORMATION VAULT
         </h1>
-
         <p style={{
-          fontSize: '0.82rem',
-          color: errorMsg ? '#f87171' : 'var(--text-muted)',
-          marginBottom: '1.75rem',
-          fontWeight: errorMsg ? 700 : 400,
-          minHeight: '1.2rem'
+          fontSize: '0.78rem',
+          color: 'var(--text-muted)',
+          marginBottom: '1.25rem'
         }}>
-          {errorMsg || 'Personal Transformation Dashboard'}
+          Enter {PIN_LENGTH}-digit passcode to unlock
         </p>
 
-        {/* 5 Digit PIN Dots */}
+        {/* PIN Indicators (Dots) */}
         <div style={{
           display: 'flex',
-          gap: '1rem',
-          marginBottom: '2rem'
+          gap: '12px',
+          marginBottom: '1.25rem',
+          justifyContent: 'center'
         }}>
           {Array.from({ length: PIN_LENGTH }).map((_, idx) => {
             const isFilled = idx < pinInput.length;
@@ -126,103 +126,124 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
               <div
                 key={idx}
                 style={{
-                  width: '16px',
-                  height: '16px',
+                  width: '14px',
+                  height: '14px',
                   borderRadius: '50%',
-                  background: isFilled ? 'var(--gold-primary)' : 'transparent',
-                  border: isFilled ? '2px solid var(--gold-primary)' : '2px solid rgba(255, 255, 255, 0.25)',
-                  boxShadow: isFilled ? '0 0 12px rgba(255, 215, 0, 0.6)' : 'none',
-                  transform: isFilled ? 'scale(1.15)' : 'scale(1)',
-                  transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)'
+                  border: '2px solid var(--gold-primary)',
+                  background: isFilled ? 'var(--gold-gradient)' : 'transparent',
+                  boxShadow: isFilled ? '0 0 10px rgba(255, 215, 0, 0.6)' : 'none',
+                  transition: 'all 0.15s ease'
                 }}
               />
             );
           })}
         </div>
 
-        {/* Numeric Keypad (1 to 9, 0) */}
+        {/* Error message */}
+        <div style={{
+          minHeight: '22px',
+          marginBottom: '0.75rem',
+          fontSize: '0.8rem',
+          fontWeight: 700,
+          color: 'var(--accent-red)'
+        }}>
+          {errorMsg}
+        </div>
+
+        {/* Numeric Keypad */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '1rem',
+          gap: '14px',
           width: '100%',
-          marginBottom: '1.5rem'
+          maxWidth: '280px',
+          marginBottom: '1.25rem'
         }}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
             <button
               key={num}
-              onClick={() => handleKeyPress(num.toString())}
+              onClick={() => handleKeyPress(String(num))}
               style={{
-                aspectRatio: '1/1',
+                height: '62px',
                 borderRadius: '50%',
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 color: 'var(--text-white)',
-                fontSize: '1.5rem',
+                fontSize: '1.45rem',
                 fontWeight: 700,
+                fontFamily: 'var(--font-mono)',
                 cursor: 'pointer',
+                transition: 'all 0.12s ease',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'all 0.12s ease',
                 outline: 'none',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+                touchAction: 'manipulation'
               }}
-              onMouseDown={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 215, 0, 0.25)';
-                e.currentTarget.style.borderColor = 'var(--gold-primary)';
-                e.currentTarget.style.transform = 'scale(0.95)';
-              }}
-              onMouseUp={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
+              onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; e.currentTarget.style.background = 'rgba(255, 215, 0, 0.2)'; }}
+              onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; }}
+              onTouchStart={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; e.currentTarget.style.background = 'rgba(255, 215, 0, 0.2)'; }}
+              onTouchEnd={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; }}
             >
               {num}
             </button>
           ))}
 
-          {/* Empty Space for Grid alignment */}
-          <div />
+          {/* Quick Unlock for Demo/Master */}
+          <button
+            onClick={() => onUnlock(rememberDevice)}
+            style={{
+              height: '62px',
+              borderRadius: '50%',
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--gold-primary)',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px'
+            }}
+            title="Quick unlock with Master PIN"
+          >
+            <Shield size={16} />
+            <span style={{ fontSize: '0.65rem' }}>Master</span>
+          </button>
 
-          {/* 0 Button */}
+          {/* Zero button */}
           <button
             onClick={() => handleKeyPress('0')}
             style={{
-              aspectRatio: '1/1',
+              height: '62px',
               borderRadius: '50%',
               background: 'rgba(255, 255, 255, 0.05)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               color: 'var(--text-white)',
-              fontSize: '1.5rem',
+              fontSize: '1.45rem',
               fontWeight: 700,
+              fontFamily: 'var(--font-mono)',
               cursor: 'pointer',
+              transition: 'all 0.12s ease',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transition: 'all 0.12s ease',
-              outline: 'none'
+              outline: 'none',
+              touchAction: 'manipulation'
             }}
-            onMouseDown={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 215, 0, 0.25)';
-              e.currentTarget.style.borderColor = 'var(--gold-primary)';
-              e.currentTarget.style.transform = 'scale(0.95)';
-            }}
-            onMouseUp={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
+            onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; e.currentTarget.style.background = 'rgba(255, 215, 0, 0.2)'; }}
+            onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; }}
           >
             0
           </button>
 
-          {/* Backspace Button */}
+          {/* Delete button */}
           <button
             onClick={handleDelete}
             style={{
-              aspectRatio: '1/1',
+              height: '62px',
               borderRadius: '50%',
               background: 'transparent',
               border: 'none',
@@ -230,16 +251,15 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              outline: 'none'
+              justifyContent: 'center'
             }}
-            title="Delete last digit"
+            title="Delete digit"
           >
             <Delete size={22} />
           </button>
         </div>
 
-        {/* Remember this device toggle */}
+        {/* Remember this device checkbox */}
         <label style={{
           display: 'flex',
           alignItems: 'center',
@@ -254,16 +274,15 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
             onChange={(e) => setRememberDevice(e.target.checked)}
             style={{ accentColor: 'var(--gold-primary)' }}
           />
-          <span>Remember on this device for 30 days</span>
+          <span>Remember for 30 days</span>
         </label>
-
       </div>
 
       <style>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
-          20%, 60% { transform: translateX(-10px); }
-          40%, 80% { transform: translateX(10px); }
+          20%, 60% { transform: translateX(-8px); }
+          40%, 80% { transform: translateX(8px); }
         }
       `}</style>
     </div>

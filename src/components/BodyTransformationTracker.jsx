@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Ruler, Weight, Sparkles, Plus, Image as ImageIcon, CheckCircle2, AlertCircle, RefreshCw, Eye } from 'lucide-react';
+import { Camera, Ruler, Weight, Sparkles, Plus, Image as ImageIcon, CheckCircle2, AlertCircle, RefreshCw, Eye, Trash2, List } from 'lucide-react';
 
 // Built-in Demo SVG Graphics for Day 1 vs Goal
 const DEMO_BEFORE_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
@@ -58,7 +58,7 @@ const DEMO_AFTER_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/20
   <text x="250" y="445" fill="%2310b981" font-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle">100.00 KG • LEAN & DEFINED</text>
 </svg>`;
 
-export default function BodyTransformationTracker({ measurements, onAddMeasurement }) {
+export default function BodyTransformationTracker({ measurements = [], onAddMeasurement, onDeleteMeasurement }) {
   const [sliderPos, setSliderPos] = useState(50);
   const [showLogModal, setShowLogModal] = useState(false);
   const [viewMode, setViewMode] = useState('slider'); // 'slider' or 'sideBySide'
@@ -70,17 +70,32 @@ export default function BodyTransformationTracker({ measurements, onAddMeasureme
   const [beforePhoto, setBeforePhoto] = useState(() => localStorage.getItem('transformation_before_photo') || null);
   const [afterPhoto, setAfterPhoto] = useState(() => localStorage.getItem('transformation_after_photo') || null);
 
+  const [inputDate, setInputDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [newWeight, setNewWeight] = useState('110.25');
   const [newWaist, setNewWaist] = useState('106.5');
   const [newChest, setNewChest] = useState('113.0');
+  const [notes, setNotes] = useState('');
 
-  const latest = measurements.length > 0 ? measurements[measurements.length - 1] : { weight: 110.25, waist: 106.5, chest: 113.0 };
-  const initial = measurements.length > 0 ? measurements[0] : { weight: 110.25, waist: 108.0, chest: 114.0 };
+  const sortedMeasurements = [...measurements].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const waistChange = (latest.waist - initial.waist).toFixed(1);
-  const chestChange = (latest.chest - initial.chest).toFixed(1);
+  const latest = sortedMeasurements.length > 0 ? sortedMeasurements[sortedMeasurements.length - 1] : { weight: 110.25, waist: 106.5, chest: 113.0 };
+  const initial = sortedMeasurements.length > 0 ? sortedMeasurements[0] : { weight: 110.25, waist: 108.0, chest: 114.0 };
+
+  const waistChange = (Number(latest.waist) - Number(initial.waist)).toFixed(1);
+  const chestChange = (Number(latest.chest) - Number(initial.chest)).toFixed(1);
 
   const [containerWidth, setContainerWidth] = useState(600);
+
+  // Escape key listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && showLogModal) {
+        setShowLogModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showLogModal]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -98,7 +113,7 @@ export default function BodyTransformationTracker({ measurements, onAddMeasureme
   const beforeSrc = beforePhoto || DEMO_BEFORE_SVG;
   const afterSrc = afterPhoto || DEMO_AFTER_SVG;
 
-  // Handle direct pointer drag on the comparison container
+  // Handle pointer drag
   const handlePointerDown = (e) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     setIsDragging(true);
@@ -153,220 +168,167 @@ export default function BodyTransformationTracker({ measurements, onAddMeasureme
 
   const handleSave = (e) => {
     e.preventDefault();
-    onAddMeasurement({
-      date: new Date().toISOString().split('T')[0],
-      weight: parseFloat(newWeight),
-      waist: parseFloat(newWaist),
-      chest: parseFloat(newChest),
-    });
-    setShowLogModal(false);
+    const w = parseFloat(newWeight);
+    const wst = parseFloat(newWaist);
+    const chst = parseFloat(newChest);
+    if (w > 0 && wst > 0) {
+      onAddMeasurement({
+        id: `bm-${Date.now()}`,
+        date: inputDate,
+        weight: w,
+        waist: wst,
+        chest: chst || 0,
+        notes: notes.trim() || 'Monthly check-in'
+      });
+      setShowLogModal(false);
+      setNotes('');
+    }
+  };
+
+  const handleDelete = (idOrIdx, e) => {
+    e.stopPropagation();
+    if (window.confirm('Delete this measurement entry?')) {
+      if (onDeleteMeasurement) {
+        onDeleteMeasurement(idOrIdx);
+      }
+    }
   };
 
   return (
     <section id="body-transformation" className="fitness-card">
-      <div className="card-header-clean">
+      <div className="card-header-clean" style={{ flexWrap: 'wrap' }}>
         <div className="card-title-group">
           <div className="card-icon-pill">
-            <Ruler size={20} />
+            <Camera size={20} />
           </div>
           <div>
-            <h2 className="card-title">Body Transformation & Photos</h2>
-            <p className="card-subtitle">Track chest, waist, and visual physique evolution</p>
+            <h2 className="card-title">Body Transformation & Measurements</h2>
+            <p className="card-subtitle">Visual progress & tape measurement tracking</p>
           </div>
         </div>
 
-        <button onClick={() => setShowLogModal(true)} className="btn-gold" style={{ padding: '0.45rem 0.9rem', fontSize: '0.8rem' }}>
-          <Plus size={14} /> Log Measurements
+        <button 
+          onClick={() => {
+            setInputDate(new Date().toISOString().split('T')[0]);
+            setShowLogModal(true);
+          }} 
+          className="btn-gold"
+        >
+          <Plus size={16} /> Log Measurement
         </button>
       </div>
 
-      {/* Mindset Quote Box */}
-      <div style={{
-        background: 'rgba(255, 215, 0, 0.08)',
-        border: '1px solid rgba(255, 215, 0, 0.25)',
-        borderRadius: 'var(--radius-md)',
-        padding: '1rem',
-        marginBottom: '1.5rem',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.75rem',
-      }}>
-        <AlertCircle size={22} color="var(--gold-primary)" style={{ flexShrink: 0 }} />
-        <div>
-          <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--gold-primary)' }}>
-            "Don't judge progress from the scale alone."
-          </div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
-            Muscle preservation, waist reduction, and clothing fit are far more accurate indicators of fat loss than daily water weight fluctuations.
-          </p>
-        </div>
-      </div>
-
-      {/* 3 Key Measurement Cards */}
+      {/* Measurement Overview Badges */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '1rem',
-        marginBottom: '2rem'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))',
+        gap: '0.75rem',
+        marginBottom: '1.25rem'
       }}>
-        {/* WEIGHT */}
-        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
-            <Weight size={15} color="var(--gold-primary)" /> WEIGHT
+        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Waist Circumference</div>
+          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--gold-primary)', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
+            {latest.waist} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>cm</span>
           </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)', marginTop: '0.3rem' }}>
-            {latest.weight} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>kg</span>
-          </div>
-        </div>
-
-        {/* WAIST */}
-        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
-            <Ruler size={15} color="var(--gold-primary)" /> WAIST
-          </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--gold-primary)', fontFamily: 'var(--font-mono)', marginTop: '0.3rem' }}>
-            {latest.waist} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>cm</span>
-          </div>
-          <div style={{ fontSize: '0.75rem', color: waistChange < 0 ? 'var(--accent-green)' : 'var(--text-muted)', fontWeight: 700, marginTop: '0.2rem' }}>
-            {waistChange < 0 ? `${waistChange} cm overall` : 'Baseline'}
+          <div style={{ fontSize: '0.7rem', color: Number(waistChange) <= 0 ? 'var(--accent-green)' : 'var(--text-muted)', marginTop: '0.2rem', fontWeight: 700 }}>
+            {Number(waistChange) <= 0 ? `${waistChange} cm from start` : `+${waistChange} cm`}
           </div>
         </div>
 
-        {/* CHEST */}
-        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
-            <Ruler size={15} color="var(--gold-secondary)" /> CHEST
+        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Chest Circumference</div>
+          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
+            {latest.chest} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>cm</span>
           </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)', marginTop: '0.3rem' }}>
-            {latest.chest} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>cm</span>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+            {chestChange} cm from start
           </div>
-          <div style={{ fontSize: '0.75rem', color: chestChange < 0 ? 'var(--accent-green)' : 'var(--text-muted)', fontWeight: 700, marginTop: '0.2rem' }}>
-            {chestChange < 0 ? `${chestChange} cm overall` : 'Baseline'}
+        </div>
+
+        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Latest Weigh-in</div>
+          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
+            {Number(latest.weight).toFixed(2)} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>kg</span>
+          </div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--accent-green)', marginTop: '0.2rem', fontWeight: 700 }}>
+            Active on plan
           </div>
         </div>
       </div>
 
-      {/* Before / After Photo Comparison Section */}
-      <div>
+      {/* Visual Comparison Section */}
+      <div style={{
+        background: 'rgba(0,0,0,0.3)',
+        border: '1px solid var(--border-subtle)',
+        borderRadius: 'var(--radius-md)',
+        padding: '1rem',
+        marginBottom: '1.5rem'
+      }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, color: 'var(--text-white)' }}>
-            <Camera size={18} color="var(--gold-primary)" /> Monthly Photo Visualizer
+          <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-white)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Eye size={16} color="var(--gold-primary)" /> Visual Physique Comparison
           </div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            {(beforePhoto || afterPhoto) && (
-              <button
-                onClick={handleClearPhotos}
-                className="btn-secondary"
-                style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
-                title="Reset to demo silhouettes"
-              >
-                <RefreshCw size={11} /> Reset Demo
-              </button>
-            )}
 
-            <div style={{ display: 'flex', gap: '0.3rem', background: 'rgba(0,0,0,0.4)', padding: '0.2rem', borderRadius: 'var(--radius-pill)' }}>
-              <button
-                onClick={() => setViewMode('slider')}
-                style={{
-                  background: viewMode === 'slider' ? 'var(--gold-gradient)' : 'transparent',
-                  color: viewMode === 'slider' ? '#000' : 'var(--text-muted)',
-                  border: 'none',
-                  padding: '0.25rem 0.75rem',
-                  borderRadius: 'var(--radius-pill)',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  cursor: 'pointer'
-                }}
-              >
-                Split Slider
-              </button>
-              <button
-                onClick={() => setViewMode('sideBySide')}
-                style={{
-                  background: viewMode === 'sideBySide' ? 'var(--gold-gradient)' : 'transparent',
-                  color: viewMode === 'sideBySide' ? '#000' : 'var(--text-muted)',
-                  border: 'none',
-                  padding: '0.25rem 0.75rem',
-                  borderRadius: 'var(--radius-pill)',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  cursor: 'pointer'
-                }}
-              >
-                Side by Side
-              </button>
-            </div>
+          <div style={{ display: 'flex', gap: '0.4rem' }}>
+            <button
+              onClick={() => setViewMode('slider')}
+              className={viewMode === 'slider' ? 'btn-gold' : 'btn-secondary'}
+              style={{ padding: '0.25rem 0.65rem', fontSize: '0.72rem' }}
+            >
+              Interactive Slider
+            </button>
+            <button
+              onClick={() => setViewMode('sideBySide')}
+              className={viewMode === 'sideBySide' ? 'btn-gold' : 'btn-secondary'}
+              style={{ padding: '0.25rem 0.65rem', fontSize: '0.72rem' }}
+            >
+              Side-by-Side
+            </button>
           </div>
         </div>
 
-        {/* Upload Buttons */}
-        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-          <label style={{
-            flex: 1,
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px dashed rgba(255, 215, 0, 0.35)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '0.65rem 1rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            cursor: 'pointer',
-            fontSize: '0.82rem',
-            color: 'var(--text-white)',
-            minWidth: '180px'
-          }}>
-            <ImageIcon size={16} color="var(--gold-primary)" />
-            <span>{beforePhoto ? 'Change Day 1 Photo' : 'Upload Day 1 (Before)'}</span>
-            <input type="file" accept="image/*" onChange={(e) => handlePhotoUpload(e, 'before')} style={{ display: 'none' }} />
+        {/* Upload Controls */}
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.85rem', flexWrap: 'wrap' }}>
+          <label className="btn-secondary" style={{ padding: '0.35rem 0.65rem', fontSize: '0.72rem', cursor: 'pointer' }}>
+            <Camera size={12} /> Upload Day 1 Photo
+            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e, 'before')} />
           </label>
-
-          <label style={{
-            flex: 1,
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px dashed rgba(16, 185, 129, 0.35)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '0.65rem 1rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            cursor: 'pointer',
-            fontSize: '0.82rem',
-            color: 'var(--text-white)',
-            minWidth: '180px'
-          }}>
-            <ImageIcon size={16} color="var(--accent-green)" />
-            <span>{afterPhoto ? 'Change Current Photo' : 'Upload Latest (Current)'}</span>
-            <input type="file" accept="image/*" onChange={(e) => handlePhotoUpload(e, 'after')} style={{ display: 'none' }} />
+          <label className="btn-secondary" style={{ padding: '0.35rem 0.65rem', fontSize: '0.72rem', cursor: 'pointer' }}>
+            <Camera size={12} /> Upload Latest Photo
+            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handlePhotoUpload(e, 'after')} />
           </label>
+          {(beforePhoto || afterPhoto) && (
+            <button onClick={handleClearPhotos} className="btn-danger-subtle">
+              <RefreshCw size={11} /> Reset to Demo
+            </button>
+          )}
         </div>
 
-        {/* Visualizer Display */}
+        {/* Comparison Box */}
         {viewMode === 'slider' ? (
           <div
             ref={containerRef}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
             style={{
               position: 'relative',
               width: '100%',
-              height: '360px',
+              height: '320px',
               borderRadius: 'var(--radius-md)',
               overflow: 'hidden',
-              border: '1px solid rgba(255, 215, 0, 0.25)',
-              background: '#07090e',
-              cursor: 'ew-resize',
               userSelect: 'none',
-              touchAction: 'none'
+              touchAction: 'pan-y',
+              cursor: 'ew-resize',
+              border: '1px solid var(--border-subtle)',
+              background: '#07090e'
             }}
           >
-            {/* Background Image (After / Target Photo - FULL WIDTH) */}
+            {/* After/Goal image (Bottom Layer) */}
             <img
               src={afterSrc}
-              alt="After / Target Progress"
+              alt="Goal Physique"
               style={{
                 position: 'absolute',
                 top: 0,
@@ -378,7 +340,7 @@ export default function BodyTransformationTracker({ measurements, onAddMeasureme
               }}
             />
 
-            {/* Foreground Image Wrapper (Before Photo - Clipped by slider width) */}
+            {/* Before image (Top Layer with clip-path) */}
             <div
               style={{
                 position: 'absolute',
@@ -387,15 +349,13 @@ export default function BodyTransformationTracker({ measurements, onAddMeasureme
                 width: `${sliderPos}%`,
                 height: '100%',
                 overflow: 'hidden',
-                borderRight: '2px solid var(--gold-primary)',
-                boxShadow: '4px 0 20px rgba(255, 215, 0, 0.6)',
-                pointerEvents: 'none'
+                borderRight: '3px solid var(--gold-primary)',
+                boxShadow: '4px 0 20px rgba(0,0,0,0.8)'
               }}
             >
-              {/* Inner Image anchored to container width so it aligns with background image */}
               <img
                 src={beforeSrc}
-                alt="Before Progress"
+                alt="Baseline Physique"
                 style={{
                   position: 'absolute',
                   top: 0,
@@ -410,11 +370,11 @@ export default function BodyTransformationTracker({ measurements, onAddMeasureme
             </div>
 
             {/* Top Badges */}
-            <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 15, background: 'rgba(0,0,0,0.8)', padding: '0.3rem 0.75rem', borderRadius: 'var(--radius-pill)', fontSize: '0.75rem', fontWeight: 800, color: 'var(--gold-primary)', border: '1px solid rgba(255,215,0,0.3)' }}>
+            <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 15, background: 'rgba(0,0,0,0.85)', padding: '0.25rem 0.6rem', borderRadius: 'var(--radius-pill)', fontSize: '0.7rem', fontWeight: 800, color: 'var(--gold-primary)', border: '1px solid rgba(255,215,0,0.3)' }}>
               DAY 1 (110.25 KG)
             </div>
 
-            <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 15, background: 'rgba(16, 185, 129, 0.9)', color: '#000', padding: '0.3rem 0.75rem', borderRadius: 'var(--radius-pill)', fontSize: '0.75rem', fontWeight: 800 }}>
+            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 15, background: 'rgba(16, 185, 129, 0.9)', color: '#000', padding: '0.25rem 0.6rem', borderRadius: 'var(--radius-pill)', fontSize: '0.7rem', fontWeight: 800 }}>
               GOAL / LATEST
             </div>
 
@@ -424,8 +384,8 @@ export default function BodyTransformationTracker({ measurements, onAddMeasureme
               top: '50%',
               left: `${sliderPos}%`,
               transform: 'translate(-50%, -50%)',
-              width: '42px',
-              height: '42px',
+              width: '36px',
+              height: '36px',
               borderRadius: '50%',
               background: 'var(--gold-gradient)',
               color: '#000',
@@ -433,37 +393,18 @@ export default function BodyTransformationTracker({ measurements, onAddMeasureme
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 900,
-              fontSize: '0.9rem',
-              boxShadow: '0 0 25px rgba(255,215,0,0.8)',
+              fontSize: '0.85rem',
+              boxShadow: '0 0 20px rgba(255,215,0,0.8)',
               pointerEvents: 'none',
               zIndex: 25
             }}>
               ↔
             </div>
-
-            {/* Helper Caption at Bottom */}
-            <div style={{
-              position: 'absolute',
-              bottom: '12px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              background: 'rgba(0,0,0,0.7)',
-              padding: '0.2rem 0.8rem',
-              borderRadius: 'var(--radius-pill)',
-              fontSize: '0.72rem',
-              color: '#cbd5e1',
-              pointerEvents: 'none',
-              zIndex: 15
-            }}>
-              Drag handle left/right to compare
-            </div>
           </div>
         ) : (
-          /* Side by Side Mode */
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
-            {/* Before Box */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem' }}>
             <div style={{
-              height: '320px',
+              height: '280px',
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--border-subtle)',
               background: '#07090e',
@@ -474,14 +415,13 @@ export default function BodyTransformationTracker({ measurements, onAddMeasureme
               overflow: 'hidden'
             }}>
               <img src={beforeSrc} alt="Day 1" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-              <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(0,0,0,0.85)', padding: '0.25rem 0.65rem', borderRadius: 'var(--radius-pill)', fontSize: '0.75rem', color: 'var(--gold-primary)', fontWeight: 800, border: '1px solid rgba(255,215,0,0.3)' }}>
+              <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(0,0,0,0.85)', padding: '0.2rem 0.55rem', borderRadius: 'var(--radius-pill)', fontSize: '0.7rem', color: 'var(--gold-primary)', fontWeight: 800 }}>
                 DAY 1 (110.25 KG)
               </div>
             </div>
 
-            {/* After Box */}
             <div style={{
-              height: '320px',
+              height: '280px',
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--border-subtle)',
               background: '#07090e',
@@ -492,42 +432,101 @@ export default function BodyTransformationTracker({ measurements, onAddMeasureme
               overflow: 'hidden'
             }}>
               <img src={afterSrc} alt="Goal" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-              <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(16, 185, 129, 0.9)', color: '#000', padding: '0.25rem 0.65rem', borderRadius: 'var(--radius-pill)', fontSize: '0.75rem', fontWeight: 800 }}>
+              <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(16, 185, 129, 0.9)', color: '#000', padding: '0.2rem 0.55rem', borderRadius: 'var(--radius-pill)', fontSize: '0.7rem', fontWeight: 800 }}>
                 GOAL / LATEST
               </div>
             </div>
           </div>
         )}
+      </div>
 
-        {/* Progress Photo Guidelines */}
-        <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(0,0,0,0.3)', borderRadius: 'var(--radius-sm)', fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Sparkles size={14} color="var(--gold-primary)" />
-          <span><strong>Tips for accurate tracking:</strong> Take photos once a month in the morning (fasted), wearing the same clothes, under identical lighting and camera distance.</span>
+      {/* MEASUREMENT HISTORY TABLE */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-white)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <List size={16} color="var(--gold-primary)" /> Measurement History ({sortedMeasurements.length})
+          </h3>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Bi-weekly checks</span>
+        </div>
+
+        <div className="table-responsive-wrapper">
+          <table className="clean-data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Weight</th>
+                <th>Waist</th>
+                <th>Chest</th>
+                <th>Notes</th>
+                <th style={{ textAlign: 'right' }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...sortedMeasurements].reverse().map((item, idx) => (
+                <tr key={item.id || `bm-${idx}`}>
+                  <td style={{ fontWeight: 700, color: 'var(--text-white)' }}>{item.date}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--gold-primary)', fontWeight: 700 }}>
+                    {Number(item.weight).toFixed(2)} kg
+                  </td>
+                  <td style={{ fontFamily: 'var(--font-mono)' }}>{item.waist} cm</td>
+                  <td style={{ fontFamily: 'var(--font-mono)' }}>{item.chest ? `${item.chest} cm` : '—'}</td>
+                  <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{item.notes || '—'}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    <button
+                      onClick={(e) => handleDelete(item.id || (sortedMeasurements.length - 1 - idx), e)}
+                      className="btn-danger-subtle"
+                    >
+                      <Trash2 size={13} /> Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
       {/* Modal to log measurements */}
       {showLogModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-white)', marginBottom: '1rem' }}>
-              Log Monthly Body Measurements
-            </h3>
+        <div className="modal-overlay" onClick={() => setShowLogModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-white)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Ruler size={20} color="var(--gold-primary)" /> Log Body Measurements
+              </h3>
+              <button 
+                onClick={() => setShowLogModal(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.25rem', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+
             <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem' }}>Weight (kg)</label>
-                <input type="number" step="0.1" className="form-input" value={newWeight} onChange={(e) => setNewWeight(e.target.value)} required />
+                <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>Date</label>
+                <input type="date" className="form-input" value={inputDate} onChange={(e) => setInputDate(e.target.value)} required />
               </div>
               <div>
-                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem' }}>Waist (cm)</label>
-                <input type="number" step="0.5" className="form-input" value={newWaist} onChange={(e) => setNewWaist(e.target.value)} required />
+                <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>Weight (kg)</label>
+                <input type="number" step="0.05" className="form-input" value={newWeight} onChange={(e) => setNewWeight(e.target.value)} required />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>Waist (cm)</label>
+                  <input type="number" step="0.5" className="form-input" value={newWaist} onChange={(e) => setNewWaist(e.target.value)} required />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>Chest (cm)</label>
+                  <input type="number" step="0.5" className="form-input" value={newChest} onChange={(e) => setNewChest(e.target.value)} />
+                </div>
               </div>
               <div>
-                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem' }}>Chest (cm)</label>
-                <input type="number" step="0.5" className="form-input" value={newChest} onChange={(e) => setNewChest(e.target.value)} required />
+                <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>Notes</label>
+                <input type="text" className="form-input" placeholder="e.g. Morning fasted tape check" value={notes} onChange={(e) => setNotes(e.target.value)} />
               </div>
 
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
                 <button type="button" onClick={() => setShowLogModal(false)} className="btn-secondary" style={{ flex: 1 }}>
                   Cancel
                 </button>
