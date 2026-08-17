@@ -193,7 +193,15 @@ export async function estimateNutritionWithAI(inputString) {
   }
 
   // 2. Intelligent Offline Fallback Engine with Fuzzy Match and Multi-item Support
+  // Check if input specifies total plate weight (e.g. "300g total: rice + veg + fish" or "total 300g plate")
+  const totalPlateGramMatch = inputString.match(/(\d+)\s*(?:g|gm|grams)\s*(?:total|plate|all together|in total|overall|meal|lunch|dinner)/i) 
+    || inputString.match(/(?:total|overall|all together|plate)\s*(?:of\s*)?(\d+)\s*(?:g|gm|grams)/i);
+
+  const totalPlateGrams = totalPlateGramMatch ? parseFloat(totalPlateGramMatch[1]) : null;
+
   const rawQuery = inputString
+    .replace(/\b(\d+)\s*(?:g|gm|grams)\s*(?:total|plate|all together|in total|overall|meal|lunch|dinner)\b/gi, '')
+    .replace(/(?:total|overall|all together|plate)\s*(?:of\s*)?(\d+)\s*(?:g|gm|grams)/gi, '')
     .replace(/\b(?:overall|approx|total|of lunch|for lunch|of dinner|for dinner|of breakfast|for breakfast)\b/gi, '')
     .toLowerCase()
     .trim();
@@ -216,6 +224,17 @@ export async function estimateNutritionWithAI(inputString) {
     let quantity = 1;
     let weightInGrams = null;
     let sizeMultiplier = 1.0;
+
+    // If whole plate was weighed (e.g. 300g total plate), rice is ~45% of plate weight, thoran ~20%, curry ~20%
+    if (totalPlateGrams && !cleanPart.match(/(\d+)\s*(?:g|gm|grams)/i)) {
+      if (cleanPart.includes('rice') || cleanPart.includes('choru')) {
+        weightInGrams = Math.round(totalPlateGrams * 0.48); // ~145g rice
+      } else if (cleanPart.includes('thoran') || cleanPart.includes('upperi') || cleanPart.includes('uppiri')) {
+        weightInGrams = Math.round(totalPlateGrams * 0.20); // ~60g thoran
+      } else if (cleanPart.includes('curry') && !cleanPart.includes('fish') && !cleanPart.includes('chicken') && !cleanPart.includes('beef')) {
+        weightInGrams = Math.round(totalPlateGrams * 0.20); // ~60g curry
+      }
+    }
 
     if (/\b(?:small|tiny|mini)\b/i.test(cleanPart)) {
       sizeMultiplier = 0.75;
