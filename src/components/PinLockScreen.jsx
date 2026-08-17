@@ -189,29 +189,8 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
             </button>
           ))}
 
-          {/* Quick Unlock for Demo/Master */}
-          <button
-            onClick={() => onUnlock(rememberDevice)}
-            style={{
-              height: '62px',
-              borderRadius: '50%',
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--gold-primary)',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2px'
-            }}
-            title="Quick unlock with Master PIN"
-          >
-            <Shield size={16} />
-            <span style={{ fontSize: '0.65rem' }}>Master</span>
-          </button>
+          {/* Empty spacer (Apple iOS style keypad) */}
+          <div style={{ height: '62px' }} />
 
           {/* Zero button */}
           <button
