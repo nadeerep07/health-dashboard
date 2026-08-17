@@ -88,7 +88,18 @@ export default function DumbbellWorkouts({ onCompleteWorkout }) {
   };
 
   const currentWorkout = activeTab === 'A' ? WORKOUT_A : WORKOUT_B;
-  const activeWorkoutObj = activeSession === 'A' ? WORKOUT_A : WORKOUT_B;
+  // Escape key listener for workout modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && activeSession) {
+        setActiveSession(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeSession]);
+
+  const activeWorkoutObj = activeSession ? WORKOUT_ROUTINES[activeSession] : null;
 
   return (
     <section id="dumbbell-workouts" className="fitness-card">
@@ -195,8 +206,8 @@ export default function DumbbellWorkouts({ onCompleteWorkout }) {
 
       {/* ACTIVE WORKOUT RUNNER MODAL */}
       {activeSession && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '600px' }}>
+        <div className="modal-overlay" onClick={() => setActiveSession(null)}>
+          <div className="modal-content" style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <div>
                 <span className="gold-tag">Workout Mode Active</span>

@@ -66,7 +66,7 @@ export default function ChangePinModal({ isOpen, onClose, currentPin, onChangePi
   };
 
   return (
-    <div className="modal-overlay" style={{ zIndex: 300 }} onClick={handleCancel}>
+    <div className="modal-overlay" onClick={handleCancel}>
       <div className="modal-content" style={{ maxWidth: '440px' }} onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}

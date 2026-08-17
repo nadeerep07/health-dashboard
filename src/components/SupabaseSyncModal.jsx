@@ -40,7 +40,7 @@ export default function SupabaseSyncModal({ isOpen, onClose, onSaveConfig, onMan
   };
 
   return (
-    <div className="modal-overlay" style={{ zIndex: 300 }} onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
