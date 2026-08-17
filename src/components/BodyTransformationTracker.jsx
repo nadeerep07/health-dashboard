@@ -141,21 +141,46 @@ export default function BodyTransformationTracker({ measurements = [], onAddMeas
     setSliderPos(pos);
   };
 
-  const handlePhotoUpload = (e, type) => {
-    const file = e.target.files[0];
-    if (file) {
+  const compressImage = (file, maxWidth = 800, quality = 0.75) => {
+    return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64Data = reader.result;
-        if (type === 'before') {
-          setBeforePhoto(base64Data);
-          localStorage.setItem('transformation_before_photo', base64Data);
-        } else {
-          setAfterPhoto(base64Data);
-          localStorage.setItem('transformation_after_photo', base64Data);
-        }
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = event.target.result;
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  const handlePhotoUpload = async (e, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        const compressedBase64 = await compressImage(file, 800, 0.75);
+        if (type === 'before') {
+          setBeforePhoto(compressedBase64);
+          localStorage.setItem('transformation_before_photo', compressedBase64);
+        } else {
+          setAfterPhoto(compressedBase64);
+          localStorage.setItem('transformation_after_photo', compressedBase64);
+        }
+      } catch (err) {
+        console.error('Image compression error', err);
+      }
     }
   };
 

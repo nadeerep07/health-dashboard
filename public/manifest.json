@@ -1,0 +1,18 @@
+{
+  "name": "APEX 100 - Transformation Dashboard",
+  "short_name": "APEX 100",
+  "description": "Personal health, walking, workouts, and AI nutrition tracking dashboard.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08090c",
+  "theme_color": "#08090c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
