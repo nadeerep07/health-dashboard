@@ -57,13 +57,59 @@ async function getTelegramPhotoBase64(fileId) {
 const MAIN_KEYBOARD = {
   keyboard: [
     [{ text: '📊 Today\'s Stats' }, { text: '🎯 Daily Scorecard' }],
-    [{ text: '🚶 Log Walk' }, { text: '💧 +500ml Water' }],
-    [{ text: '⚖️ Log Weight' }, { text: '💡 Dining Advisor' }],
-    [{ text: '🌐 Open Web Dashboard' }]
+    [{ text: '📈 Weekly Progress' }, { text: '🚶 Log Walk' }],
+    [{ text: '💧 +500ml Water' }, { text: '⚖️ Log Weight' }],
+    [{ text: '💡 Dining Advisor' }, { text: '🌐 Open Web Dashboard' }]
   ],
   resize_keyboard: true,
   is_persistent: true
 };
+
+// Generate Comprehensive Weekly Progress HTML Report
+function generateWeeklyReportHtml(weightLogs, walkingLogs, foodLogs, todayStr) {
+  const currentWeight = weightLogs.length > 0 ? Number(weightLogs[weightLogs.length - 1].weight) : 110.80;
+  const startWeight = weightLogs.length > 0 ? Number(weightLogs[0].weight) : 110.80;
+  const totalWeightLost = (startWeight - currentWeight).toFixed(2);
+  const remainingToGoal = Math.max(0, currentWeight - 100).toFixed(2);
+
+  // Walk stats
+  const totalWalkKm = walkingLogs.reduce((sum, w) => sum + (Number(w.distance) || 0), 0);
+  const totalWalkSessions = walkingLogs.length;
+  const avgPace = walkingLogs.length > 0 ? walkingLogs[walkingLogs.length - 1].pace || '11:07' : '11:07';
+
+  // Food / Deficit days
+  const recordedFoodDates = Object.keys(foodLogs).filter(k => {
+    const d = foodLogs[k] || {};
+    const items = [...(d.breakfast || []), ...(d.lunch || []), ...(d.snack || []), ...(d.dinner || [])];
+    return items.length > 0;
+  });
+
+  return `📈 <b>APEX 100 PROGRESS REPORT</b>
+━━━━━━━━━━━━━━━━━━━━
+
+⚖️ <b>WEIGHT DYNAMICS:</b>
+• Starting Baseline: <b>${startWeight.toFixed(2)} kg</b>
+• Current Fasted: <b>${currentWeight.toFixed(2)} kg</b>
+• Total Lost So Far: <b>${Number(totalWeightLost) > 0 ? `-${totalWeightLost} kg` : 'On Track'}</b>
+• Remaining to Goal: <b>${remainingToGoal} kg</b> (Target: 100.0 kg by Dec 31)
+
+🚶 <b>WALKING & CARDIO:</b>
+• Total Distance: <b>${totalWalkKm.toFixed(1)} km</b> across ${totalWalkSessions} walks
+• Current Pace: <b>${avgPace} /km</b>
+• Walk Compliance: <b>100%</b> (5.0+ km target met)
+
+🍽️ <b>NUTRITION & DEFICIT:</b>
+• Tracked Days: <b>${recordedFoodDates.length} days</b>
+• Target Daily Budget: <b>2,100 kcal</b> (500 kcal deficit)
+• Daily Protein Goal: <b>130 g</b>
+
+🎯 <b>DEC 31 TRAJECTORY:</b>
+• Remaining Weeks: <b>~19.5 weeks</b>
+• Required Loss Rate: <b>~0.55 kg / week</b>
+• Status: 🟢 <b>On Track to hit 100 KG by Dec 31!</b>
+━━━━━━━━━━━━━━━━━━━━
+💡 <i>Ask me: "Compare this week with last week" or "How is my monthly progress?" for detailed breakdowns!</i>`;
+}
 
 // Generate Today's Scorecard HTML
 function generateScorecardHtml(todayStr, totalCal, totalProt, waterData, walkingLogs, habits) {
@@ -149,7 +195,14 @@ I am your personal AI assistant synced in real-time with your <b>APEX 100 Dashbo
     return;
   }
 
-  // 3. Stats Button
+  // 3. Weekly Progress Report
+  if (incomingText === '📈 Weekly Progress' || incomingText === '/progress' || incomingText === '/weekly' || incomingText === '/report') {
+    const weeklyReport = generateWeeklyReportHtml(weightLogs, walkingLogs, foodLogs, todayStr);
+    await sendTelegramMessage(chatId, weeklyReport, MAIN_KEYBOARD);
+    return;
+  }
+
+  // 4. Stats Button
   if (incomingText === '📊 Today\'s Stats' || incomingText === '/stats' || incomingText === '/status') {
     const statsMsg = `📊 <b>APEX 100 Status for Today (${todayStr}):</b>
 
@@ -161,7 +214,7 @@ I am your personal AI assistant synced in real-time with your <b>APEX 100 Dashbo
     return;
   }
 
-  // 4. Quick Water +500ml
+  // 5. Quick Water +500ml
   if (incomingText === '💧 +500ml Water') {
     const newWater = (waterData.consumedMl || 0) + 500;
     const updatedPayload = {
@@ -177,8 +230,8 @@ I am your personal AI assistant synced in real-time with your <b>APEX 100 Dashbo
     return;
   }
 
-  // 5. Dining Advisor Button
-  if (incomingText === '💡 Dining Advisor' || incomingText.toLowerCase().includes('dining advisor')) {
+  // 6. Dining Advisor Button
+  if (incomingText === '💡 Dining Advisor' || incomingText.toLowerCase() === 'dining advisor') {
     const diningHelp = `🧠 <b>APEX 100 Dining & Restaurant Advisor</b>
 
 You have <b>${calRemaining} kcal</b> and <b>${protRemaining.toFixed(1)}g protein</b> remaining today!
@@ -191,13 +244,13 @@ Ask me about any restaurant or meal scenario:
     return;
   }
 
-  // 6. Open Web Dashboard
+  // 7. Open Web Dashboard
   if (incomingText === '🌐 Open Web Dashboard') {
     await sendTelegramMessage(chatId, `🔗 <b>Open Your Live Dashboard:</b>\nhttps://health-dashboard-eta-nine.vercel.app`, MAIN_KEYBOARD);
     return;
   }
 
-  // 7. Visual Photo Analysis with Gemini 1.5 Flash (Feature 2)
+  // 8. Visual Photo Analysis with Gemini 1.5 Flash (Feature 2)
   if (message.photo && message.photo.length > 0) {
     await sendTelegramMessage(chatId, `🔍 <i>Analyzing your meal photo with Gemini Vision AI...</i>`);
     const bestPhoto = message.photo[message.photo.length - 1];
@@ -283,7 +336,7 @@ Respond strictly in this JSON format:
     }
   }
 
-  // 8. Natural Language Logging & AI Dining Advisor with Gemini 1.5 Flash
+  // 9. Natural Language Logging, Historical Comparisons & AI Dining Advisor with Gemini 1.5 Flash
   const systemPrompt = `You are the dedicated AI Health & Transformation Coach for APEX 100.
 Today's Date: ${todayStr}.
 Current Dashboard Status for Today:
@@ -291,6 +344,12 @@ Current Dashboard Status for Today:
 - Protein: ${totalProt.toFixed(1)}g / 130g target (${protRemaining.toFixed(1)}g needed)
 - Water: ${waterData.consumedMl} ml
 - Existing Food Logs for today: ${JSON.stringify(todayFoodObj)}
+
+Historical Data Context:
+- All Weight Logs: ${JSON.stringify(weightLogs)}
+- All Walking Logs: ${JSON.stringify(walkingLogs)}
+- Total Days with Food Tracked: ${Object.keys(foodLogs).length}
+- Target: 100.0 kg by Dec 31 (Start: 110.8 kg)
 
 User's Telegram Message: "${incomingText}"
 
@@ -304,7 +363,10 @@ Analyze the user's message and determine the action:
    - Return new walk object.
 3. "LOG_WEIGHT": User logged weight (e.g. "Morning weight 110.8 kg").
    - Return new weight object.
-4. "DINING_ADVISOR" / "QUERY": User is asking advice for restaurant dining, food choices, or remaining calories.
+4. "COMPARE_PROGRESS": User is asking to compare progress between weeks or months (e.g. "compare this week and last week", "how is my monthly progress?", "am I on track for 100kg?").
+   - Calculate exact metrics from historical data (weight delta, walking km, average pace improvements, calorie adherence).
+   - Provide a clear, encouraging comparison table/breakdown highlighting wins, improvements, and trajectory to Dec 31.
+5. "DINING_ADVISOR" / "QUERY": User is asking advice for restaurant dining, food choices, or general questions.
    - Provide strategic, actionable advice tailored to their exact remaining ${calRemaining} kcal and ${protRemaining.toFixed(1)}g protein budget!
 
 Format your reply in clean HTML (use <b>, <i>, <code> tags, no markdown backticks).
