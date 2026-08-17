@@ -34,13 +34,20 @@ const FOOD_DATABASE = {
   'brown rice': { aliases: ['brown rice cooked'], name: 'Cooked Brown Rice', serving: '100g cooked', cal: 122, p: 2.6, c: 25, f: 0.9, tip: 'Higher fiber and slower digestion than white rice.' },
   'oats': { aliases: ['rolled oats', 'oatmeal', 'porridge'], name: 'Cooked Rolled Oats', serving: '1 cup cooked (200g)', cal: 155, p: 5.5, c: 27, f: 2.8, tip: 'Rich in beta-glucan soluble fiber for fullness.' },
 
-  // --- CURRIES, CONDIMENTS & SIDES ---
+  // --- CURRIES, THORANS, VEGGIES & SIDES ---
   'chutney': { aliases: ['coconut chutney', 'chammanthi', 'thenga chutney', 'white chutney', 'red chutney', 'tomato chutney', 'pudina chutney'], name: 'Coconut Chutney', serving: '1-2 tbsp (30g)', cal: 50, p: 0.8, c: 2.0, f: 4.5, tip: 'Healthy fats, but calorie-dense. Stick to 1–2 tbsp.' },
   'sambar': { aliases: ['sambhar', 'kerala sambar', 'dal sambar'], name: 'Kerala Sambar', serving: '1 bowl (150g)', cal: 110, p: 4.5, c: 15, f: 3.5, tip: 'Nutrient-dense with toor dal and assorted vegetables.' },
+  'beetroot thoran': { aliases: ['beetroot thoran', 'beetroot upperi', 'beetroot mezhukkupuratti', 'beetroot uppiri', 'beetroot'], name: 'Beetroot Thoran / Uppiri', serving: '100g', cal: 85, p: 2.2, c: 12.0, f: 3.5, tip: 'Rich in dietary nitrates to boost blood flow and walk stamina.' },
+  'payar thoran': { aliases: ['payar thoran', 'cherupayar thoran', 'vanpayar thoran', 'achinga payar thoran', 'payar upperi', 'payar mezhukkupuratti', 'payar', 'cherupayar', 'vanpayar'], name: 'Payar (Green Gram / Cowpeas / Long Beans) Thoran', serving: '100g', cal: 110, p: 6.5, c: 15.0, f: 3.2, tip: 'High protein plant-based side! Great for muscle preservation.' },
+  'pavakka thoran': { aliases: ['pavakka thoran', 'bitter gourd thoran', 'bitter melon thoran', 'bitter lemon', 'bitter gourd', 'bitter melon', 'kayappakka thoran', 'pavakka payar', 'pavakka payar thoran', 'pavakka payar mixed thoran', 'bitter lemon and payar', 'bitter gourd and payar'], name: 'Pavakka (Bitter Gourd/Melon) & Payar Thoran', serving: '100g', cal: 80, p: 3.2, c: 10.0, f: 3.0, tip: 'Superfood for insulin sensitivity, blood sugar control, and fat loss.' },
+  'cabbage thoran': { aliases: ['cabbage thoran', 'cabbage upperi', 'cabbage'], name: 'Cabbage Thoran', serving: '100g', cal: 75, p: 2.0, c: 8.0, f: 3.8, tip: 'High volume, low calorie fiber source.' },
+  'cheera thoran': { aliases: ['spinach thoran', 'cheera thoran', 'red spinach', 'palak thoran', 'cheera'], name: 'Cheera (Spinach) Thoran', serving: '100g', cal: 70, p: 3.5, c: 6.0, f: 3.5, tip: 'Rich in iron, folate, and essential vitamins.' },
+  'avial': { aliases: ['kerala avial', 'avial curry', 'avial'], name: 'Kerala Avial', serving: '1 bowl (150g)', cal: 140, p: 3.8, c: 16.0, f: 6.8, tip: 'Nutrient-dense mixed vegetables with curd and coconut.' },
+  'moru curry': { aliases: ['mor curry', 'pulissery', 'kachiya moru', 'buttermilk curry', 'moru'], name: 'Kachiya Moru / Pulissery', serving: '1 cup (150g)', cal: 75, p: 3.0, c: 5.0, f: 4.5, tip: 'Probiotic-rich and refreshing for gut health and digestion.' },
   'green peas curry': { aliases: ['peas curry', 'pattani curry', 'green peas'], name: 'Green Peas Curry', serving: '100g', cal: 115, p: 5.8, c: 16, f: 3.5, tip: 'Plant protein powerhouse with good fiber.' },
   'kadala curry': { aliases: ['kadala', 'chickpea curry', 'black chickpea'], name: 'Kadala Curry (Black Chickpeas)', serving: '100g', cal: 145, p: 7.2, c: 19, f: 4.8, tip: 'High protein and complex carbs, perfect with Puttu.' },
   'dal curry': { aliases: ['parippu', 'dal', 'daal', 'parippu curry', 'lentil curry'], name: 'Dal Curry / Parippu', serving: '1 cup (150g)', cal: 150, p: 8.0, c: 22, f: 3.5, tip: 'Good everyday plant protein source.' },
-  'vegetable thoran': { aliases: ['thoran', 'cabbage thoran', 'beans thoran', 'beetroot uppiri', 'upperi', 'uppiri', 'beetroot thoran'], name: 'Vegetable Thoran / Uppiri', serving: '100g', cal: 85, p: 2.5, c: 8, f: 4.5, tip: 'Excellent low-calorie micronutrient source.' },
+  'vegetable thoran': { aliases: ['thoran', 'beans thoran', 'mixed veg thoran', 'upperi', 'uppiri', 'mezhukkupuratti'], name: 'Vegetable Thoran / Upperi', serving: '100g', cal: 85, p: 2.5, c: 8, f: 4.5, tip: 'Excellent low-calorie micronutrient source.' },
   'salad': { aliases: ['green salad', 'cucumber salad', 'kachumber'], name: 'Fresh Mixed Salad', serving: '1 bowl (150g)', cal: 35, p: 1.2, c: 7, f: 0.3, tip: 'Zero guilt volume food! Eat before lunch/dinner.' },
 
   // --- CORN & VEGETABLES ---
