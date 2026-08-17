@@ -19,16 +19,23 @@ import {
   Zap,
   Check,
   Key,
-  ExternalLink
+  ExternalLink,
+  Calendar,
+  ChevronLeft,
+  History,
+  TrendingDown
 } from 'lucide-react';
 import { estimateNutritionWithAI, getGeminiApiKey, setGeminiApiKey } from '../utils/nutritionAi';
 
 export default function NutritionDashboard({ 
-  foodLogs = { breakfast: [], lunch: [], snack: [], dinner: [] }, 
+  foodLogs = {}, 
   onAddFoodItem, 
   onDeleteFoodItem, 
   onResetFoodLogs 
 }) {
+  const getTodayStr = () => new Date().toISOString().split('T')[0];
+  const [selectedDate, setSelectedDate] = useState(() => getTodayStr());
+
   const [showAiModal, setShowAiModal] = useState(false);
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [apiKeyInput, setApiKeyInput] = useState(() => getGeminiApiKey());
@@ -58,12 +65,28 @@ export default function NutritionDashboard({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showAiModal, showKeyModal]);
 
-  // Aggregate all logged foods across 4 meals
+  // Normalize foodLogs: Handle both date-keyed { '2026-08-17': { breakfast: [...] } } and legacy { breakfast: [...] }
+  const getActiveDayMeals = (dateStr) => {
+    if (foodLogs[dateStr]) {
+      return foodLogs[dateStr];
+    }
+    // If foodLogs has direct meal keys (legacy fallback)
+    if (foodLogs.breakfast || foodLogs.lunch || foodLogs.snack || foodLogs.dinner) {
+      if (dateStr === '2026-08-17' || dateStr === getTodayStr()) {
+        return foodLogs;
+      }
+    }
+    return { breakfast: [], lunch: [], snack: [], dinner: [] };
+  };
+
+  const activeDayMeals = getActiveDayMeals(selectedDate);
+
+  // Aggregate selected day's logged foods across 4 meals
   const allItems = [
-    ...(foodLogs.breakfast || []),
-    ...(foodLogs.lunch || []),
-    ...(foodLogs.snack || []),
-    ...(foodLogs.dinner || [])
+    ...(activeDayMeals.breakfast || []),
+    ...(activeDayMeals.lunch || []),
+    ...(activeDayMeals.snack || []),
+    ...(activeDayMeals.dinner || [])
   ];
 
   const totalCalories = allItems.reduce((sum, item) => sum + (Number(item.calories) || 0), 0);
@@ -77,6 +100,26 @@ export default function NutritionDashboard({
   const remainingCalories = CALORIE_BUDGET - totalCalories;
   const caloriePercent = Math.min(Math.round((totalCalories / CALORIE_BUDGET) * 100), 150);
   const proteinPercent = Math.min(Math.round((totalProtein / PROTEIN_GOAL) * 100), 150);
+
+  // Date Navigation Handlers
+  const handleShiftDate = (days) => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() + days);
+    setSelectedDate(d.toISOString().split('T')[0]);
+  };
+
+  const isSelectedToday = selectedDate === getTodayStr() || selectedDate === '2026-08-17';
+
+  // Format date for display
+  const formatDateDisplay = (dateStr) => {
+    try {
+      const d = new Date(dateStr + 'T00:00:00');
+      const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+      return d.toLocaleDateString(undefined, options);
+    } catch (e) {
+      return dateStr;
+    }
+  };
 
   const openLogModal = (category = 'breakfast', initialText = '') => {
     setTargetCategory(category);
@@ -135,7 +178,7 @@ export default function NutritionDashboard({
     };
 
     if (onAddFoodItem) {
-      onAddFoodItem(targetCategory, newItem);
+      onAddFoodItem(selectedDate, targetCategory, newItem);
     }
 
     setShowAiModal(false);
@@ -145,7 +188,7 @@ export default function NutritionDashboard({
 
   const handleDelete = (category, itemId) => {
     if (onDeleteFoodItem) {
-      onDeleteFoodItem(category, itemId);
+      onDeleteFoodItem(selectedDate, category, itemId);
     }
   };
 
@@ -162,7 +205,7 @@ export default function NutritionDashboard({
       time: timeStr
     };
     if (onAddFoodItem) {
-      onAddFoodItem(category, newItem);
+      onAddFoodItem(selectedDate, category, newItem);
     }
   };
 
@@ -172,6 +215,11 @@ export default function NutritionDashboard({
     setHasApiKey(!!apiKeyInput.trim());
     setShowKeyModal(false);
   };
+
+  // Extract all logged historical dates for the history section
+  const recordedDates = Object.keys(foodLogs)
+    .filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k))
+    .sort((a, b) => new Date(b) - new Date(a));
 
   const mealCategories = [
     { key: 'breakfast', label: 'Breakfast', icon: Sun, color: '#f59e0b', desc: '08:00 AM – 09:30 AM' },
@@ -212,7 +260,7 @@ export default function NutritionDashboard({
                 <Sparkles size={11} /> {hasApiKey ? 'Live Gemini AI' : 'AI Engine'}
               </button>
             </div>
-            <p className="card-subtitle">Calculate calories & macros for ANY food in the world</p>
+            <p className="card-subtitle">Daily date-scoped meal tracking & intelligent AI calculation</p>
           </div>
         </div>
 
@@ -221,15 +269,15 @@ export default function NutritionDashboard({
             <button
               type="button"
               onClick={() => {
-                if (window.confirm("Reset today's food entries?")) {
-                  if (onResetFoodLogs) onResetFoodLogs();
+                if (window.confirm(`Reset food logs for ${formatDateDisplay(selectedDate)}?`)) {
+                  if (onResetFoodLogs) onResetFoodLogs(selectedDate);
                 }
               }}
               className="btn-secondary"
               style={{ padding: '0.45rem 0.75rem', fontSize: '0.75rem' }}
               title="Reset day"
             >
-              <RotateCcw size={12} /> Reset
+              <RotateCcw size={12} /> Reset Day
             </button>
           )}
           <button 
@@ -242,7 +290,66 @@ export default function NutritionDashboard({
         </div>
       </div>
 
-      {/* Real-time Macro & Calorie Overview Banner */}
+      {/* DATE SELECTOR BAR */}
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.04)',
+        border: '1px solid var(--border-subtle)',
+        borderRadius: 'var(--radius-md)',
+        padding: '0.65rem 0.9rem',
+        marginBottom: '1.25rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '0.5rem'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <button
+            type="button"
+            onClick={() => handleShiftDate(-1)}
+            className="btn-secondary"
+            style={{ padding: '0.35rem 0.55rem', borderRadius: '8px' }}
+            title="Previous Day"
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.2rem 0.5rem' }}>
+            <Calendar size={16} color="var(--gold-primary)" />
+            <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-white)' }}>
+              {formatDateDisplay(selectedDate)}
+            </span>
+            {isSelectedToday && (
+              <span className="gold-tag" style={{ fontSize: '0.65rem', padding: '0.1rem 0.45rem' }}>
+                Today
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => handleShiftDate(1)}
+            className="btn-secondary"
+            style={{ padding: '0.35rem 0.55rem', borderRadius: '8px' }}
+            title="Next Day"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+
+        {!isSelectedToday && (
+          <button
+            type="button"
+            onClick={() => setSelectedDate(getTodayStr())}
+            className="btn-gold"
+            style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem' }}
+          >
+            Jump to Today
+          </button>
+        )}
+      </div>
+
+      {/* Real-time Macro & Calorie Overview Banner for Selected Date */}
       <div style={{
         background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(22, 25, 36, 0.95) 100%)',
         border: '1px solid rgba(255, 215, 0, 0.25)',
@@ -280,7 +387,7 @@ export default function NutritionDashboard({
               />
             </div>
             <div style={{ fontSize: '0.72rem', color: remainingCalories >= 0 ? 'var(--accent-green)' : 'var(--accent-red)', marginTop: '0.3rem', fontWeight: 600 }}>
-              {remainingCalories >= 0 ? `${remainingCalories} kcal remaining today` : `+${Math.abs(remainingCalories)} kcal over budget`}
+              {remainingCalories >= 0 ? `${remainingCalories} kcal remaining for ${formatDateDisplay(selectedDate).split(',')[0]}` : `+${Math.abs(remainingCalories)} kcal over budget`}
             </div>
           </div>
 
@@ -338,7 +445,7 @@ export default function NutritionDashboard({
       {/* 1-Tap Quick Staples for Fast Logging */}
       <div style={{ marginBottom: '1.5rem' }}>
         <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <Zap size={14} color="var(--gold-primary)" /> 1-Tap Favorites & Snacks
+          <Zap size={14} color="var(--gold-primary)" /> 1-Tap Quick Add to {formatDateDisplay(selectedDate).split(',')[0]}
         </div>
         <div style={{ display: 'flex', gap: '0.45rem', overflowX: 'auto', paddingBottom: '0.4rem', scrollbarWidth: 'none' }}>
           <button 
@@ -386,15 +493,20 @@ export default function NutritionDashboard({
         </div>
       </div>
 
-      {/* Daily Meals Breakdown (Live Logged Categories) */}
+      {/* Daily Meals Breakdown (Live Logged Categories for Selected Date) */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-        <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-white)' }}>
-          Today's Meals Log
-        </h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-white)' }}>
+            Meals for {formatDateDisplay(selectedDate)}
+          </h3>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            {allItems.length} items logged ({totalCalories} kcal)
+          </span>
+        </div>
 
         {mealCategories.map(cat => {
           const Icon = cat.icon;
-          const items = foodLogs[cat.key] || [];
+          const items = activeDayMeals[cat.key] || [];
           const mealCalories = items.reduce((sum, i) => sum + (Number(i.calories) || 0), 0);
           const mealProtein = items.reduce((sum, i) => sum + (Number(i.protein) || 0), 0);
 
@@ -441,13 +553,13 @@ export default function NutritionDashboard({
                 </div>
               </div>
 
-              {/* Items List */}
+              {/* Items List (Capped Max Height with Smooth Scroll) */}
               {items.length === 0 ? (
                 <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', fontStyle: 'italic', padding: '0.4rem 0' }}>
-                  No items logged yet for {cat.label.toLowerCase()}. Click "+ Add Food" to calculate with AI.
+                  No items logged for {cat.label.toLowerCase()} on this date. Click "+ Add Food" to log.
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: '220px', overflowY: 'auto' }}>
                   {items.map(item => (
                     <div 
                       key={item.id}
@@ -492,6 +604,87 @@ export default function NutritionDashboard({
         })}
       </div>
 
+      {/* Historical Days Summary */}
+      {recordedDates.length > 0 && (
+        <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem' }}>
+            <History size={16} color="var(--gold-primary)" />
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-white)' }}>
+              Past Days Nutrition Records
+            </h3>
+          </div>
+
+          <div className="table-responsive-wrapper">
+            <table className="clean-data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Total Calories</th>
+                  <th>Protein</th>
+                  <th>Deficit Status</th>
+                  <th style={{ textAlign: 'right' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recordedDates.map(dateKey => {
+                  const dayObj = foodLogs[dateKey] || {};
+                  const dayItems = [
+                    ...(dayObj.breakfast || []),
+                    ...(dayObj.lunch || []),
+                    ...(dayObj.snack || []),
+                    ...(dayObj.dinner || [])
+                  ];
+                  const dayCal = dayItems.reduce((sum, i) => sum + (Number(i.calories) || 0), 0);
+                  const dayProt = dayItems.reduce((sum, i) => sum + (Number(i.protein) || 0), 0);
+                  const isDeficit = dayCal > 0 && dayCal <= 2200;
+
+                  return (
+                    <tr key={dateKey} style={{ background: selectedDate === dateKey ? 'rgba(255, 215, 0, 0.06)' : 'transparent' }}>
+                      <td>
+                        <div style={{ fontWeight: 700, color: 'var(--text-white)' }}>{formatDateDisplay(dateKey)}</div>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{dayItems.length} items logged</div>
+                      </td>
+                      <td>
+                        <span style={{ fontWeight: 800, color: 'var(--gold-primary)', fontFamily: 'var(--font-mono)' }}>
+                          {dayCal} kcal
+                        </span>
+                      </td>
+                      <td>
+                        <span style={{ fontWeight: 700, color: '#60a5fa', fontFamily: 'var(--font-mono)' }}>
+                          {dayProt.toFixed(1)}g
+                        </span>
+                      </td>
+                      <td>
+                        {dayCal === 0 ? (
+                          <span style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>No data</span>
+                        ) : isDeficit ? (
+                          <span style={{ color: 'var(--accent-green)', fontWeight: 700, fontSize: '0.75rem' }}>✓ Deficit Met</span>
+                        ) : (
+                          <span style={{ color: '#f87171', fontWeight: 700, fontSize: '0.75rem' }}>Over Budget</span>
+                        )}
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedDate(dateKey);
+                            window.scrollTo({ top: 300, behavior: 'smooth' });
+                          }}
+                          className="btn-secondary"
+                          style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
+                        >
+                          {selectedDate === dateKey ? 'Active' : 'View / Edit'}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* AI Log Food Modal */}
       {showAiModal && (
         <div className="modal-overlay" onClick={() => setShowAiModal(false)}>
@@ -506,7 +699,7 @@ export default function NutritionDashboard({
                     AI Food & Calorie Estimator
                   </h3>
                   <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                    Type whatever you ate and AI will calculate the exact calories & macros
+                    Logging for <strong>{formatDateDisplay(selectedDate)}</strong>
                   </p>
                 </div>
               </div>

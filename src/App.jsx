@@ -399,17 +399,20 @@ export default function App() {
     });
   };
 
-  // Food Handlers
-  const handleAddFoodItem = (category, newItem) => {
+  // Date-Scoped Food Handlers
+  const handleAddFoodItem = (dateStr, category, newItem) => {
+    const targetDate = dateStr || new Date().toISOString().split('T')[0];
     setFoodLogs(prev => {
-      const updatedCat = [newItem, ...(prev[category] || [])];
-      const next = { ...prev, [category]: updatedCat };
+      const dayData = prev[targetDate] || { breakfast: [], lunch: [], snack: [], dinner: [] };
+      const updatedCat = [newItem, ...(dayData[category] || [])];
+      const updatedDay = { ...dayData, [category]: updatedCat };
+      const next = { ...prev, [targetDate]: updatedDay };
 
-      const all = Object.values(next).flat();
+      const all = Object.values(updatedDay).flat();
       const totalCal = all.reduce((sum, item) => sum + (Number(item.calories) || 0), 0);
       const totalProt = all.reduce((sum, item) => sum + (Number(item.protein) || 0), 0);
 
-      if (totalCal >= 1900 && totalCal <= 2300) {
+      if (totalCal >= 1400 && totalCal <= 2200) {
         handleHabitSync('calories', true);
       }
       if (totalProt >= 120) {
@@ -419,15 +422,24 @@ export default function App() {
     });
   };
 
-  const handleDeleteFoodItem = (category, itemId) => {
-    setFoodLogs(prev => ({
-      ...prev,
-      [category]: (prev[category] || []).filter(item => item.id !== itemId)
-    }));
+  const handleDeleteFoodItem = (dateStr, category, itemId) => {
+    const targetDate = dateStr || new Date().toISOString().split('T')[0];
+    setFoodLogs(prev => {
+      const dayData = prev[targetDate] || { breakfast: [], lunch: [], snack: [], dinner: [] };
+      const updatedCat = (dayData[category] || []).filter(item => item.id !== itemId);
+      return {
+        ...prev,
+        [targetDate]: { ...dayData, [category]: updatedCat }
+      };
+    });
   };
 
-  const handleResetFoodLogs = () => {
-    setFoodLogs({ breakfast: [], lunch: [], snack: [], dinner: [] });
+  const handleResetFoodLogs = (dateStr) => {
+    const targetDate = dateStr || new Date().toISOString().split('T')[0];
+    setFoodLogs(prev => ({
+      ...prev,
+      [targetDate]: { breakfast: [], lunch: [], snack: [], dinner: [] }
+    }));
     handleHabitSync('calories', false);
     handleHabitSync('protein', false);
   };
@@ -468,9 +480,16 @@ export default function App() {
   const totalWeightLost = (110.25 - currentWeight).toFixed(2);
   const lastSleep = sleepLogs.length > 0 ? sleepLogs[sleepLogs.length - 1] : { duration: 8.0 };
 
-  const allFoodItems = Object.values(foodLogs).flat();
-  const totalTodayCalories = allFoodItems.reduce((sum, i) => sum + (Number(i.calories) || 0), 0);
-  const totalTodayProtein = allFoodItems.reduce((sum, i) => sum + (Number(i.protein) || 0), 0);
+  const todayKey = new Date().toISOString().split('T')[0];
+  const todayFoodObj = foodLogs[todayKey] || foodLogs['2026-08-17'] || (foodLogs.breakfast ? foodLogs : { breakfast: [], lunch: [], snack: [], dinner: [] });
+  const todayFoodItems = [
+    ...(todayFoodObj.breakfast || []),
+    ...(todayFoodObj.lunch || []),
+    ...(todayFoodObj.snack || []),
+    ...(todayFoodObj.dinner || [])
+  ];
+  const totalTodayCalories = todayFoodItems.reduce((sum, i) => sum + (Number(i.calories) || 0), 0);
+  const totalTodayProtein = todayFoodItems.reduce((sum, i) => sum + (Number(i.protein) || 0), 0);
 
   return (
     <div className="app-container">

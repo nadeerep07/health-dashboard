@@ -15,24 +15,26 @@ const STORAGE_KEYS = {
   FOOD_LOGS: 'transformation_food_logs',
 };
 
-// Initial default daily food logs (Today 17 Aug actual meals)
+// Initial default daily food logs (Date-indexed: 'YYYY-MM-DD')
 const DEFAULT_FOOD_LOGS = {
-  breakfast: [
-    { id: 'f-1', name: 'Idli with Coconut Chutney', calories: 170, protein: 4.4, carbs: 24.0, fat: 5.7, time: '08:30 AM' },
-    { id: 'f-2', name: '2 Whole Boiled Eggs', calories: 148, protein: 12.6, carbs: 0.8, fat: 10.0, time: '08:45 AM' }
-  ],
-  lunch: [
-    { id: 'f-3', name: '300g Matta Rice + Curry + 2 Fish Fry + Beetroot Uppiri', calories: 495, protein: 36.5, carbs: 58.0, fat: 12.5, time: '01:30 PM' }
-  ],
-  snack: [
-    { id: 'f-4', name: '1 Fresh Banana', calories: 95, protein: 1.2, carbs: 24.0, fat: 0.3, time: '05:00 PM' }
-  ],
-  dinner: [
-    { id: 'f-5', name: '2 Whole Wheat Chapati', calories: 190, protein: 6.4, carbs: 36.0, fat: 3.0, time: '08:15 PM' },
-    { id: 'f-6', name: 'Fish Curry (Kudampuli style)', calories: 135, protein: 19.5, carbs: 1.5, fat: 5.5, time: '08:20 PM' },
-    { id: 'f-7', name: '2 Whole Boiled Eggs', calories: 148, protein: 12.6, carbs: 0.8, fat: 10.0, time: '08:30 PM' },
-    { id: 'f-8', name: '90g Boiled Sweet Corn', calories: 78, protein: 2.7, carbs: 16.8, fat: 1.1, time: '08:40 PM' }
-  ]
+  '2026-08-17': {
+    breakfast: [
+      { id: 'f-1', name: 'Idli with Coconut Chutney', calories: 170, protein: 4.4, carbs: 24.0, fat: 5.7, time: '08:30 AM' },
+      { id: 'f-2', name: '2 Whole Boiled Eggs', calories: 148, protein: 12.6, carbs: 0.8, fat: 10.0, time: '08:45 AM' }
+    ],
+    lunch: [
+      { id: 'f-3', name: '300g Matta Rice + Curry + 2 Fish Fry + Beetroot Uppiri', calories: 495, protein: 36.5, carbs: 58.0, fat: 12.5, time: '01:30 PM' }
+    ],
+    snack: [
+      { id: 'f-4', name: '1 Fresh Banana', calories: 95, protein: 1.2, carbs: 24.0, fat: 0.3, time: '05:00 PM' }
+    ],
+    dinner: [
+      { id: 'f-5', name: '2 Whole Wheat Chapati', calories: 190, protein: 6.4, carbs: 36.0, fat: 3.0, time: '08:15 PM' },
+      { id: 'f-6', name: 'Fish Curry (Kudampuli style)', calories: 135, protein: 19.5, carbs: 1.5, fat: 5.5, time: '08:20 PM' },
+      { id: 'f-7', name: '2 Whole Boiled Eggs', calories: 148, protein: 12.6, carbs: 0.8, fat: 10.0, time: '08:30 PM' },
+      { id: 'f-8', name: '90g Boiled Sweet Corn', calories: 78, protein: 2.7, carbs: 16.8, fat: 1.1, time: '08:40 PM' }
+    ]
+  }
 };
 
 // Initial default water intake (in ml) - Today: 2.2 L logged
