@@ -102,9 +102,32 @@ export default function App() {
   useEffect(() => setStoredData(STORAGE_KEYS.BODY_MEASUREMENTS, measurements), [measurements]);
   useEffect(() => setStoredData(STORAGE_KEYS.FOOD_LOGS, foodLogs), [foodLogs]);
 
-  // Initial Cloud Fetch on Mount (if Supabase is configured)
+  // Initial Cloud Fetch & Local Data Synchronization
   useEffect(() => {
     const initCloud = async () => {
+      // 1. Ensure August 17th actual data exists in local state
+      setWeightLogs(prev => {
+        const hasAug17 = prev.some(l => l.date === '2026-08-17');
+        if (!hasAug17) {
+          return [...prev, { id: 'wt-6', date: '2026-08-17', weight: 110.80, notes: 'Morning fasted weight (Day 1)' }];
+        }
+        return prev;
+      });
+
+      setWalkingLogs(prev => {
+        const hasAug17 = prev.some(l => l.date === '2026-08-17');
+        if (!hasAug17) {
+          return [...prev, { id: 'wl-7', date: '2026-08-17', day: 'Mon', distance: 5.4, duration: 60, pace: '11:07', calories: 492, notes: 'Avg HR: 133 bpm • Elevation: 50m • Day 1 Done!' }];
+        }
+        return prev;
+      });
+
+      setWeeklyWorkouts(prev => ({
+        ...prev,
+        mon: { walk: true, workout: false, title: '5.4 km walk • Day 1 Done!' }
+      }));
+
+      // 2. Fetch from Supabase Cloud if configured
       const config = getSupabaseConfig();
       setIsCloudConfigured(config.isConfigured);
       if (config.isConfigured) {
