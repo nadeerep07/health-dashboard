@@ -34,9 +34,10 @@ async function sendTelegramMessage(chatId, text, replyMarkup = null) {
 // Quick action reply keyboard for Telegram
 const MAIN_KEYBOARD = {
   keyboard: [
-    [{ text: '📊 Today\'s Stats' }, { text: '💧 +500ml Water' }],
-    [{ text: '🚶 Log 5.4km Walk' }, { text: '⚖️ Log Weight' }],
-    [{ text: '🍽️ Log Meal' }, { text: '🌐 Open Web Dashboard' }]
+    [{ text: '📊 Today\'s Stats' }, { text: '🎯 Daily Scorecard' }],
+    [{ text: '🚶 Log Walk' }, { text: '💧 +500ml Water' }],
+    [{ text: '⚖️ Log Weight' }, { text: '💡 Dining Advisor' }],
+    [{ text: '🌐 Open Web Dashboard' }]
   ],
   resize_keyboard: true,
   is_persistent: true
