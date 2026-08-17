@@ -117,7 +117,14 @@ Respond ONLY with a valid JSON object in this exact schema, with no markdown for
     throw new Error("Empty response from AI");
   }
 
-  const parsed = JSON.parse(textResponse);
+  let cleanedText = textResponse.trim();
+  if (cleanedText.startsWith('```json')) {
+    cleanedText = cleanedText.replace(/^```json/, '').replace(/```$/, '').trim();
+  } else if (cleanedText.startsWith('```')) {
+    cleanedText = cleanedText.replace(/^```/, '').replace(/```$/, '').trim();
+  }
+
+  const parsed = JSON.parse(cleanedText);
   return {
     calories: Math.round(Number(parsed.calories) || 0),
     protein: parseFloat((Number(parsed.protein) || 0).toFixed(1)),
