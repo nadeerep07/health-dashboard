@@ -1306,4 +1306,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'EGCG catechins that assist metabolic rate and antioxidant defense.'
   },
+  'kerala appam': {
+    canonicalName: 'Kerala Vellayappam / Palappam (Fermented Rice Pancake)',
+    aliases: ["appam","vellayappam","palappam","kerala appam"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 135,
+    proteinPer100g: 2.1,
+    carbsPer100g: 26.5,
+    fatPer100g: 2.3,
+    fiberPer100g: 0.8,
+    defaultServingDesc: '1 medium appam (50g) ≈ 68 kcal',
+    edibleWeightPerUnit: 50,
+    category: 'grains',
+    confidence: 'verified',
+    healthTip: 'Fermented yeast/rice pancake with soft spongy center.'
+  },
 };
