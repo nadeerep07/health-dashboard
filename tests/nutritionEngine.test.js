@@ -195,4 +195,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(71);
     expect(res.calories).toBeLessThanOrEqual(79);
   });
+  it('Verified Calculation: calculates exact 150g meen pollichathu', async () => {
+    const res = await estimateNutrition('150g meen pollichathu');
+    expect(res.calories).toBeGreaterThanOrEqual(235);
+    expect(res.calories).toBeLessThanOrEqual(261);
+  });
 });
