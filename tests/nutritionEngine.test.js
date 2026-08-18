@@ -470,4 +470,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(3);
     expect(res.calories).toBeLessThanOrEqual(6);
   });
+  it('Verified Calculation: calculates exact 15g coriander leaves', async () => {
+    const res = await estimateNutrition('15g coriander leaves');
+    expect(res.calories).toBeGreaterThanOrEqual(2);
+    expect(res.calories).toBeLessThanOrEqual(5);
+  });
 });
