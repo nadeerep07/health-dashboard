@@ -1354,4 +1354,20 @@ export const FOOD_DATABASE = {
     confidence: 'estimated_range',
     healthTip: 'High protein plant legume rich in resistant starch for insulin sensitivity.'
   },
+  'chana dal yellow': {
+    canonicalName: 'Chana Dal (Split Bengal Gram / Kadala Parippu)',
+    aliases: ["chana dal","kadala parippu","bengal gram dal","split chickpeas"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 140,
+    proteinPer100g: 8.5,
+    carbsPer100g: 24,
+    fatPer100g: 2,
+    fiberPer100g: 7,
+    defaultServingDesc: '1 bowl (150g) = 210 kcal',
+    edibleWeightPerUnit: null,
+    category: 'curries',
+    confidence: 'estimated_range',
+    healthTip: 'Lowest glycemic index among Indian lentils.'
+  },
 };
