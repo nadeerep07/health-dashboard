@@ -430,4 +430,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(30);
     expect(res.calories).toBeLessThanOrEqual(38);
   });
+  it('Verified Calculation: calculates exact 100g padavalanga', async () => {
+    const res = await estimateNutrition('100g padavalanga');
+    expect(res.calories).toBeGreaterThanOrEqual(28);
+    expect(res.calories).toBeLessThanOrEqual(36);
+  });
 });
