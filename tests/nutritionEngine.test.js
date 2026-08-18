@@ -375,4 +375,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(23);
     expect(res.calories).toBeLessThanOrEqual(27);
   });
+  it('Verified Calculation: calculates exact 120g capsicum', async () => {
+    const res = await estimateNutrition('120g capsicum');
+    expect(res.calories).toBeGreaterThanOrEqual(22);
+    expect(res.calories).toBeLessThanOrEqual(26);
+  });
 });
