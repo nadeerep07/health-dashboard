@@ -180,4 +180,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(64);
     expect(res.calories).toBeLessThanOrEqual(72);
   });
+  it('Verified Calculation: calculates exact 100g cabbage thoran', async () => {
+    const res = await estimateNutrition('100g cabbage thoran');
+    expect(res.calories).toBeGreaterThanOrEqual(61);
+    expect(res.calories).toBeLessThanOrEqual(69);
+  });
 });
