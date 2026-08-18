@@ -1850,4 +1850,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Menthol-rich aromatic herb for digestive comfort.'
   },
+  'fresh coriander leaves': {
+    canonicalName: 'Fresh Coriander / Cilantro Leaves (Malliyila)',
+    aliases: ["coriander leaves","cilantro","malliyila","dhaniya patta"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 23,
+    proteinPer100g: 2.1,
+    carbsPer100g: 3.7,
+    fatPer100g: 0.5,
+    fiberPer100g: 2.8,
+    defaultServingDesc: '1 handful (15g) = 3 kcal',
+    edibleWeightPerUnit: 15,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Heavy-metal chelating antioxidant herb.'
+  },
 };
