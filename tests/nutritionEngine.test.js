@@ -330,4 +330,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(38);
     expect(res.calories).toBeLessThanOrEqual(42);
   });
+  it('Verified Calculation: calculates exact 150g chembu', async () => {
+    const res = await estimateNutrition('150g chembu');
+    expect(res.calories).toBeGreaterThanOrEqual(202);
+    expect(res.calories).toBeLessThanOrEqual(224);
+  });
 });
