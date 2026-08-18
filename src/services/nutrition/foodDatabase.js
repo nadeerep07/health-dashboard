@@ -1546,4 +1546,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Versatile low-carb vegetable substitute for rice or mash.'
   },
+  'bell pepper capsicum': {
+    canonicalName: 'Fresh Sliced Bell Pepper / Capsicum (Raw/Stir-Fry)',
+    aliases: ["capsicum","bell pepper","green capsicum","red bell pepper"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 20,
+    proteinPer100g: 0.9,
+    carbsPer100g: 4.6,
+    fatPer100g: 0.2,
+    fiberPer100g: 1.7,
+    defaultServingDesc: '1 medium capsicum (120g) = 24 kcal',
+    edibleWeightPerUnit: 120,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'Crunchy low-calorie vegetable with high Vitamin C and bioflavonoids.'
+  },
 };
