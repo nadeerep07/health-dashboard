@@ -1130,4 +1130,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Plant-based Alpha-Linolenic Acid (ALA) Omega-3 powerhouse.'
   },
+  'guava fresh': {
+    canonicalName: 'Fresh Guava (Raw/Edible with Skin)',
+    aliases: ["guava","fresh guava","pera","amrood","koyyaka"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 68,
+    proteinPer100g: 2.6,
+    carbsPer100g: 14.3,
+    fatPer100g: 0.9,
+    fiberPer100g: 5.4,
+    defaultServingDesc: '1 medium guava (120g) = 82 kcal, 6.5g fiber',
+    edibleWeightPerUnit: 120,
+    category: 'fruits',
+    confidence: 'verified',
+    healthTip: 'Contains 4x more Vitamin C than oranges with high pectin soluble fiber.'
+  },
 };
