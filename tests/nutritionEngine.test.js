@@ -205,4 +205,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(188);
     expect(res.calories).toBeLessThanOrEqual(208);
   });
+  it('Verified Calculation: calculates exact 100g low fat paneer', async () => {
+    const res = await estimateNutrition('100g low fat paneer');
+    expect(res.calories).toBeGreaterThanOrEqual(166);
+    expect(res.calories).toBeLessThanOrEqual(184);
+  });
 });
