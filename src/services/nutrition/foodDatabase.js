@@ -986,4 +986,20 @@ export const FOOD_DATABASE = {
     confidence: 'estimated_range',
     healthTip: 'Rich in dietary fiber and folate.'
   },
+  'meen pollichathu': {
+    canonicalName: 'Meen Pollichathu (Banana Leaf Wrapped Pearlspot / Karimeen)',
+    aliases: ["meen pollichathu","karimeen pollichathu","fish pollichathu","fish in banana leaf"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 165,
+    proteinPer100g: 19.5,
+    carbsPer100g: 3.5,
+    fatPer100g: 8,
+    fiberPer100g: 1,
+    defaultServingDesc: '1 fish (150g edible)',
+    edibleWeightPerUnit: 150,
+    category: 'seafood',
+    confidence: 'estimated_range',
+    healthTip: 'Traditional shallow roasted fish in shallot-tomato masala wrapped in banana leaf.'
+  },
 };
