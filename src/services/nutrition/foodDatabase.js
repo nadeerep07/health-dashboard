@@ -1802,4 +1802,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Curcumin active compound with systemic antioxidant properties.'
   },
+  'black pepper malabar': {
+    canonicalName: 'Malabar Black Pepper (Kurumolaku)',
+    aliases: ["black pepper","pepper powder","kurumolaku","kali mirch","crushed black pepper"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 251,
+    proteinPer100g: 10.4,
+    carbsPer100g: 64,
+    fatPer100g: 3.3,
+    fiberPer100g: 25.3,
+    defaultServingDesc: '1 pinch (1g) = 3 kcal (Piperine)',
+    edibleWeightPerUnit: 1,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Piperine increases nutrient and curcumin bioavailability by up to 2000%.'
+  },
 };
