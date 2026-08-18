@@ -1770,4 +1770,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Gingerol bioactive compound for gastric motility and anti-inflammatory relief.'
   },
+  'fresh garlic cloves': {
+    canonicalName: 'Fresh Crushed Garlic Cloves (Veluthulli)',
+    aliases: ["garlic","garlic cloves","veluthulli","lahsun","crushed garlic"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 149,
+    proteinPer100g: 6.4,
+    carbsPer100g: 33.1,
+    fatPer100g: 0.5,
+    fiberPer100g: 2.1,
+    defaultServingDesc: '3 cloves (9g) = 13 kcal (Allicin)',
+    edibleWeightPerUnit: 9,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Allicin organosulfur compound promoting vascular nitric oxide and immune defense.'
+  },
 };
