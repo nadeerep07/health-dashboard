@@ -1690,4 +1690,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Superfood leaf with extraordinary calcium, iron, and complete plant amino acids.'
   },
+  'muringakka drumstick pod': {
+    canonicalName: 'Muringakka (Drumstick Pod) Sambar Pieces',
+    aliases: ["drumstick","muringakka","drumstick pod","muringakkai"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 37,
+    proteinPer100g: 2.1,
+    carbsPer100g: 8.5,
+    fatPer100g: 0.2,
+    fiberPer100g: 3.2,
+    defaultServingDesc: '100g edible pulp = 37 kcal',
+    edibleWeightPerUnit: 100,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'High bioflavonoid antioxidant pod aiding glucose metabolism.'
+  },
 };
