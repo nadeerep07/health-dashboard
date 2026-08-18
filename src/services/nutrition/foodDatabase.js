@@ -1050,4 +1050,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Fastest absorbing bio-available protein. Peak leucine for muscle protein synthesis.'
   },
+  'soya chunks': {
+    canonicalName: 'Soya Chunks / Mealmaker (Dry/Boiled)',
+    aliases: ["soya chunks","mealmaker","soy chunks","boiled soya chunks","soya"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 345,
+    proteinPer100g: 52,
+    carbsPer100g: 33,
+    fatPer100g: 0.5,
+    fiberPer100g: 13,
+    defaultServingDesc: '30g dry (yields 90g boiled) = 104 kcal, 15.6g protein',
+    edibleWeightPerUnit: 30,
+    category: 'proteins',
+    confidence: 'verified',
+    healthTip: 'Highest protein density of any plant food (52% protein by dry weight).'
+  },
 };
