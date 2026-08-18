@@ -320,4 +320,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(199);
     expect(res.calories).toBeLessThanOrEqual(221);
   });
+  it('Verified Calculation: calculates exact 150g mathanga erissery', async () => {
+    const res = await estimateNutrition('150g mathanga erissery');
+    expect(res.calories).toBeGreaterThanOrEqual(96);
+    expect(res.calories).toBeLessThanOrEqual(108);
+  });
 });
