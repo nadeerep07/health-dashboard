@@ -1290,4 +1290,20 @@ export const FOOD_DATABASE = {
     confidence: 'estimated_range',
     healthTip: 'Dense source of bioavailable heme iron, creatine, and carnosine.'
   },
+  'green tea unsweetened': {
+    canonicalName: 'Pure Green Tea (Unsweetened / 0 kcal)',
+    aliases: ["green tea","matcha tea","herbal green tea","black tea unsweetened"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 1,
+    proteinPer100g: 0,
+    carbsPer100g: 0.2,
+    fatPer100g: 0,
+    fiberPer100g: 0,
+    defaultServingDesc: '1 cup (200ml) ≈ 2 kcal',
+    edibleWeightPerUnit: 200,
+    category: 'beverages',
+    confidence: 'verified',
+    healthTip: 'EGCG catechins that assist metabolic rate and antioxidant defense.'
+  },
 };
