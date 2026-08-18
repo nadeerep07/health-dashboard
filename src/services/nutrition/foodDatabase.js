@@ -922,4 +922,20 @@ export const FOOD_DATABASE = {
     category: 'supplements',
     healthTip: '1 scoop (30g) in water = 120 kcal, 24g pure protein.'
   }
+  'kappa puzhukku': {
+    canonicalName: 'Kappa (Boiled Tapioca / Cassava)',
+    aliases: ["kappa","boiled tapioca","kappa puzhukku","boiled cassava","maravalli kizhangu"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 160,
+    proteinPer100g: 1.4,
+    carbsPer100g: 38.1,
+    fatPer100g: 0.3,
+    fiberPer100g: 1.8,
+    defaultServingDesc: '150g boiled portion',
+    edibleWeightPerUnit: null,
+    category: 'grains',
+    confidence: 'verified',
+    healthTip: 'Traditional Kerala carbohydrate staple. High energy density.'
+  },
 };
