@@ -235,4 +235,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(69);
     expect(res.calories).toBeLessThanOrEqual(77);
   });
+  it('Verified Calculation: calculates exact 12g almonds', async () => {
+    const res = await estimateNutrition('12g almonds');
+    expect(res.calories).toBeGreaterThanOrEqual(65);
+    expect(res.calories).toBeLessThanOrEqual(73);
+  });
 });
