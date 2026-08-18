@@ -1034,4 +1034,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Complete plant protein with all 9 essential amino acids and zero cholesterol.'
   },
+  'whey protein isolate': {
+    canonicalName: '100% Whey Protein Isolate (1 Scoop / 30g)',
+    aliases: ["whey protein","whey isolate","protein powder","1 scoop whey","isolate protein","whey shake"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 370,
+    proteinPer100g: 88,
+    carbsPer100g: 2,
+    fatPer100g: 1,
+    fiberPer100g: 0.5,
+    defaultServingDesc: '1 scoop (30g powder = 111 kcal, 26.4g protein)',
+    edibleWeightPerUnit: 30,
+    category: 'proteins',
+    confidence: 'verified',
+    healthTip: 'Fastest absorbing bio-available protein. Peak leucine for muscle protein synthesis.'
+  },
 };
