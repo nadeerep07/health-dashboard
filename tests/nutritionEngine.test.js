@@ -420,4 +420,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(60);
     expect(res.calories).toBeLessThanOrEqual(70);
   });
+  it('Verified Calculation: calculates exact 100g muringakka', async () => {
+    const res = await estimateNutrition('100g muringakka');
+    expect(res.calories).toBeGreaterThanOrEqual(34);
+    expect(res.calories).toBeLessThanOrEqual(40);
+  });
 });
