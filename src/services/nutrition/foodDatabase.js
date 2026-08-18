@@ -1882,4 +1882,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Ultra low coumarin true cinnamon improving cellular glucose uptake.'
   },
+  'green cardamom pods': {
+    canonicalName: 'Green Cardamom Pods (Elakka)',
+    aliases: ["cardamom","green cardamom","elakka","elaichi"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 311,
+    proteinPer100g: 10.8,
+    carbsPer100g: 68.5,
+    fatPer100g: 6.7,
+    fiberPer100g: 28,
+    defaultServingDesc: '2 pods crushed (1g) = 3 kcal',
+    edibleWeightPerUnit: 1,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Therapeutic terpene oils supporting fresh breath and digestion.'
+  },
 };
