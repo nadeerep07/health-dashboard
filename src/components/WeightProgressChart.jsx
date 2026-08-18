@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingDown, Plus, Target, Award, Calendar, Trash2, List, BarChart2, Info } from 'lucide-react';
+import { calculate7DayMovingAverage } from '../services/weightService.js';
 
 export default function WeightProgressChart({ weightLogs = [], onAddWeightLog, onDeleteWeightLog, targetWeight = 100 }) {
   const [showModal, setShowModal] = useState(false);
@@ -76,8 +77,10 @@ export default function WeightProgressChart({ weightLogs = [], onAddWeightLog, o
     return paddingRatio + (index / (sortedLogs.length - 1)) * (chartWidth - paddingRatio * 2);
   };
 
-  // Build SVG Path
+  // Build SVG Paths
+  const movingAverages = calculate7DayMovingAverage(sortedLogs);
   const points = sortedLogs.map((log, idx) => `${getX(idx)},${getY(log.weight)}`).join(' ');
+  const maPoints = movingAverages.map((ma, idx) => `${getX(idx)},${getY(ma.movingAvg)}`).join(' ');
   const targetY = getY(targetWeight);
 
   return (
@@ -158,7 +161,14 @@ export default function WeightProgressChart({ weightLogs = [], onAddWeightLog, o
         marginBottom: '1.5rem'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.35rem' }}>
-          <span style={{ fontWeight: 600 }}>Weight Trendline (kg)</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span style={{ color: 'var(--gold-primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--gold-primary)', display: 'inline-block' }}></span> Daily Fasted
+            </span>
+            <span style={{ color: '#38bdf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <span style={{ width: '12px', height: '2px', background: '#38bdf8', display: 'inline-block' }}></span> 7-Day Trend
+            </span>
+          </div>
           <span style={{ color: 'var(--gold-primary)', fontWeight: 700 }}>Phase 1 Goal: 100.00 kg</span>
         </div>
 
@@ -187,15 +197,28 @@ export default function WeightProgressChart({ weightLogs = [], onAddWeightLog, o
               />
             )}
 
-            {/* Line Path */}
+            {/* Daily Fasted Weight Line Path */}
             {sortedLogs.length > 1 && (
               <polyline
                 fill="none"
                 stroke="var(--gold-primary)"
-                strokeWidth="3"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 points={points}
+              />
+            )}
+
+            {/* 7-Day Moving Average Trendline */}
+            {movingAverages.length > 1 && (
+              <polyline
+                fill="none"
+                stroke="#38bdf8"
+                strokeWidth="2.5"
+                strokeDasharray="4,4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={maPoints}
               />
             )}
 

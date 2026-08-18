@@ -1,10 +1,11 @@
 import React from 'react';
 import { Target, Calendar, TrendingDown, Flame, Trophy, Award } from 'lucide-react';
 
-export default function TransformationHero({ currentWeight = 110.25, startWeight = 110.25, targetWeight = 100 }) {
+export default function TransformationHero({ currentWeight = 110.80, startWeight = 110.80, targetWeight = 100, sevenDayAvg = null }) {
   const remainingWeight = (currentWeight - targetWeight).toFixed(2);
   const totalToLose = startWeight - targetWeight;
   const lostWeight = startWeight - currentWeight;
+  const avgWeightDisplay = sevenDayAvg ? Number(sevenDayAvg).toFixed(2) : currentWeight.toFixed(2);
   
   // Calculate percentage (capped between 0 and 100)
   const rawProgress = totalToLose > 0 ? (lostWeight / totalToLose) * 100 : 0;
@@ -122,6 +123,11 @@ export default function TransformationHero({ currentWeight = 110.25, startWeight
             <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)' }}>
               {currentWeight.toFixed(2)} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>kg</span>
             </span>
+            {sevenDayAvg && (
+              <span style={{ fontSize: '0.68rem', color: 'var(--gold-primary)', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                <TrendingDown size={11} /> 7-Day Avg: <b>{avgWeightDisplay} kg</b>
+              </span>
+            )}
           </div>
 
           {/* Stat 2: Target */}

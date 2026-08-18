@@ -575,13 +575,35 @@ export default function NutritionDashboard({
                       }}
                     >
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-white)' }}>
-                          {item.name}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-white)' }}>
+                            {item.name}
+                          </span>
+                          {item.weightType && (
+                            <span style={{
+                              fontSize: '0.62rem',
+                              fontWeight: 700,
+                              textTransform: 'uppercase',
+                              padding: '0.1rem 0.35rem',
+                              borderRadius: '4px',
+                              background: item.weightType === 'raw' ? 'rgba(239, 68, 68, 0.15)' : item.weightType === 'edible' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                              color: item.weightType === 'raw' ? '#fca5a5' : item.weightType === 'edible' ? '#7dd3fc' : '#6ee7b7',
+                              border: '1px solid rgba(255, 255, 255, 0.08)'
+                            }}>
+                              {item.weightType}
+                            </span>
+                          )}
+                          {item.confidence === 'verified' && (
+                            <span style={{ fontSize: '0.62rem', color: '#34d399', display: 'flex', alignItems: 'center', gap: '0.15rem' }} title="Verified Nutrition Database">
+                              <ShieldCheck size={11} /> Verified
+                            </span>
+                          )}
                         </div>
-                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'flex', gap: '0.6rem', marginTop: '0.1rem' }}>
-                          <span style={{ color: 'var(--gold-primary)' }}>{item.calories} kcal</span>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'flex', gap: '0.6rem', marginTop: '0.15rem', alignItems: 'center' }}>
+                          <span style={{ color: 'var(--gold-primary)', fontWeight: 700 }}>{item.calories} kcal</span>
                           <span style={{ color: '#60a5fa' }}>{item.protein}g protein</span>
                           {item.carbs ? <span>{item.carbs}g carbs</span> : null}
+                          {item.weightGrams ? <span style={{ color: 'var(--text-dim)' }}>({item.weightGrams}g)</span> : null}
                           {item.time ? <span style={{ color: 'var(--text-dim)' }}>• {item.time}</span> : null}
                         </div>
                       </div>

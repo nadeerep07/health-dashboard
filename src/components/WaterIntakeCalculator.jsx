@@ -102,6 +102,23 @@ export default function WaterIntakeCalculator({ waterData, onUpdateWater, onHabi
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button
+            onClick={() => {
+              const input = prompt('Enter your daily water target in ml (e.g. 3000, 3500, 4000):', targetMl);
+              const num = parseInt(input);
+              if (num && num >= 1000 && num <= 10000) {
+                onUpdateWater({
+                  ...waterData,
+                  targetMl: num
+                });
+              }
+            }}
+            className="btn-secondary"
+            style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.3)' }}
+            title="Configure daily water target"
+          >
+            🎯 Goal: {targetLiters}L
+          </button>
           <button 
             onClick={resetWater} 
             className="btn-secondary" 
