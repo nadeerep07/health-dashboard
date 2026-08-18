@@ -230,4 +230,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(95);
     expect(res.calories).toBeLessThanOrEqual(105);
   });
+  it('Verified Calculation: calculates exact 15g chia seeds', async () => {
+    const res = await estimateNutrition('15g chia seeds');
+    expect(res.calories).toBeGreaterThanOrEqual(69);
+    expect(res.calories).toBeLessThanOrEqual(77);
+  });
 });
