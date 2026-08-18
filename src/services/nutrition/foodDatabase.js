@@ -1402,4 +1402,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Ultra high diuretic fiber vegetable supporting renal function.'
   },
+  'chembu taro root': {
+    canonicalName: 'Boiled Chembu (Taro Root / Colocasia)',
+    aliases: ["chembu","boiled chembu","taro root","colocasia","arbi"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 142,
+    proteinPer100g: 1.5,
+    carbsPer100g: 34.6,
+    fatPer100g: 0.1,
+    fiberPer100g: 5.1,
+    defaultServingDesc: '150g portion = 213 kcal',
+    edibleWeightPerUnit: null,
+    category: 'grains',
+    confidence: 'verified',
+    healthTip: 'Complex carbohydrate root vegetable with high potassium.'
+  },
 };
