@@ -1082,4 +1082,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Strained yogurt with double the protein and half the carbohydrates of standard curd.'
   },
+  'chia seeds': {
+    canonicalName: 'Raw Chia Seeds',
+    aliases: ["chia seeds","chia","soaked chia seeds","chia seed"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 486,
+    proteinPer100g: 16.5,
+    carbsPer100g: 42.1,
+    fatPer100g: 30.7,
+    fiberPer100g: 34.4,
+    defaultServingDesc: '1 tbsp (15g) = 73 kcal, 5.2g fiber',
+    edibleWeightPerUnit: 15,
+    category: 'nuts_seeds',
+    confidence: 'verified',
+    healthTip: 'Soluble fiber gel that expands 10x in water to promote sustained satiety.'
+  },
 };
