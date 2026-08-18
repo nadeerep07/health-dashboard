@@ -1002,4 +1002,20 @@ export const FOOD_DATABASE = {
     confidence: 'estimated_range',
     healthTip: 'Traditional shallow roasted fish in shallot-tomato masala wrapped in banana leaf.'
   },
+  'paneer low fat': {
+    canonicalName: 'Low-Fat Cottage Cheese / Paneer (Raw/Cooked)',
+    aliases: ["low fat paneer","diet paneer","light paneer","skim paneer"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 175,
+    proteinPer100g: 22,
+    carbsPer100g: 4.5,
+    fatPer100g: 7.5,
+    fiberPer100g: 0,
+    defaultServingDesc: '100g portion',
+    edibleWeightPerUnit: 100,
+    category: 'proteins',
+    confidence: 'verified',
+    healthTip: 'Slow-digesting casein protein. Great for overnight muscle repair.'
+  },
 };
