@@ -160,4 +160,9 @@ describe('Sanity Validation Layer', () => {
     const validation = validateNutritionEntry(mismatchEntry);
     expect(validation.flaggedForReview).toBe(true);
   });
+  it('Verified Calculation: calculates exact 150g kappa', async () => {
+    const res = await estimateNutrition('150g kappa');
+    expect(res.calories).toBeGreaterThanOrEqual(228);
+    expect(res.calories).toBeLessThanOrEqual(252);
+  });
 });
