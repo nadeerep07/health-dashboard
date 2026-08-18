@@ -325,4 +325,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(96);
     expect(res.calories).toBeLessThanOrEqual(108);
   });
+  it('Verified Calculation: calculates exact 100g vazhapindi thoran', async () => {
+    const res = await estimateNutrition('100g vazhapindi thoran');
+    expect(res.calories).toBeGreaterThanOrEqual(38);
+    expect(res.calories).toBeLessThanOrEqual(42);
+  });
 });
