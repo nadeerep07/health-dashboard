@@ -405,4 +405,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(40);
     expect(res.calories).toBeLessThanOrEqual(46);
   });
+  it('Verified Calculation: calculates exact 14g olive oil', async () => {
+    const res = await estimateNutrition('14g olive oil');
+    expect(res.calories).toBeGreaterThanOrEqual(120);
+    expect(res.calories).toBeLessThanOrEqual(130);
+  });
 });
