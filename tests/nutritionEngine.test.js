@@ -175,4 +175,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(185);
     expect(res.calories).toBeLessThanOrEqual(205);
   });
+  it('Verified Calculation: calculates exact 150g moru curry', async () => {
+    const res = await estimateNutrition('150g moru curry');
+    expect(res.calories).toBeGreaterThanOrEqual(64);
+    expect(res.calories).toBeLessThanOrEqual(72);
+  });
 });
