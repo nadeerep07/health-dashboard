@@ -1,9 +1,21 @@
 import React from 'react';
 
 /**
- * Universal Button Primitive
- * Variants: 'primary' | 'secondary' | 'ghost' | 'danger' | 'success'
- * Sizes: 'sm' | 'md' | 'lg'
+ * Universal Button Primitive Component
+ * 
+ * Provides accessible, keyboard-navigable interactive button with consistent brand styling.
+ * 
+ * @param {Object} props - Component properties
+ * @param {React.ReactNode} props.children - Button label or nested elements
+ * @param {'primary' | 'secondary' | 'ghost' | 'danger' | 'success'} [props.variant='primary'] - Visual style variant
+ * @param {'sm' | 'md' | 'lg'} [props.size='md'] - Button size scale
+ * @param {React.ComponentType} [props.icon] - Lucide icon component reference
+ * @param {'left' | 'right'} [props.iconPosition='left'] - Placement of icon relative to label
+ * @param {boolean} [props.fullWidth=false] - Whether button spans full container width
+ * @param {boolean} [props.disabled=false] - Disables interaction and dims opacity
+ * @param {boolean} [props.loading=false] - Shows loading state and prevents duplicate clicks
+ * @param {Function} [props.onClick] - Click event handler callback
+ * @returns {JSX.Element}
  */
 export default function Button({
   children,

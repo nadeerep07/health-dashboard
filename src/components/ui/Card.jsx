@@ -2,7 +2,15 @@ import React from 'react';
 
 /**
  * Universal Card Container Primitive
- * Variants: 'default' | 'elevated' | 'interactive' | 'subtle' | 'gradient'
+ * 
+ * Provides consistent elevation, border radius, and surface backgrounds across screens.
+ * 
+ * @param {Object} props - Component properties
+ * @param {React.ReactNode} props.children - Card content elements
+ * @param {'default' | 'elevated' | 'interactive' | 'subtle' | 'gradient'} [props.variant='default'] - Surface elevation style
+ * @param {string} [props.padding='1.25rem'] - Internal padding specification
+ * @param {Function} [props.onClick] - Optional click handler for interactive cards
+ * @returns {JSX.Element}
  */
 export default function Card({
   children,
@@ -36,8 +44,8 @@ export default function Card({
       case 'gradient':
         return {
           background: 'linear-gradient(145deg, var(--surface-card) 0%, var(--surface-elevated) 100%)',
-          border: '1px solid rgba(245, 158, 11, 0.25)',
-          boxShadow: 'var(--shadow-card), 0 0 20px rgba(245, 158, 11, 0.05)',
+          border: '1px solid var(--border-accent)',
+          boxShadow: 'var(--shadow-card), 0 0 20px rgba(16, 185, 129, 0.06)',
         };
       case 'default':
       default:

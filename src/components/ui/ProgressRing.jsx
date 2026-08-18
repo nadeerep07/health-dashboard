@@ -1,8 +1,18 @@
 import React from 'react';
 
 /**
- * Universal SVG Progress Ring Primitive
- * Supports multi-ring overlays, center label/metrics, and custom color accents
+ * Universal SVG Radial Circular Progress Indicator Primitive
+ * 
+ * Renders smooth animated SVG arcs for calorie targets, macro adherence, and daily transformation scorecards.
+ * 
+ * @param {Object} props - Component properties
+ * @param {number} [props.size=80] - Diameter of the circular ring in pixels
+ * @param {number} [props.strokeWidth=7] - Thickness of the progress arc stroke
+ * @param {number} [props.progress=0] - Numerical progress percentage (0 to 100)
+ * @param {string} [props.color='var(--brand-primary)'] - Hex or CSS variable color for active progress arc
+ * @param {string} [props.trackColor='rgba(255, 255, 255, 0.08)'] - CSS color for underlying circular track
+ * @param {React.ReactNode} [props.children] - Centered metrics or labels
+ * @returns {JSX.Element}
  */
 export default function ProgressRing({
   size = 80,
