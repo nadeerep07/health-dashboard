@@ -285,4 +285,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(26);
     expect(res.calories).toBeLessThanOrEqual(30);
   });
+  it('Verified Calculation: calculates exact 100g chicken thigh', async () => {
+    const res = await estimateNutrition('100g chicken thigh');
+    expect(res.calories).toBeGreaterThanOrEqual(168);
+    expect(res.calories).toBeLessThanOrEqual(186);
+  });
 });
