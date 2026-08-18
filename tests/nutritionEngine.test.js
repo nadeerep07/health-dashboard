@@ -450,4 +450,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(11);
     expect(res.calories).toBeLessThanOrEqual(16);
   });
+  it('Verified Calculation: calculates exact 2g turmeric', async () => {
+    const res = await estimateNutrition('2g turmeric');
+    expect(res.calories).toBeGreaterThanOrEqual(5);
+    expect(res.calories).toBeLessThanOrEqual(8);
+  });
 });
