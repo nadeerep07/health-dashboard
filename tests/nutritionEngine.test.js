@@ -280,4 +280,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(33);
     expect(res.calories).toBeLessThanOrEqual(37);
   });
+  it('Verified Calculation: calculates exact 100g mushrooms', async () => {
+    const res = await estimateNutrition('100g mushrooms');
+    expect(res.calories).toBeGreaterThanOrEqual(26);
+    expect(res.calories).toBeLessThanOrEqual(30);
+  });
 });
