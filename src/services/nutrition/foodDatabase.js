@@ -1642,4 +1642,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Lauric acid & Medium Chain Triglycerides (MCTs) for ketogenic brain fuel.'
   },
+  'extra virgin olive oil': {
+    canonicalName: 'Extra Virgin Cold-Pressed Olive Oil (EVOO)',
+    aliases: ["olive oil","extra virgin olive oil","evoo"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 884,
+    proteinPer100g: 0,
+    carbsPer100g: 0,
+    fatPer100g: 100,
+    fiberPer100g: 0,
+    defaultServingDesc: '1 tbsp (14g) = 124 kcal (Oleic acid)',
+    edibleWeightPerUnit: 14,
+    category: 'fats',
+    confidence: 'verified',
+    healthTip: 'Rich in polyphenols and monounsaturated oleic fatty acids.'
+  },
 };
