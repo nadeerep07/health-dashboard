@@ -1818,4 +1818,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Piperine increases nutrient and curcumin bioavailability by up to 2000%.'
   },
+  'fresh curry leaves': {
+    canonicalName: 'Fresh Curry Leaves (Kariveppila)',
+    aliases: ["curry leaves","kariveppila","kadi patta"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 108,
+    proteinPer100g: 6.1,
+    carbsPer100g: 18.7,
+    fatPer100g: 1,
+    fiberPer100g: 6.4,
+    defaultServingDesc: '1 sprig (2g) ≈ 2 kcal',
+    edibleWeightPerUnit: 2,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Mahanimbine alkaloid with natural lipid-lowering properties.'
+  },
 };
