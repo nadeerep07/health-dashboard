@@ -1098,4 +1098,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Soluble fiber gel that expands 10x in water to promote sustained satiety.'
   },
+  'almonds raw': {
+    canonicalName: 'Raw Whole Almonds',
+    aliases: ["almonds","raw almonds","badam","soaked almonds"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 579,
+    proteinPer100g: 21.2,
+    carbsPer100g: 21.6,
+    fatPer100g: 49.9,
+    fiberPer100g: 12.5,
+    defaultServingDesc: '10 almonds (12g) = 69 kcal',
+    edibleWeightPerUnit: 12,
+    category: 'nuts_seeds',
+    confidence: 'verified',
+    healthTip: 'Rich in Vitamin E and monounsaturated healthy fats.'
+  },
 };
