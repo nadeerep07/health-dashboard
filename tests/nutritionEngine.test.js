@@ -215,4 +215,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(78);
     expect(res.calories).toBeLessThanOrEqual(88);
   });
+  it('Verified Calculation: calculates exact 30g whey protein', async () => {
+    const res = await estimateNutrition('30g whey protein');
+    expect(res.calories).toBeGreaterThanOrEqual(105);
+    expect(res.calories).toBeLessThanOrEqual(117);
+  });
 });
