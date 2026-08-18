@@ -165,4 +165,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(228);
     expect(res.calories).toBeLessThanOrEqual(252);
   });
+  it('Verified Calculation: calculates exact 120g puttu', async () => {
+    const res = await estimateNutrition('120g puttu');
+    expect(res.calories).toBeGreaterThanOrEqual(177);
+    expect(res.calories).toBeLessThanOrEqual(197);
+  });
 });
