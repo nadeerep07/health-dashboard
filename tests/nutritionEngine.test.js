@@ -270,4 +270,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(57);
     expect(res.calories).toBeLessThanOrEqual(65);
   });
+  it('Verified Calculation: calculates exact 100g broccoli', async () => {
+    const res = await estimateNutrition('100g broccoli');
+    expect(res.calories).toBeGreaterThanOrEqual(33);
+    expect(res.calories).toBeLessThanOrEqual(37);
+  });
 });
