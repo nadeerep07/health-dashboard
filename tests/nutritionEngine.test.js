@@ -335,4 +335,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(202);
     expect(res.calories).toBeLessThanOrEqual(224);
   });
+  it('Verified Calculation: calculates exact 50g kozhuva fry', async () => {
+    const res = await estimateNutrition('50g kozhuva fry');
+    expect(res.calories).toBeGreaterThanOrEqual(99);
+    expect(res.calories).toBeLessThanOrEqual(111);
+  });
 });
