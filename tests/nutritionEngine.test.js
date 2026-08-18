@@ -240,4 +240,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(65);
     expect(res.calories).toBeLessThanOrEqual(73);
   });
+  it('Verified Calculation: calculates exact 14g walnuts', async () => {
+    const res = await estimateNutrition('14g walnuts');
+    expect(res.calories).toBeGreaterThanOrEqual(87);
+    expect(res.calories).toBeLessThanOrEqual(97);
+  });
 });
