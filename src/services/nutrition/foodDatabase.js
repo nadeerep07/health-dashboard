@@ -1610,4 +1610,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Natural live probiotics supporting microbiome diversity.'
   },
+  'tomato salad slices': {
+    canonicalName: 'Fresh Raw Tomato Slices',
+    aliases: ["tomato","sliced tomato","fresh tomato","thakkali"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 18,
+    proteinPer100g: 0.9,
+    carbsPer100g: 3.9,
+    fatPer100g: 0.2,
+    fiberPer100g: 1.2,
+    defaultServingDesc: '1 medium tomato (100g) = 18 kcal',
+    edibleWeightPerUnit: 100,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'Rich in lycopene antioxidant for arterial health.'
+  },
 };
