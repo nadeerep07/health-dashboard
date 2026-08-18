@@ -410,4 +410,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(120);
     expect(res.calories).toBeLessThanOrEqual(130);
   });
+  it('Verified Calculation: calculates exact 5g ghee', async () => {
+    const res = await estimateNutrition('5g ghee');
+    expect(res.calories).toBeGreaterThanOrEqual(42);
+    expect(res.calories).toBeLessThanOrEqual(48);
+  });
 });
