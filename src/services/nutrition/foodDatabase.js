@@ -1242,4 +1242,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Rich in non-heme iron, magnesium, and lutein.'
   },
+  'button mushrooms': {
+    canonicalName: 'Sauteed / Grilled White Button Mushrooms',
+    aliases: ["mushrooms","button mushrooms","grilled mushrooms","koon"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 28,
+    proteinPer100g: 3.1,
+    carbsPer100g: 3.3,
+    fatPer100g: 0.3,
+    fiberPer100g: 1,
+    defaultServingDesc: '1 cup (100g) = 28 kcal, 3.1g protein',
+    edibleWeightPerUnit: 100,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'High umami flavor with almost zero calories. Natural ergosterol Vitamin D precursor.'
+  },
 };
