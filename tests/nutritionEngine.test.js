@@ -340,4 +340,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(99);
     expect(res.calories).toBeLessThanOrEqual(111);
   });
+  it('Verified Calculation: calculates exact 100g chemmeen roast', async () => {
+    const res = await estimateNutrition('100g chemmeen roast');
+    expect(res.calories).toBeGreaterThanOrEqual(137);
+    expect(res.calories).toBeLessThanOrEqual(153);
+  });
 });
