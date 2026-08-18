@@ -380,4 +380,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(22);
     expect(res.calories).toBeLessThanOrEqual(26);
   });
+  it('Verified Calculation: calculates exact 130g sweet potato', async () => {
+    const res = await estimateNutrition('130g sweet potato');
+    expect(res.calories).toBeGreaterThanOrEqual(106);
+    expect(res.calories).toBeLessThanOrEqual(118);
+  });
 });
