@@ -938,4 +938,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Traditional Kerala carbohydrate staple. High energy density.'
   },
+  'kerala puttu': {
+    canonicalName: 'Rice Puttu (Steamed Cylindrical Rice Cake)',
+    aliases: ["puttu","kerala puttu","rice puttu","ari puttu"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 156,
+    proteinPer100g: 3.1,
+    carbsPer100g: 33.2,
+    fatPer100g: 1.2,
+    fiberPer100g: 1.4,
+    defaultServingDesc: '1 puttu portion (120g)',
+    edibleWeightPerUnit: 120,
+    category: 'grains',
+    confidence: 'verified',
+    healthTip: 'Steamed rice flour with light coconut layers. 1 piece ≈ 187 kcal.'
+  },
 };
