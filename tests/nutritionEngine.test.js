@@ -300,4 +300,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(1);
     expect(res.calories).toBeLessThanOrEqual(3);
   });
+  it('Verified Calculation: calculates exact 2 appam', async () => {
+    const res = await estimateNutrition('2 appam');
+    expect(res.calories).toBeGreaterThanOrEqual(128);
+    expect(res.calories).toBeLessThanOrEqual(142);
+  });
 });
