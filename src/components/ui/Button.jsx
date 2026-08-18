@@ -28,7 +28,7 @@ export default function Button({
           color: '#0a0b0e',
           fontWeight: 700,
           border: 'none',
-          boxShadow: '0 4px 14px rgba(245, 158, 11, 0.25)',
+          boxShadow: '0 4px 14px rgba(16, 185, 129, 0.22)',
         };
       case 'secondary':
         return {

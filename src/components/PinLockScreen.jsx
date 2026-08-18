@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Lock, Delete, ArrowRight, Shield } from 'lucide-react';
+import ApexLogo from './ui/ApexLogo';
+import { Lock, Delete } from 'lucide-react';
 
 export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
   const [pinInput, setPinInput] = useState('');
@@ -60,7 +61,7 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
       zIndex: 1000,
-      background: 'radial-gradient(circle at 50% 30%, #151824 0%, #08090c 100%)',
+      background: 'radial-gradient(circle at 50% 30%, #17201f 0%, #0b1110 100%)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -78,39 +79,17 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
         animation: isShaking ? 'shake 0.4s ease' : 'none'
       }}>
         
-        {/* Lock Icon */}
-        <div style={{
-          width: '56px',
-          height: '56px',
-          borderRadius: '16px',
-          background: 'rgba(255, 215, 0, 0.1)',
-          border: '1px solid rgba(255, 215, 0, 0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--gold-primary)',
-          marginBottom: '1rem',
-          boxShadow: '0 0 25px rgba(255, 215, 0, 0.15)'
-        }}>
-          <Lock size={26} strokeWidth={2.5} />
+        {/* Brand Logo & Vault Header */}
+        <div style={{ marginBottom: '1.25rem' }}>
+          <ApexLogo size={42} showWordmark={true} />
         </div>
 
-        {/* Title */}
-        <h1 style={{
-          fontSize: '1.25rem',
-          fontWeight: 800,
-          color: 'var(--text-white)',
-          letterSpacing: '0.03em',
-          marginBottom: '0.2rem'
-        }}>
-          TRANSFORMATION VAULT
-        </h1>
         <p style={{
           fontSize: '0.78rem',
           color: 'var(--text-muted)',
           marginBottom: '1.25rem'
         }}>
-          Enter {PIN_LENGTH}-digit passcode to unlock
+          Enter {PIN_LENGTH}-digit passcode to unlock dashboard
         </p>
 
         {/* PIN Indicators (Dots) */}
@@ -129,9 +108,9 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
                   width: '14px',
                   height: '14px',
                   borderRadius: '50%',
-                  border: '2px solid var(--gold-primary)',
-                  background: isFilled ? 'var(--gold-gradient)' : 'transparent',
-                  boxShadow: isFilled ? '0 0 10px rgba(255, 215, 0, 0.6)' : 'none',
+                  border: '2px solid var(--brand-primary)',
+                  background: isFilled ? 'var(--brand-gradient)' : 'transparent',
+                  boxShadow: isFilled ? '0 0 10px rgba(16, 185, 129, 0.6)' : 'none',
                   transition: 'all 0.15s ease'
                 }}
               />
@@ -145,7 +124,7 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
           marginBottom: '0.75rem',
           fontSize: '0.8rem',
           fontWeight: 700,
-          color: 'var(--accent-red)'
+          color: 'var(--accent-danger)'
         }}>
           {errorMsg}
         </div>
@@ -166,8 +145,8 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
               style={{
                 height: '62px',
                 borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                background: 'var(--surface-secondary)',
+                border: '1px solid var(--border-medium)',
                 color: 'var(--text-white)',
                 fontSize: '1.45rem',
                 fontWeight: 700,
@@ -180,10 +159,10 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
                 outline: 'none',
                 touchAction: 'manipulation'
               }}
-              onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; e.currentTarget.style.background = 'rgba(255, 215, 0, 0.2)'; }}
-              onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; }}
-              onTouchStart={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; e.currentTarget.style.background = 'rgba(255, 215, 0, 0.2)'; }}
-              onTouchEnd={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; }}
+              onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; e.currentTarget.style.background = 'rgba(16, 185, 129, 0.2)'; }}
+              onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'var(--surface-secondary)'; }}
+              onTouchStart={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; e.currentTarget.style.background = 'rgba(16, 185, 129, 0.2)'; }}
+              onTouchEnd={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'var(--surface-secondary)'; }}
             >
               {num}
             </button>
@@ -198,8 +177,8 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
             style={{
               height: '62px',
               borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'var(--surface-secondary)',
+              border: '1px solid var(--border-medium)',
               color: 'var(--text-white)',
               fontSize: '1.45rem',
               fontWeight: 700,
@@ -212,8 +191,8 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
               outline: 'none',
               touchAction: 'manipulation'
             }}
-            onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; e.currentTarget.style.background = 'rgba(255, 215, 0, 0.2)'; }}
-            onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; }}
+            onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; e.currentTarget.style.background = 'rgba(16, 185, 129, 0.2)'; }}
+            onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'var(--surface-secondary)'; }}
           >
             0
           </button>
@@ -251,7 +230,7 @@ export default function PinLockScreen({ onUnlock, currentPin = '68356' }) {
             type="checkbox"
             checked={rememberDevice}
             onChange={(e) => setRememberDevice(e.target.checked)}
-            style={{ accentColor: 'var(--gold-primary)' }}
+            style={{ accentColor: 'var(--brand-primary)' }}
           />
           <span>Remember for 30 days</span>
         </label>

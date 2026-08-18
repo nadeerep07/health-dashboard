@@ -15,6 +15,19 @@ export default function Badge({
 }) {
   const getVariantStyles = () => {
     switch (variant) {
+      case 'emerald':
+      case 'brand':
+        return {
+          background: 'rgba(16, 185, 129, 0.15)',
+          color: 'var(--brand-primary-soft)',
+          border: '1px solid rgba(16, 185, 129, 0.3)',
+        };
+      case 'teal':
+        return {
+          background: 'rgba(34, 211, 238, 0.15)',
+          color: 'var(--brand-secondary)',
+          border: '1px solid rgba(34, 211, 238, 0.3)',
+        };
       case 'gold':
         return {
           background: 'rgba(245, 158, 11, 0.15)',
