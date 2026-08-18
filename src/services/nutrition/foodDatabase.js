@@ -1322,4 +1322,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Fermented yeast/rice pancake with soft spongy center.'
   },
+  'idiyappam string hopper': {
+    canonicalName: 'Idiyappam / String Hoppers (Steamed Rice Noodles)',
+    aliases: ["idiyappam","string hoppers","noolputtu","sevai"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 140,
+    proteinPer100g: 2.5,
+    carbsPer100g: 31,
+    fatPer100g: 0.5,
+    fiberPer100g: 0.9,
+    defaultServingDesc: '2 idiyappams (100g) = 140 kcal',
+    edibleWeightPerUnit: 50,
+    category: 'grains',
+    confidence: 'verified',
+    healthTip: 'Oil-free steamed rice noodles.'
+  },
 };
