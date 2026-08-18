@@ -1434,4 +1434,20 @@ export const FOOD_DATABASE = {
     confidence: 'estimated_range',
     healthTip: 'Edible with soft bones for superior bioavailable calcium absorption.'
   },
+  'prawns chemmeen roast': {
+    canonicalName: 'Chemmeen (Prawns / Shrimp) Roast',
+    aliases: ["chemmeen roast","prawns roast","shrimp roast","chemmeen fry","prawns masala"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 145,
+    proteinPer100g: 24,
+    carbsPer100g: 3.5,
+    fatPer100g: 4,
+    fiberPer100g: 0.5,
+    defaultServingDesc: '100g prawns = 145 kcal, 24g protein',
+    edibleWeightPerUnit: 100,
+    category: 'seafood',
+    confidence: 'estimated_range',
+    healthTip: 'Ultra lean protein rich in astaxanthin antioxidant and zinc.'
+  },
 };
