@@ -435,4 +435,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(28);
     expect(res.calories).toBeLessThanOrEqual(36);
   });
+  it('Verified Calculation: calculates exact 100g kovakka', async () => {
+    const res = await estimateNutrition('100g kovakka');
+    expect(res.calories).toBeGreaterThanOrEqual(38);
+    expect(res.calories).toBeLessThanOrEqual(46);
+  });
 });
