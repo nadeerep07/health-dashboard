@@ -1,4 +1,5 @@
 import React from 'react';
+import ApexLogo from '../ui/ApexLogo';
 import {
   Home,
   CalendarCheck,
@@ -21,7 +22,7 @@ export default function Sidebar({
   onOpenQuickAdd,
   onOpenPinModal,
   onOpenSyncModal,
-  streakDays = 14,
+  streakDays = 1,
   isSynced = true,
 }) {
   const navItems = [
@@ -38,7 +39,7 @@ export default function Sidebar({
       style={{
         width: 'var(--sidebar-width)',
         backgroundColor: 'var(--surface-elevated)',
-        borderRight: '1px solid var(--border-subtle)',
+        borderRight: '1px solid var(--border-medium)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -52,48 +53,15 @@ export default function Sidebar({
     >
       {/* Top: Brand Header */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        {/* Brand Icon & Name */}
+        {/* Minimal Geometric Apex Logo */}
         <div
           onClick={() => onNavigate('home')}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.65rem',
             padding: '0.25rem 0.5rem',
             cursor: 'pointer',
           }}
         >
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'var(--brand-gradient)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
-              color: '#08090d',
-              fontWeight: 900,
-              fontSize: '1rem',
-              fontFamily: 'var(--font-mono)',
-            }}
-          >
-            A
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              <span style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-white)', letterSpacing: '0.04em' }}>
-                APEX 100
-              </span>
-              <span style={{ fontSize: '0.62rem', background: 'rgba(245, 158, 11, 0.15)', color: 'var(--brand-primary)', padding: '0.1rem 0.3rem', borderRadius: '4px', fontWeight: 700 }}>
-                PRO
-              </span>
-            </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-              Transformation Coach
-            </span>
-          </div>
+          <ApexLogo size={32} showWordmark={true} />
         </div>
 
         {/* Quick Log Primary Action Button */}
@@ -141,8 +109,8 @@ export default function Sidebar({
                   padding: '0.6rem 0.75rem',
                   borderRadius: 'var(--radius-sm)',
                   border: 'none',
-                  background: isActive ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-                  color: isActive ? 'var(--brand-primary)' : 'var(--text-secondary)',
+                  background: isActive ? 'rgba(16, 185, 129, 0.12)' : 'transparent',
+                  color: isActive ? 'var(--brand-primary-soft)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   fontWeight: isActive ? 700 : 500,
                   fontSize: '0.84rem',
@@ -170,7 +138,7 @@ export default function Sidebar({
       </div>
 
       {/* Bottom: Streak, Cloud Sync & Security */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.85rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', borderTop: '1px solid var(--border-medium)', paddingTop: '0.85rem' }}>
         {/* Streak Counter Pill */}
         <div
           style={{
@@ -179,13 +147,13 @@ export default function Sidebar({
             justifyContent: 'space-between',
             padding: '0.5rem 0.65rem',
             borderRadius: 'var(--radius-xs)',
-            background: 'rgba(245, 158, 11, 0.08)',
-            border: '1px solid rgba(245, 158, 11, 0.15)',
+            background: 'rgba(16, 185, 129, 0.08)',
+            border: '1px solid rgba(16, 185, 129, 0.2)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <Flame size={14} color="var(--brand-primary)" />
-            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--brand-primary)' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--brand-primary-soft)' }}>
               100-Day Streak
             </span>
           </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
 import QuickAddModal from '../ui/QuickAddModal';
+import ApexLogo from '../ui/ApexLogo';
 import { Lock, Cloud, Sparkles, User, Bell } from 'lucide-react';
 
 /**
@@ -17,9 +18,9 @@ export default function AppLayout({
   onLogWeight,
   onLogWalk,
   onLogWater,
-  currentWeight = 110.80,
-  waterTargetMl = 3500,
-  streakDays = 14,
+  currentWeight = null,
+  waterTargetMl = 2500,
+  streakDays = 1,
   isSynced = true,
 }) {
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
@@ -85,10 +86,10 @@ export default function AppLayout({
             paddingTop: 'var(--safe-top)',
             paddingLeft: '1rem',
             paddingRight: '1rem',
-            backgroundColor: 'rgba(17, 19, 25, 0.92)',
+            backgroundColor: 'var(--surface-card)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            borderBottom: '1px solid var(--border-subtle)',
+            borderBottom: '1px solid var(--border-medium)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -99,28 +100,9 @@ export default function AppLayout({
         >
           <div
             onClick={() => onNavigate('home')}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+            style={{ cursor: 'pointer' }}
           >
-            <div
-              style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: 'var(--radius-xs)',
-                background: 'var(--brand-gradient)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#08090d',
-                fontWeight: 900,
-                fontSize: '0.85rem',
-                fontFamily: 'var(--font-mono)',
-              }}
-            >
-              A
-            </div>
-            <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-white)' }}>
-              APEX 100
-            </span>
+            <ApexLogo size={28} showWordmark={true} />
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

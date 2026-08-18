@@ -306,6 +306,11 @@ export default function App() {
     }
   };
 
+  // Calculate dynamic 100-Day Challenge Day count (Started: Aug 17, 2026)
+  const challengeStartDate = new Date('2026-08-17T00:00:00');
+  const now = new Date();
+  const currentChallengeDay = Math.max(1, Math.floor((now - challengeStartDate) / (1000 * 60 * 60 * 24)) + 1);
+
   // If locked, render PIN screen
   if (isLocked) {
     return <PinLockScreen onUnlock={handleUnlock} currentPin={dashboardPin} />;
@@ -326,7 +331,7 @@ export default function App() {
       onLogWater={handleQuickLogWater}
       currentWeight={weightMetrics.currentWeight}
       waterTargetMl={waterData.targetMl || 3500}
-      streakDays={14}
+      streakDays={currentChallengeDay}
       isSynced={syncStatus === 'saved' || syncStatus === 'idle'}
     >
       {/* 1. SCREEN: HOME (Daily Transformation Coach) */}
