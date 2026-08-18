@@ -1210,4 +1210,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'High bioflavonoid Vitamin C source.'
   },
+  'broccoli steamed': {
+    canonicalName: 'Steamed Broccoli Florets',
+    aliases: ["broccoli","steamed broccoli","boiled broccoli","fresh broccoli"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 35,
+    proteinPer100g: 2.8,
+    carbsPer100g: 7.2,
+    fatPer100g: 0.4,
+    fiberPer100g: 2.6,
+    defaultServingDesc: '1 cup florets (100g) = 35 kcal',
+    edibleWeightPerUnit: 100,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'Sulforaphane-packed cruciferous vegetable supporting cellular detox.'
+  },
 };
