@@ -1562,4 +1562,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Crunchy low-calorie vegetable with high Vitamin C and bioflavonoids.'
   },
+  'sweet potato boiled': {
+    canonicalName: 'Boiled Sweet Potato (with Skin)',
+    aliases: ["sweet potato","boiled sweet potato","shakarkandi","madhura kizhangu"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 86,
+    proteinPer100g: 1.6,
+    carbsPer100g: 20.1,
+    fatPer100g: 0.1,
+    fiberPer100g: 3,
+    defaultServingDesc: '1 medium potato (130g) = 112 kcal',
+    edibleWeightPerUnit: 130,
+    category: 'grains',
+    confidence: 'verified',
+    healthTip: 'Low glycemic complex carbohydrate rich in Vitamin A (beta-carotene).'
+  },
 };
