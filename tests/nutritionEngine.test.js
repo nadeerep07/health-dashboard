@@ -395,4 +395,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(57);
     expect(res.calories).toBeLessThanOrEqual(63);
   });
+  it('Verified Calculation: calculates exact 100g tomato', async () => {
+    const res = await estimateNutrition('100g tomato');
+    expect(res.calories).toBeGreaterThanOrEqual(17);
+    expect(res.calories).toBeLessThanOrEqual(19);
+  });
 });
