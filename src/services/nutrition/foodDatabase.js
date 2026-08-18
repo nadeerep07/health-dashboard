@@ -921,7 +921,7 @@ export const FOOD_DATABASE = {
     edibleWeightPerUnit: 30,
     category: 'supplements',
     healthTip: '1 scoop (30g) in water = 120 kcal, 24g pure protein.'
-  }
+  },
   'kappa puzhukku': {
     canonicalName: 'Kappa (Boiled Tapioca / Cassava)',
     aliases: ["kappa","boiled tapioca","kappa puzhukku","boiled cassava","maravalli kizhangu"],
