@@ -465,4 +465,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(1);
     expect(res.calories).toBeLessThanOrEqual(3);
   });
+  it('Verified Calculation: calculates exact 10g mint leaves', async () => {
+    const res = await estimateNutrition('10g mint leaves');
+    expect(res.calories).toBeGreaterThanOrEqual(3);
+    expect(res.calories).toBeLessThanOrEqual(6);
+  });
 });
