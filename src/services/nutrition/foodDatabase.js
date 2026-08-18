@@ -1274,4 +1274,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Juicy dark meat chicken rich in zinc and B vitamins.'
   },
+  'beef roast kerala': {
+    canonicalName: 'Kerala Style Dry Beef Roast (Lean Cut)',
+    aliases: ["beef roast","kerala beef roast","beef fry","erachi roast","beef olathiyathu"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 210,
+    proteinPer100g: 26.5,
+    carbsPer100g: 3,
+    fatPer100g: 10,
+    fiberPer100g: 0.5,
+    defaultServingDesc: '100g portion = 210 kcal, 26.5g protein',
+    edibleWeightPerUnit: 100,
+    category: 'proteins',
+    confidence: 'estimated_range',
+    healthTip: 'Dense source of bioavailable heme iron, creatine, and carnosine.'
+  },
 };
