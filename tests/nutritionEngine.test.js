@@ -475,4 +475,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(2);
     expect(res.calories).toBeLessThanOrEqual(5);
   });
+  it('Verified Calculation: calculates exact 2g cinnamon', async () => {
+    const res = await estimateNutrition('2g cinnamon');
+    expect(res.calories).toBeGreaterThanOrEqual(4);
+    expect(res.calories).toBeLessThanOrEqual(7);
+  });
 });
