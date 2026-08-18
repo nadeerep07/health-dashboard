@@ -1706,4 +1706,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'High bioflavonoid antioxidant pod aiding glucose metabolism.'
   },
+  'pavakka bitter gourd': {
+    canonicalName: 'Pavakka / Bitter Gourd (Karela) Mezhukkupuratti',
+    aliases: ["pavakka","bitter gourd","karela","pavakka fry","kaippakka"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 34,
+    proteinPer100g: 1.8,
+    carbsPer100g: 5.4,
+    fatPer100g: 1,
+    fiberPer100g: 2.8,
+    defaultServingDesc: '1 bowl (100g) = 34 kcal',
+    edibleWeightPerUnit: 100,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'Charantin and polypeptide-p active compounds for insulin receptor sensitivity.'
+  },
 };
