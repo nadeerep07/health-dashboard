@@ -495,4 +495,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(10);
     expect(res.calories).toBeLessThanOrEqual(13);
   });
+  it('Verified Calculation: calculates exact 5g fenugreek', async () => {
+    const res = await estimateNutrition('5g fenugreek');
+    expect(res.calories).toBeGreaterThanOrEqual(14);
+    expect(res.calories).toBeLessThanOrEqual(18);
+  });
 });
