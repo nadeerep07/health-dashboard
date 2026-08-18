@@ -265,4 +265,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(74);
     expect(res.calories).toBeLessThanOrEqual(82);
   });
+  it('Verified Calculation: calculates exact 130g orange', async () => {
+    const res = await estimateNutrition('130g orange');
+    expect(res.calories).toBeGreaterThanOrEqual(57);
+    expect(res.calories).toBeLessThanOrEqual(65);
+  });
 });
