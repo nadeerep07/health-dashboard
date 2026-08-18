@@ -1386,4 +1386,20 @@ export const FOOD_DATABASE = {
     confidence: 'estimated_range',
     healthTip: 'Beta-carotene rich antioxidant powerhouse.'
   },
+  'vazhapindi banana stem': {
+    canonicalName: 'Vazhapindi (Banana Stem / Pith) Thoran',
+    aliases: ["vazhapindi thoran","banana stem thoran","vazhapindi","banana pith"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 40,
+    proteinPer100g: 1.1,
+    carbsPer100g: 6.5,
+    fatPer100g: 1.2,
+    fiberPer100g: 4.5,
+    defaultServingDesc: '1 bowl (100g) = 40 kcal',
+    edibleWeightPerUnit: null,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'Ultra high diuretic fiber vegetable supporting renal function.'
+  },
 };
