@@ -355,4 +355,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(9);
     expect(res.calories).toBeLessThanOrEqual(11);
   });
+  it('Verified Calculation: calculates exact 16g peanut butter', async () => {
+    const res = await estimateNutrition('16g peanut butter');
+    expect(res.calories).toBeGreaterThanOrEqual(89);
+    expect(res.calories).toBeLessThanOrEqual(99);
+  });
 });
