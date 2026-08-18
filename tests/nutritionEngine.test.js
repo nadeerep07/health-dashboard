@@ -445,4 +445,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(3);
     expect(res.calories).toBeLessThanOrEqual(6);
   });
+  it('Verified Calculation: calculates exact 9g garlic', async () => {
+    const res = await estimateNutrition('9g garlic');
+    expect(res.calories).toBeGreaterThanOrEqual(11);
+    expect(res.calories).toBeLessThanOrEqual(16);
+  });
 });
