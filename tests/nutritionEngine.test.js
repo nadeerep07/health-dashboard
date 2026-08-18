@@ -415,4 +415,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(42);
     expect(res.calories).toBeLessThanOrEqual(48);
   });
+  it('Verified Calculation: calculates exact 100g muringa ila', async () => {
+    const res = await estimateNutrition('100g muringa ila');
+    expect(res.calories).toBeGreaterThanOrEqual(60);
+    expect(res.calories).toBeLessThanOrEqual(70);
+  });
 });
