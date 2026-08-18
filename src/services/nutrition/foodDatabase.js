@@ -1898,4 +1898,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Therapeutic terpene oils supporting fresh breath and digestion.'
   },
+  'whole cloves laung': {
+    canonicalName: 'Whole Aromatic Cloves (Gramboo / Karayampoovu)',
+    aliases: ["cloves","gramboo","karayampoovu","laung","whole cloves"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 274,
+    proteinPer100g: 6,
+    carbsPer100g: 65.5,
+    fatPer100g: 13,
+    fiberPer100g: 33.9,
+    defaultServingDesc: '3 cloves (1g) = 3 kcal (Eugenol)',
+    edibleWeightPerUnit: 1,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Highest ORAC antioxidant value of any plant spice (Eugenol).'
+  },
 };
