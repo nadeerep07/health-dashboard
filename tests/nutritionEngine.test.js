@@ -455,4 +455,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(5);
     expect(res.calories).toBeLessThanOrEqual(8);
   });
+  it('Verified Calculation: calculates exact 1g black pepper', async () => {
+    const res = await estimateNutrition('1g black pepper');
+    expect(res.calories).toBeGreaterThanOrEqual(2);
+    expect(res.calories).toBeLessThanOrEqual(4);
+  });
 });
