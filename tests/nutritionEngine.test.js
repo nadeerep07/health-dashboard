@@ -490,4 +490,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(2);
     expect(res.calories).toBeLessThanOrEqual(4);
   });
+  it('Verified Calculation: calculates exact 3g cumin seeds', async () => {
+    const res = await estimateNutrition('3g cumin seeds');
+    expect(res.calories).toBeGreaterThanOrEqual(10);
+    expect(res.calories).toBeLessThanOrEqual(13);
+  });
 });
