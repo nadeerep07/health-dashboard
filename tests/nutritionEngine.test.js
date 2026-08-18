@@ -315,4 +315,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(180);
     expect(res.calories).toBeLessThanOrEqual(200);
   });
+  it('Verified Calculation: calculates exact 150g chana dal', async () => {
+    const res = await estimateNutrition('150g chana dal');
+    expect(res.calories).toBeGreaterThanOrEqual(199);
+    expect(res.calories).toBeLessThanOrEqual(221);
+  });
 });
