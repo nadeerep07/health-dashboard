@@ -255,4 +255,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(61);
     expect(res.calories).toBeLessThanOrEqual(69);
   });
+  it('Verified Calculation: calculates exact 250g watermelon', async () => {
+    const res = await estimateNutrition('250g watermelon');
+    expect(res.calories).toBeGreaterThanOrEqual(71);
+    expect(res.calories).toBeLessThanOrEqual(79);
+  });
 });
