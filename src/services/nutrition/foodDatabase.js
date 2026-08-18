@@ -1530,4 +1530,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Richest source of plant lignans and ALA Omega-3s.'
   },
+  'cauliflower cooked': {
+    canonicalName: 'Steamed / Roasted Cauliflower',
+    aliases: ["cauliflower","gobi","roasted cauliflower","steamed gobi"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 25,
+    proteinPer100g: 1.9,
+    carbsPer100g: 5,
+    fatPer100g: 0.3,
+    fiberPer100g: 2,
+    defaultServingDesc: '1 cup (100g) = 25 kcal',
+    edibleWeightPerUnit: 100,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'Versatile low-carb vegetable substitute for rice or mash.'
+  },
 };
