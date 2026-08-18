@@ -1626,4 +1626,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Rich in lycopene antioxidant for arterial health.'
   },
+  'cold pressed coconut oil': {
+    canonicalName: 'Pure Cold-Pressed Virgin Coconut Oil (VCNO)',
+    aliases: ["coconut oil","virgin coconut oil","velichenna","pure coconut oil"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 862,
+    proteinPer100g: 0,
+    carbsPer100g: 0,
+    fatPer100g: 100,
+    fiberPer100g: 0,
+    defaultServingDesc: '1 tsp (5g) = 43 kcal (Pure MCTs)',
+    edibleWeightPerUnit: 5,
+    category: 'fats',
+    confidence: 'verified',
+    healthTip: 'Lauric acid & Medium Chain Triglycerides (MCTs) for ketogenic brain fuel.'
+  },
 };
