@@ -1786,4 +1786,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Allicin organosulfur compound promoting vascular nitric oxide and immune defense.'
   },
+  'turmeric powder haldi': {
+    canonicalName: 'Pure Alleppey Turmeric Powder (Manjal)',
+    aliases: ["turmeric","turmeric powder","manjal","haldi","curcumin"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 312,
+    proteinPer100g: 9.7,
+    carbsPer100g: 67.1,
+    fatPer100g: 3.2,
+    fiberPer100g: 22.7,
+    defaultServingDesc: '1/2 tsp (2g) = 6 kcal (Curcumin)',
+    edibleWeightPerUnit: 2,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Curcumin active compound with systemic antioxidant properties.'
+  },
 };
