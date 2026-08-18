@@ -345,4 +345,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(137);
     expect(res.calories).toBeLessThanOrEqual(153);
   });
+  it('Verified Calculation: calculates exact 150g black coffee', async () => {
+    const res = await estimateNutrition('150g black coffee');
+    expect(res.calories).toBeGreaterThanOrEqual(1);
+    expect(res.calories).toBeLessThanOrEqual(3);
+  });
 });
