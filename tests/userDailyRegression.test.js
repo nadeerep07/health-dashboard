@@ -1,9 +1,15 @@
+/**
+ * @file userDailyRegression.test.js
+ * @description Real-user regression test suite verifying end-to-end transformation workflows,
+ * exact gram Kerala meal plates, multi-food dishes, and noise-free 7-day moving averages.
+ */
+
 import { describe, it, expect } from 'vitest';
 import { estimateNutrition } from '../src/services/nutritionService';
 import { calculateWeightMetrics } from '../src/services/weightService';
 
 describe('Real User Daily Regression & Data Integrity Suite', () => {
-  // Morning Routine
+  // Morning Routine: Fasted Scale Weigh-In & Trend Analysis
   it('Morning Step 1-4: Accurately calculates 7-day moving average upon weigh-in', () => {
     const historicalLogs = [
       { date: '2026-08-15', weight: 111.40 },
