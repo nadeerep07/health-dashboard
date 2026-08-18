@@ -1370,4 +1370,20 @@ export const FOOD_DATABASE = {
     confidence: 'estimated_range',
     healthTip: 'Lowest glycemic index among Indian lentils.'
   },
+  'pumpkin mathanga thoran': {
+    canonicalName: 'Mathanga (Yellow Pumpkin) & Vanpayar Erissery',
+    aliases: ["mathanga thoran","pumpkin erissery","mathanga erissery","yellow pumpkin curry"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 68,
+    proteinPer100g: 2.4,
+    carbsPer100g: 11.5,
+    fatPer100g: 1.8,
+    fiberPer100g: 2.6,
+    defaultServingDesc: '1 bowl (150g) = 102 kcal',
+    edibleWeightPerUnit: null,
+    category: 'vegetables',
+    confidence: 'estimated_range',
+    healthTip: 'Beta-carotene rich antioxidant powerhouse.'
+  },
 };
