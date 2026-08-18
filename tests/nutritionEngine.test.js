@@ -305,4 +305,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(128);
     expect(res.calories).toBeLessThanOrEqual(142);
   });
+  it('Verified Calculation: calculates exact 100g idiyappam', async () => {
+    const res = await estimateNutrition('100g idiyappam');
+    expect(res.calories).toBeGreaterThanOrEqual(133);
+    expect(res.calories).toBeLessThanOrEqual(147);
+  });
 });
