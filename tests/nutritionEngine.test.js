@@ -350,4 +350,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(1);
     expect(res.calories).toBeLessThanOrEqual(3);
   });
+  it('Verified Calculation: calculates exact 250g lemon water', async () => {
+    const res = await estimateNutrition('250g lemon water');
+    expect(res.calories).toBeGreaterThanOrEqual(9);
+    expect(res.calories).toBeLessThanOrEqual(11);
+  });
 });
