@@ -310,4 +310,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(133);
     expect(res.calories).toBeLessThanOrEqual(147);
   });
+  it('Verified Calculation: calculates exact 150g rajma', async () => {
+    const res = await estimateNutrition('150g rajma');
+    expect(res.calories).toBeGreaterThanOrEqual(180);
+    expect(res.calories).toBeLessThanOrEqual(200);
+  });
 });
