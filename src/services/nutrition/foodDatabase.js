@@ -1834,4 +1834,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Mahanimbine alkaloid with natural lipid-lowering properties.'
   },
+  'fresh mint leaves': {
+    canonicalName: 'Fresh Mint / Pudina Leaves',
+    aliases: ["mint","mint leaves","pudina","fresh mint"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 44,
+    proteinPer100g: 3.3,
+    carbsPer100g: 8.4,
+    fatPer100g: 0.7,
+    fiberPer100g: 6.8,
+    defaultServingDesc: '1 handful (10g) = 4 kcal',
+    edibleWeightPerUnit: 10,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Menthol-rich aromatic herb for digestive comfort.'
+  },
 };
