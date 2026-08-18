@@ -970,4 +970,20 @@ export const FOOD_DATABASE = {
     confidence: 'estimated_range',
     healthTip: 'Probiotic-rich digestive curry made with sour curd and turmeric.'
   },
+  'beans thoran': {
+    canonicalName: 'French Beans Thoran / Poriyal',
+    aliases: ["beans thoran","french beans thoran","beans poriyal","green beans thoran"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 70,
+    proteinPer100g: 2.2,
+    carbsPer100g: 7.8,
+    fatPer100g: 3.2,
+    fiberPer100g: 3.4,
+    defaultServingDesc: '1 bowl (100g)',
+    edibleWeightPerUnit: null,
+    category: 'vegetables',
+    confidence: 'estimated_range',
+    healthTip: 'Rich in dietary fiber and folate.'
+  },
 };
