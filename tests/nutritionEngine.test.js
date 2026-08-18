@@ -485,4 +485,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(2);
     expect(res.calories).toBeLessThanOrEqual(4);
   });
+  it('Verified Calculation: calculates exact 1g cloves', async () => {
+    const res = await estimateNutrition('1g cloves');
+    expect(res.calories).toBeGreaterThanOrEqual(2);
+    expect(res.calories).toBeLessThanOrEqual(4);
+  });
 });
