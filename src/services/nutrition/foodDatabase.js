@@ -1194,4 +1194,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Low glycemic index fruit rich in polyphenols and malic acid.'
   },
+  'orange fresh': {
+    canonicalName: 'Fresh Whole Orange (Peeled)',
+    aliases: ["orange","fresh orange","santra","naranga"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 47,
+    proteinPer100g: 0.9,
+    carbsPer100g: 11.8,
+    fatPer100g: 0.1,
+    fiberPer100g: 2.4,
+    defaultServingDesc: '1 medium orange (130g edible) = 61 kcal',
+    edibleWeightPerUnit: 130,
+    category: 'fruits',
+    confidence: 'verified',
+    healthTip: 'High bioflavonoid Vitamin C source.'
+  },
 };
