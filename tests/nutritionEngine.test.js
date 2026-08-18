@@ -250,4 +250,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(77);
     expect(res.calories).toBeLessThanOrEqual(87);
   });
+  it('Verified Calculation: calculates exact 150g papaya', async () => {
+    const res = await estimateNutrition('150g papaya');
+    expect(res.calories).toBeGreaterThanOrEqual(61);
+    expect(res.calories).toBeLessThanOrEqual(69);
+  });
 });
