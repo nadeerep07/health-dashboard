@@ -1482,4 +1482,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Replenishes sodium and potassium electrolytes during fasted morning hydration.'
   },
+  'peanut butter unsweetened': {
+    canonicalName: '100% Natural Peanut Butter (No Added Sugar / Oil)',
+    aliases: ["peanut butter","natural peanut butter","100% peanut butter","unsweetened peanut butter"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 588,
+    proteinPer100g: 25.1,
+    carbsPer100g: 20,
+    fatPer100g: 50.4,
+    fiberPer100g: 8.5,
+    defaultServingDesc: '1 tbsp (16g) = 94 kcal, 4.0g protein',
+    edibleWeightPerUnit: 16,
+    category: 'nuts_seeds',
+    confidence: 'verified',
+    healthTip: 'Dense source of healthy monounsaturated fats and arginine.'
+  },
 };
