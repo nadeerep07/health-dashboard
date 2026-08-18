@@ -390,4 +390,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(74);
     expect(res.calories).toBeLessThanOrEqual(82);
   });
+  it('Verified Calculation: calculates exact 100g curd', async () => {
+    const res = await estimateNutrition('100g curd');
+    expect(res.calories).toBeGreaterThanOrEqual(57);
+    expect(res.calories).toBeLessThanOrEqual(63);
+  });
 });
