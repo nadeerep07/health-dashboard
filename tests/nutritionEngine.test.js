@@ -360,4 +360,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(89);
     expect(res.calories).toBeLessThanOrEqual(99);
   });
+  it('Verified Calculation: calculates exact 30g roasted chana', async () => {
+    const res = await estimateNutrition('30g roasted chana');
+    expect(res.calories).toBeGreaterThanOrEqual(105);
+    expect(res.calories).toBeLessThanOrEqual(117);
+  });
 });
