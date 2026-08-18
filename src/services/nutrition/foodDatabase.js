@@ -1658,4 +1658,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Rich in polyphenols and monounsaturated oleic fatty acids.'
   },
+  'a2 desi ghee': {
+    canonicalName: 'Grass-Fed A2 Desi Cow Ghee (Clarified Butter)',
+    aliases: ["ghee","desi ghee","cow ghee","neyy","clarified butter"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 900,
+    proteinPer100g: 0,
+    carbsPer100g: 0,
+    fatPer100g: 100,
+    fiberPer100g: 0,
+    defaultServingDesc: '1 tsp (5g) = 45 kcal (Butyric acid)',
+    edibleWeightPerUnit: 5,
+    category: 'fats',
+    confidence: 'verified',
+    healthTip: 'Butyric acid source supporting gut wall integrity.'
+  },
 };
