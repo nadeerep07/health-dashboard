@@ -1722,4 +1722,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Charantin and polypeptide-p active compounds for insulin receptor sensitivity.'
   },
+  'padavalanga snake gourd': {
+    canonicalName: 'Padavalanga (Snake Gourd) Thoran',
+    aliases: ["padavalanga","snake gourd","padavalanga thoran","pudalangai"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 32,
+    proteinPer100g: 1.2,
+    carbsPer100g: 4.8,
+    fatPer100g: 1.1,
+    fiberPer100g: 2.1,
+    defaultServingDesc: '1 bowl (100g) = 32 kcal',
+    edibleWeightPerUnit: 100,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'High hydration gourd with low carbohydrate density.'
+  },
 };
