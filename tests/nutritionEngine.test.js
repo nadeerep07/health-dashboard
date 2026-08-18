@@ -260,4 +260,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(71);
     expect(res.calories).toBeLessThanOrEqual(79);
   });
+  it('Verified Calculation: calculates exact 150g green apple', async () => {
+    const res = await estimateNutrition('150g green apple');
+    expect(res.calories).toBeGreaterThanOrEqual(74);
+    expect(res.calories).toBeLessThanOrEqual(82);
+  });
 });
