@@ -1754,4 +1754,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Supports enzymatic carbohydrate breakdown and steady blood sugar.'
   },
+  'fresh ginger root': {
+    canonicalName: 'Fresh Crushed Ginger (Inji)',
+    aliases: ["ginger","fresh ginger","inji","crushed ginger","adrak"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 80,
+    proteinPer100g: 1.8,
+    carbsPer100g: 17.8,
+    fatPer100g: 0.8,
+    fiberPer100g: 2,
+    defaultServingDesc: '1 tsp grated (5g) = 4 kcal (Gingerols)',
+    edibleWeightPerUnit: 5,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Gingerol bioactive compound for gastric motility and anti-inflammatory relief.'
+  },
 };
