@@ -275,4 +275,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(33);
     expect(res.calories).toBeLessThanOrEqual(37);
   });
+  it('Verified Calculation: calculates exact 150g spinach', async () => {
+    const res = await estimateNutrition('150g spinach');
+    expect(res.calories).toBeGreaterThanOrEqual(33);
+    expect(res.calories).toBeLessThanOrEqual(37);
+  });
 });
