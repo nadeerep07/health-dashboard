@@ -1146,4 +1146,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Contains 4x more Vitamin C than oranges with high pectin soluble fiber.'
   },
+  'papaya ripe': {
+    canonicalName: 'Fresh Ripe Papaya Slices',
+    aliases: ["papaya","ripe papaya","papaya slices","omakka","pappali"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 43,
+    proteinPer100g: 0.5,
+    carbsPer100g: 10.8,
+    fatPer100g: 0.3,
+    fiberPer100g: 1.7,
+    defaultServingDesc: '1 cup cubed (150g) = 65 kcal',
+    edibleWeightPerUnit: 150,
+    category: 'fruits',
+    confidence: 'verified',
+    healthTip: 'Contains papain enzyme for protein digestion and gut health.'
+  },
 };
