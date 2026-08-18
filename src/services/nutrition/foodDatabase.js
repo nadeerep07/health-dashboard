@@ -1914,4 +1914,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Highest ORAC antioxidant value of any plant spice (Eugenol).'
   },
+  'cumin seeds jeerakam': {
+    canonicalName: 'Whole Cumin Seeds (Jeerakam)',
+    aliases: ["cumin","cumin seeds","jeerakam","jeera","jeeraka vellam"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 375,
+    proteinPer100g: 17.8,
+    carbsPer100g: 44.2,
+    fatPer100g: 22.3,
+    fiberPer100g: 10.5,
+    defaultServingDesc: '1 tsp (3g in water) = 11 kcal',
+    edibleWeightPerUnit: 3,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Stimulates pancreatic lipase and bile acid secretion.'
+  },
 };
