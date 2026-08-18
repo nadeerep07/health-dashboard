@@ -1498,4 +1498,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Dense source of healthy monounsaturated fats and arginine.'
   },
+  'roasted chana unpeeled': {
+    canonicalName: 'Roasted Bengal Gram / Chana (with Skin)',
+    aliases: ["roasted chana","bhuna chana","dry roasted chickpeas","pottukadala"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 369,
+    proteinPer100g: 22.5,
+    carbsPer100g: 58.1,
+    fatPer100g: 5.2,
+    fiberPer100g: 16.8,
+    defaultServingDesc: '1 handful (30g) = 111 kcal, 6.7g protein, 5g fiber',
+    edibleWeightPerUnit: 30,
+    category: 'nuts_seeds',
+    confidence: 'verified',
+    healthTip: 'Top-tier travel snack with high fiber and sustained fullness.'
+  },
 };
