@@ -295,4 +295,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(199);
     expect(res.calories).toBeLessThanOrEqual(221);
   });
+  it('Verified Calculation: calculates exact 200g green tea', async () => {
+    const res = await estimateNutrition('200g green tea');
+    expect(res.calories).toBeGreaterThanOrEqual(1);
+    expect(res.calories).toBeLessThanOrEqual(3);
+  });
 });
