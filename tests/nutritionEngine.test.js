@@ -370,4 +370,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(50);
     expect(res.calories).toBeLessThanOrEqual(56);
   });
+  it('Verified Calculation: calculates exact 100g cauliflower', async () => {
+    const res = await estimateNutrition('100g cauliflower');
+    expect(res.calories).toBeGreaterThanOrEqual(23);
+    expect(res.calories).toBeLessThanOrEqual(27);
+  });
 });
