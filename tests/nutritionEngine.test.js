@@ -385,4 +385,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(106);
     expect(res.calories).toBeLessThanOrEqual(118);
   });
+  it('Verified Calculation: calculates exact 120g egg white omelette', async () => {
+    const res = await estimateNutrition('120g egg white omelette');
+    expect(res.calories).toBeGreaterThanOrEqual(74);
+    expect(res.calories).toBeLessThanOrEqual(82);
+  });
 });
