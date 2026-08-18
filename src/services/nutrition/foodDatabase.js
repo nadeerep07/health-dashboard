@@ -1162,4 +1162,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Contains papain enzyme for protein digestion and gut health.'
   },
+  'watermelon fresh': {
+    canonicalName: 'Fresh Watermelon Chunks',
+    aliases: ["watermelon","fresh watermelon","tarbooz","thannimathan"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 30,
+    proteinPer100g: 0.6,
+    carbsPer100g: 7.6,
+    fatPer100g: 0.2,
+    fiberPer100g: 0.4,
+    defaultServingDesc: '1 large bowl (250g) = 75 kcal',
+    edibleWeightPerUnit: 250,
+    category: 'fruits',
+    confidence: 'verified',
+    healthTip: '92% water content with L-citrulline for cardiovascular recovery.'
+  },
 };
