@@ -200,4 +200,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(235);
     expect(res.calories).toBeLessThanOrEqual(261);
   });
+  it('Verified Calculation: calculates exact 90g ayala fry', async () => {
+    const res = await estimateNutrition('90g ayala fry');
+    expect(res.calories).toBeGreaterThanOrEqual(188);
+    expect(res.calories).toBeLessThanOrEqual(208);
+  });
 });
