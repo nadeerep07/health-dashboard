@@ -1066,4 +1066,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Highest protein density of any plant food (52% protein by dry weight).'
   },
+  'greek yogurt plain': {
+    canonicalName: 'Plain Greek Yogurt (0% Non-Fat)',
+    aliases: ["greek yogurt","plain greek yogurt","nonfat greek yogurt","0% greek yogurt"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 59,
+    proteinPer100g: 10.3,
+    carbsPer100g: 3.6,
+    fatPer100g: 0.4,
+    fiberPer100g: 0,
+    defaultServingDesc: '1 cup (170g) = 100 kcal, 17.5g protein',
+    edibleWeightPerUnit: 170,
+    category: 'dairy',
+    confidence: 'verified',
+    healthTip: 'Strained yogurt with double the protein and half the carbohydrates of standard curd.'
+  },
 };
