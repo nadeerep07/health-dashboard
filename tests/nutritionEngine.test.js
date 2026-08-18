@@ -365,4 +365,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(105);
     expect(res.calories).toBeLessThanOrEqual(117);
   });
+  it('Verified Calculation: calculates exact 10g flaxseeds', async () => {
+    const res = await estimateNutrition('10g flaxseeds');
+    expect(res.calories).toBeGreaterThanOrEqual(50);
+    expect(res.calories).toBeLessThanOrEqual(56);
+  });
 });
