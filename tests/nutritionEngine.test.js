@@ -245,4 +245,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(87);
     expect(res.calories).toBeLessThanOrEqual(97);
   });
+  it('Verified Calculation: calculates exact 120g guava', async () => {
+    const res = await estimateNutrition('120g guava');
+    expect(res.calories).toBeGreaterThanOrEqual(77);
+    expect(res.calories).toBeLessThanOrEqual(87);
+  });
 });
