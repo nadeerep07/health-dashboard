@@ -400,4 +400,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(17);
     expect(res.calories).toBeLessThanOrEqual(19);
   });
+  it('Verified Calculation: calculates exact 5g coconut oil', async () => {
+    const res = await estimateNutrition('5g coconut oil');
+    expect(res.calories).toBeGreaterThanOrEqual(40);
+    expect(res.calories).toBeLessThanOrEqual(46);
+  });
 });
