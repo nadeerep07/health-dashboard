@@ -1514,4 +1514,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Top-tier travel snack with high fiber and sustained fullness.'
   },
+  'flaxseeds ground': {
+    canonicalName: 'Ground Golden / Brown Flaxseeds',
+    aliases: ["flaxseeds","ground flaxseeds","flax seed powder","alsi"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 534,
+    proteinPer100g: 18.3,
+    carbsPer100g: 28.9,
+    fatPer100g: 42.2,
+    fiberPer100g: 27.3,
+    defaultServingDesc: '1 tbsp (10g) = 53 kcal, 2.7g fiber',
+    edibleWeightPerUnit: 10,
+    category: 'nuts_seeds',
+    confidence: 'verified',
+    healthTip: 'Richest source of plant lignans and ALA Omega-3s.'
+  },
 };
