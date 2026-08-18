@@ -1178,4 +1178,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: '92% water content with L-citrulline for cardiovascular recovery.'
   },
+  'green apple': {
+    canonicalName: 'Fresh Green Granny Smith Apple',
+    aliases: ["green apple","granny smith apple","crisp green apple"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 52,
+    proteinPer100g: 0.3,
+    carbsPer100g: 13.8,
+    fatPer100g: 0.2,
+    fiberPer100g: 2.4,
+    defaultServingDesc: '1 medium apple (150g) = 78 kcal',
+    edibleWeightPerUnit: 150,
+    category: 'fruits',
+    confidence: 'verified',
+    healthTip: 'Low glycemic index fruit rich in polyphenols and malic acid.'
+  },
 };
