@@ -2,6 +2,7 @@
 // Connects Telegram (@apex100_health_bot) directly to Supabase and Google Gemini AI
 
 import { createClient } from '@supabase/supabase-js';
+import { estimateNutrition } from '../src/services/nutritionService.js';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -60,8 +61,9 @@ export default async function handler(req, res) {
     const incomingText = (message.text || '').trim();
     const todayStr = new Date().toISOString().split('T')[0];
 
-    // Handle Start & Help commands
-    if (incomingText === '/start' || incomingText === '/help') {
+    // Handle Start & Help commands and common typos
+    const isStartCmd = /^\/?(start|help|styart|stary|menu)$/i.test(incomingText.toLowerCase());
+    if (isStartCmd) {
       const welcomeMsg = `🔥 <b>Welcome to APEX 100 AI Health Coach!</b>
 
 I am your personal AI assistant synced directly to your <b>APEX 100 Dashboard</b>.
@@ -187,7 +189,7 @@ Respond strictly in this JSON format:
   "telegramHtmlReply": "The encouraging, beautifully formatted HTML message to send back to the user."
 }`;
 
-    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`;
     const aiResponse = await fetch(geminiEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

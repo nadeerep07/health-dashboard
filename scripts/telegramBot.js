@@ -1,7 +1,40 @@
 // Standalone Telegram AI Bot Runner with Vision, Scheduled Reminders, Scorecard & Dining Advisor
 // Connects @apex100_health_bot directly to Supabase and Google Gemini AI
 
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
+import { estimateNutrition } from '../src/services/nutritionService.js';
+import { calculateWeightMetrics } from '../src/services/weightService.js';
+
+// Auto-load .env if not already set
+try {
+  if (typeof process.loadEnvFile === 'function') {
+    process.loadEnvFile();
+  }
+} catch {
+  // Try loading .env manually from root
+  try {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const envPath = path.resolve(__dirname, '../.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf8');
+      for (const line of content.split('\n')) {
+        const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+        if (match) {
+          const key = match[1];
+          let val = (match[2] || '').trim();
+          if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+          if (val.startsWith("'") && val.endsWith("'")) val = val.slice(1, -1);
+          if (!process.env[key]) process.env[key] = val;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('Could not read .env file:', e.message);
+  }
+}
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -144,8 +177,9 @@ async function handleMessage(message) {
 
   console.log(`[Telegram Bot] Message from ${chatId}: "${incomingText}" (Has photo: ${Boolean(message.photo)})`);
 
-  // 1. /start or /help
-  if (incomingText === '/start' || incomingText === '/help') {
+  // 1. /start or /help or common typos
+  const isStartCmd = /^\/?(start|help|styart|stary|menu)$/i.test(incomingText.toLowerCase());
+  if (isStartCmd) {
     const welcome = `🔥 <b>Welcome to APEX 100 AI Health Coach!</b>
 
 I am your personal AI assistant synced in real-time with your <b>APEX 100 Dashboard</b>.
@@ -282,7 +316,7 @@ Respond strictly in this JSON format:
 }`;
 
       try {
-        const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`;
         const aiRes = await fetch(geminiEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -382,7 +416,7 @@ Respond strictly in this JSON format:
 }`;
 
   try {
-    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`;
     const aiResponse = await fetch(geminiEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
