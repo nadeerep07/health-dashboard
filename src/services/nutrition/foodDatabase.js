@@ -1674,4 +1674,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Butyric acid source supporting gut wall integrity.'
   },
+  'moringa drumstick leaves': {
+    canonicalName: 'Moringa (Drumstick / Muringa) Leaves Thoran',
+    aliases: ["muringa ila","moringa leaves","drumstick leaves","muringayila thoran"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 64,
+    proteinPer100g: 9.4,
+    carbsPer100g: 8.3,
+    fatPer100g: 1.4,
+    fiberPer100g: 2,
+    defaultServingDesc: '1 bowl (100g) = 64 kcal, 9.4g protein',
+    edibleWeightPerUnit: 100,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'Superfood leaf with extraordinary calcium, iron, and complete plant amino acids.'
+  },
 };
