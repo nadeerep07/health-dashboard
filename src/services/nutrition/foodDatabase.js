@@ -1578,4 +1578,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Low glycemic complex carbohydrate rich in Vitamin A (beta-carotene).'
   },
+  'egg white omelette': {
+    canonicalName: '3-Egg White Spinach Omelette',
+    aliases: ["egg white omelette","3 egg whites","whites omelet"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 65,
+    proteinPer100g: 12.5,
+    carbsPer100g: 1.2,
+    fatPer100g: 1,
+    fiberPer100g: 0.3,
+    defaultServingDesc: '1 omelette (120g) = 78 kcal, 15g protein',
+    edibleWeightPerUnit: 120,
+    category: 'proteins',
+    confidence: 'verified',
+    healthTip: 'High volume, pure lean protein breakfast.'
+  },
 };
