@@ -1258,4 +1258,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'High umami flavor with almost zero calories. Natural ergosterol Vitamin D precursor.'
   },
+  'chicken thigh skinless': {
+    canonicalName: 'Cooked Chicken Thigh (Skinless/Boneless)',
+    aliases: ["chicken thigh","skinless chicken thigh","grilled chicken thigh"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 177,
+    proteinPer100g: 24,
+    carbsPer100g: 0,
+    fatPer100g: 8.5,
+    fiberPer100g: 0,
+    defaultServingDesc: '1 medium thigh (100g edible) = 177 kcal, 24g protein',
+    edibleWeightPerUnit: 100,
+    category: 'proteins',
+    confidence: 'verified',
+    healthTip: 'Juicy dark meat chicken rich in zinc and B vitamins.'
+  },
 };
