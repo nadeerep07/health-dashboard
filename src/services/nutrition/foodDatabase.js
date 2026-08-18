@@ -1594,4 +1594,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'High volume, pure lean protein breakfast.'
   },
+  'curd homemade cow milk': {
+    canonicalName: 'Fresh Homemade Cow Milk Curd / Dahi',
+    aliases: ["curd","dahi","plain curd","homemade curd","thayir"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 60,
+    proteinPer100g: 3.8,
+    carbsPer100g: 4.7,
+    fatPer100g: 3.1,
+    fiberPer100g: 0,
+    defaultServingDesc: '1 small bowl (100g) = 60 kcal, 3.8g protein',
+    edibleWeightPerUnit: 100,
+    category: 'dairy',
+    confidence: 'verified',
+    healthTip: 'Natural live probiotics supporting microbiome diversity.'
+  },
 };
