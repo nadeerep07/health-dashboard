@@ -954,4 +954,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Steamed rice flour with light coconut layers. 1 piece ≈ 187 kcal.'
   },
+  'moru curry': {
+    canonicalName: 'Kerala Moru (Spiced Buttermilk) Curry / Pulissery',
+    aliases: ["moru curry","moru kachiyathu","pulissery","kachiya moru","buttermilk curry"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 45,
+    proteinPer100g: 2.1,
+    carbsPer100g: 3.8,
+    fatPer100g: 2.2,
+    fiberPer100g: 0.5,
+    defaultServingDesc: '1 cup (150ml)',
+    edibleWeightPerUnit: null,
+    category: 'curries',
+    confidence: 'estimated_range',
+    healthTip: 'Probiotic-rich digestive curry made with sour curd and turmeric.'
+  },
 };
