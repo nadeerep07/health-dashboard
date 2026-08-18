@@ -1114,4 +1114,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Rich in Vitamin E and monounsaturated healthy fats.'
   },
+  'walnuts': {
+    canonicalName: 'Raw Walnut Halves',
+    aliases: ["walnuts","raw walnuts","akhrot","walnut kernels"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 654,
+    proteinPer100g: 15.2,
+    carbsPer100g: 13.7,
+    fatPer100g: 65.2,
+    fiberPer100g: 6.7,
+    defaultServingDesc: '4 walnut halves (14g) = 92 kcal',
+    edibleWeightPerUnit: 14,
+    category: 'nuts_seeds',
+    confidence: 'verified',
+    healthTip: 'Plant-based Alpha-Linolenic Acid (ALA) Omega-3 powerhouse.'
+  },
 };
