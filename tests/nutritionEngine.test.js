@@ -190,4 +190,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(66);
     expect(res.calories).toBeLessThanOrEqual(74);
   });
+  it('Verified Calculation: calculates exact 100g beetroot thoran', async () => {
+    const res = await estimateNutrition('100g beetroot thoran');
+    expect(res.calories).toBeGreaterThanOrEqual(71);
+    expect(res.calories).toBeLessThanOrEqual(79);
+  });
 });
