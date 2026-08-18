@@ -1018,4 +1018,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Slow-digesting casein protein. Great for overnight muscle repair.'
   },
+  'tofu firm': {
+    canonicalName: 'Firm Tofu (Soy Bean Curd)',
+    aliases: ["tofu","firm tofu","organic tofu","soy tofu"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 83,
+    proteinPer100g: 10,
+    carbsPer100g: 1.9,
+    fatPer100g: 4.8,
+    fiberPer100g: 1.2,
+    defaultServingDesc: '100g slice',
+    edibleWeightPerUnit: 100,
+    category: 'proteins',
+    confidence: 'verified',
+    healthTip: 'Complete plant protein with all 9 essential amino acids and zero cholesterol.'
+  },
 };
