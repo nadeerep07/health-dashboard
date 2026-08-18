@@ -1226,4 +1226,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Sulforaphane-packed cruciferous vegetable supporting cellular detox.'
   },
+  'spinach cheera': {
+    canonicalName: 'Steamed Spinach / Cheera Thoran',
+    aliases: ["spinach","cheera","palak","boiled spinach","cheera thoran"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 23,
+    proteinPer100g: 3,
+    carbsPer100g: 3.6,
+    fatPer100g: 0.4,
+    fiberPer100g: 2.2,
+    defaultServingDesc: '1 cup cooked (150g) = 35 kcal',
+    edibleWeightPerUnit: 150,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'Rich in non-heme iron, magnesium, and lutein.'
+  },
 };
