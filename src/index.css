@@ -21,6 +21,12 @@ html, body {
   scroll-behavior: smooth;
 }
 
+/* Text Selection */
+::selection {
+  background: rgba(16, 185, 129, 0.35);
+  color: #ffffff;
+}
+
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
@@ -34,7 +40,7 @@ html, body {
   border-radius: var(--radius-pill);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(16, 185, 129, 0.4);
 }
 
 /* Typography Helpers */
@@ -92,6 +98,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .form-input:focus {
   border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
 }
 
 /* Universal Button Hover Micro-interactions */
@@ -100,19 +107,4 @@ h1, h2, h3, h4, h5, h6 {
 }
 .btn-primitive:active:not(:disabled) {
   transform: scale(0.98);
-}
-
-/* Card Hover Subtle Shift */
-.card-primitive {
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
-}
-
-/* Accessibility & Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }

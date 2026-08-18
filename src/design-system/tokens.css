@@ -1,67 +1,70 @@
 /* ==============================================================================
    APEX 100 DESIGN SYSTEM TOKENS
-   Inspired by Apple Health, Oura, Linear & Vercel
+   Deep Emerald, Modern Teal & Calm Technical Health Palette
    ============================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
 
 :root {
-  /* Core Surface Layers */
-  --bg-app: #08090d;
-  --surface-elevated: #111319;
-  --surface-card: #151821;
-  --surface-secondary: #1a1e2a;
-  --surface-tertiary: #222736;
-  --surface-interactive: #2a3042;
+  /* Core Deep Dark Surfaces (Calm Botanical Charcoal / Navy) */
+  --bg-app: #0b1110;
+  --surface-elevated: #1c2725;
+  --surface-card: #111918;
+  --surface-secondary: #17201f;
+  --surface-tertiary: #1f2b29;
+  --surface-interactive: #243330;
   --surface-hover: rgba(255, 255, 255, 0.04);
   --surface-active: rgba(255, 255, 255, 0.08);
 
   /* Glass / Overlays */
-  --glass-bg: rgba(17, 19, 25, 0.82);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(17, 25, 24, 0.85);
+  --glass-border: rgba(38, 53, 50, 0.6);
   --overlay-bg: rgba(0, 0, 0, 0.75);
 
   /* Borders & Dividers */
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-medium: rgba(255, 255, 255, 0.12);
-  --border-strong: rgba(255, 255, 255, 0.20);
-  --border-accent: rgba(245, 158, 11, 0.35);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-medium: #263532;
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-accent: rgba(16, 185, 129, 0.35);
 
-  /* Brand Palette (Warm Amber / Gold) */
-  --brand-primary: #f59e0b;
-  --brand-secondary: #d97706;
-  --brand-glow: rgba(245, 158, 11, 0.16);
-  --brand-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  --brand-text-gradient: linear-gradient(135deg, #ffffff 40%, #f59e0b 100%);
+  /* Primary Brand Palette: Deep Emerald & Modern Teal */
+  --brand-primary: #10b981;
+  --brand-primary-dark: #059669;
+  --brand-primary-soft: #34d399;
+  --brand-secondary: #22d3ee;
+  --brand-secondary-dark: #0891b2;
+  --brand-glow: rgba(16, 185, 129, 0.18);
+  --brand-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --brand-text-gradient: linear-gradient(135deg, #ffffff 40%, #34d399 100%);
 
   /* Semantic State Colors */
   --accent-success: #10b981;
   --accent-success-glow: rgba(16, 185, 129, 0.16);
-  --accent-info: #38bdf8;
-  --accent-info-glow: rgba(56, 189, 248, 0.16);
-  --accent-warning: #f59e0b;
+  --accent-info: #22d3ee;
+  --accent-info-glow: rgba(34, 211, 238, 0.16);
+  --accent-warning: #f59e0b; /* Semantic amber strictly for warnings / alerts */
   --accent-warning-glow: rgba(245, 158, 11, 0.16);
   --accent-danger: #ef4444;
   --accent-danger-glow: rgba(239, 68, 68, 0.16);
-  --accent-purple: #a855f7;
-  --accent-purple-glow: rgba(168, 85, 247, 0.16);
+  --accent-purple: #8b5cf6;
+  --accent-purple-glow: rgba(139, 92, 246, 0.16);
 
   /* Text & Typography Colors */
   --text-white: #ffffff;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-dim: #475569;
+  --text-primary: #f3f7f6;
+  --text-secondary: #a7b8b4;
+  --text-muted: #71827e;
+  --text-dim: #4b5b57;
 
   /* Typography Families */
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Space Grotesk', monospace;
 
   /* Elevation Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
   --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -1px rgba(0, 0, 0, 0.4);
   --shadow-elevated: 0 12px 36px -4px rgba(0, 0, 0, 0.7), 0 4px 12px -2px rgba(0, 0, 0, 0.5);
-  --shadow-floating: 0 20px 48px -6px rgba(0, 0, 0, 0.8), 0 0 24px rgba(245, 158, 11, 0.15);
+  --shadow-floating: 0 20px 48px -6px rgba(0, 0, 0, 0.8), 0 0 24px rgba(16, 185, 129, 0.15);
 
   /* Radius Scale */
   --radius-xs: 6px;
@@ -90,30 +93,37 @@
   --transition-smooth: 350ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Light Theme Variables (Subtle, Crisp, Non-glaring) */
+/* Light Theme Variables (Calm Sage / Clean Technical) */
 [data-theme='light'] {
-  --bg-app: #f8fafc;
+  --bg-app: #f7faf9;
   --surface-elevated: #ffffff;
   --surface-card: #ffffff;
-  --surface-secondary: #f1f5f9;
-  --surface-tertiary: #e2e8f0;
-  --surface-interactive: #cbd5e1;
+  --surface-secondary: #f0f5f3;
+  --surface-tertiary: #e3ece8;
+  --surface-interactive: #d4e3dc;
   --surface-hover: rgba(0, 0, 0, 0.03);
   --surface-active: rgba(0, 0, 0, 0.06);
 
-  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-bg: rgba(255, 255, 255, 0.88);
   --glass-border: rgba(0, 0, 0, 0.08);
 
   --border-subtle: rgba(0, 0, 0, 0.06);
-  --border-medium: rgba(0, 0, 0, 0.10);
+  --border-medium: #dde7e3;
   --border-strong: rgba(0, 0, 0, 0.16);
 
-  --text-white: #0f172a;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --text-dim: #cbd5e1;
+  --brand-primary: #059669;
+  --brand-primary-dark: #047857;
+  --brand-primary-soft: #10b981;
+  --brand-secondary: #0891b2;
+  --brand-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
+  --brand-text-gradient: linear-gradient(135deg, #17201e 40%, #059669 100%);
 
-  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --text-white: #17201e;
+  --text-primary: #17201e;
+  --text-secondary: #52635e;
+  --text-muted: #7a8985;
+  --text-dim: #9cb0ab;
+
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
   --shadow-elevated: 0 12px 32px -4px rgba(0, 0, 0, 0.08);
 }
