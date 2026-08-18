@@ -460,4 +460,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(2);
     expect(res.calories).toBeLessThanOrEqual(4);
   });
+  it('Verified Calculation: calculates exact 2g curry leaves', async () => {
+    const res = await estimateNutrition('2g curry leaves');
+    expect(res.calories).toBeGreaterThanOrEqual(1);
+    expect(res.calories).toBeLessThanOrEqual(3);
+  });
 });
