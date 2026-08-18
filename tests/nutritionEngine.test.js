@@ -170,4 +170,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(177);
     expect(res.calories).toBeLessThanOrEqual(197);
   });
+  it('Verified Calculation: calculates exact 150g kadala curry', async () => {
+    const res = await estimateNutrition('150g kadala curry');
+    expect(res.calories).toBeGreaterThanOrEqual(185);
+    expect(res.calories).toBeLessThanOrEqual(205);
+  });
 });
