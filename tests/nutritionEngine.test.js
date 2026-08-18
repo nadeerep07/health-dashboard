@@ -480,4 +480,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(4);
     expect(res.calories).toBeLessThanOrEqual(7);
   });
+  it('Verified Calculation: calculates exact 1g cardamom', async () => {
+    const res = await estimateNutrition('1g cardamom');
+    expect(res.calories).toBeGreaterThanOrEqual(2);
+    expect(res.calories).toBeLessThanOrEqual(4);
+  });
 });
