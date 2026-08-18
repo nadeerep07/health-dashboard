@@ -225,4 +225,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(98);
     expect(res.calories).toBeLessThanOrEqual(110);
   });
+  it('Verified Calculation: calculates exact 170g greek yogurt', async () => {
+    const res = await estimateNutrition('170g greek yogurt');
+    expect(res.calories).toBeGreaterThanOrEqual(95);
+    expect(res.calories).toBeLessThanOrEqual(105);
+  });
 });
