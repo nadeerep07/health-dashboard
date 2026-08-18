@@ -1,0 +1,119 @@
+/* ==============================================================================
+   APEX 100 DESIGN SYSTEM TOKENS
+   Inspired by Apple Health, Oura, Linear & Vercel
+   ============================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
+
+:root {
+  /* Core Surface Layers */
+  --bg-app: #08090d;
+  --surface-elevated: #111319;
+  --surface-card: #151821;
+  --surface-secondary: #1a1e2a;
+  --surface-tertiary: #222736;
+  --surface-interactive: #2a3042;
+  --surface-hover: rgba(255, 255, 255, 0.04);
+  --surface-active: rgba(255, 255, 255, 0.08);
+
+  /* Glass / Overlays */
+  --glass-bg: rgba(17, 19, 25, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --overlay-bg: rgba(0, 0, 0, 0.75);
+
+  /* Borders & Dividers */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.20);
+  --border-accent: rgba(245, 158, 11, 0.35);
+
+  /* Brand Palette (Warm Amber / Gold) */
+  --brand-primary: #f59e0b;
+  --brand-secondary: #d97706;
+  --brand-glow: rgba(245, 158, 11, 0.16);
+  --brand-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --brand-text-gradient: linear-gradient(135deg, #ffffff 40%, #f59e0b 100%);
+
+  /* Semantic State Colors */
+  --accent-success: #10b981;
+  --accent-success-glow: rgba(16, 185, 129, 0.16);
+  --accent-info: #38bdf8;
+  --accent-info-glow: rgba(56, 189, 248, 0.16);
+  --accent-warning: #f59e0b;
+  --accent-warning-glow: rgba(245, 158, 11, 0.16);
+  --accent-danger: #ef4444;
+  --accent-danger-glow: rgba(239, 68, 68, 0.16);
+  --accent-purple: #a855f7;
+  --accent-purple-glow: rgba(168, 85, 247, 0.16);
+
+  /* Text & Typography Colors */
+  --text-white: #ffffff;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-dim: #475569;
+
+  /* Typography Families */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
+
+  /* Elevation Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 12px 36px -4px rgba(0, 0, 0, 0.7), 0 4px 12px -2px rgba(0, 0, 0, 0.5);
+  --shadow-floating: 0 20px 48px -6px rgba(0, 0, 0, 0.8), 0 0 24px rgba(245, 158, 11, 0.15);
+
+  /* Radius Scale */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+
+  /* Layout Spacing */
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 72px;
+  --right-rail-width: 320px;
+  --header-height: 64px;
+  --bottom-nav-height: 68px;
+
+  /* Safe Area Padding for Mobile */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 16px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Light Theme Variables (Subtle, Crisp, Non-glaring) */
+[data-theme='light'] {
+  --bg-app: #f8fafc;
+  --surface-elevated: #ffffff;
+  --surface-card: #ffffff;
+  --surface-secondary: #f1f5f9;
+  --surface-tertiary: #e2e8f0;
+  --surface-interactive: #cbd5e1;
+  --surface-hover: rgba(0, 0, 0, 0.03);
+  --surface-active: rgba(0, 0, 0, 0.06);
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-medium: rgba(0, 0, 0, 0.10);
+  --border-strong: rgba(0, 0, 0, 0.16);
+
+  --text-white: #0f172a;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --text-dim: #cbd5e1;
+
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-elevated: 0 12px 32px -4px rgba(0, 0, 0, 0.08);
+}
