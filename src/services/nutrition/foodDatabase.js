@@ -1450,4 +1450,20 @@ export const FOOD_DATABASE = {
     confidence: 'estimated_range',
     healthTip: 'Ultra lean protein rich in astaxanthin antioxidant and zinc.'
   },
+  'black coffee unsweetened': {
+    canonicalName: 'Pure Black Coffee (0 kcal / Unsweetened)',
+    aliases: ["black coffee","espresso","americano","filter coffee black"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 1,
+    proteinPer100g: 0.1,
+    carbsPer100g: 0,
+    fatPer100g: 0,
+    fiberPer100g: 0,
+    defaultServingDesc: '1 cup (150ml) = 2 kcal',
+    edibleWeightPerUnit: 150,
+    category: 'beverages',
+    confidence: 'verified',
+    healthTip: 'Stimulates lipolysis and central nervous system alertness before morning walks.'
+  },
 };
