@@ -1738,4 +1738,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'High hydration gourd with low carbohydrate density.'
   },
+  'kovakka ivy gourd': {
+    canonicalName: 'Kovakka (Ivy Gourd / Tindora) Mezhukkupuratti',
+    aliases: ["kovakka","ivy gourd","tindora","kovakkai fry","kovakka mezhukkupuratti"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 42,
+    proteinPer100g: 1.5,
+    carbsPer100g: 5.6,
+    fatPer100g: 1.8,
+    fiberPer100g: 2.4,
+    defaultServingDesc: '1 bowl (100g) = 42 kcal',
+    edibleWeightPerUnit: 100,
+    category: 'vegetables',
+    confidence: 'verified',
+    healthTip: 'Supports enzymatic carbohydrate breakdown and steady blood sugar.'
+  },
 };
