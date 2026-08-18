@@ -1866,4 +1866,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Heavy-metal chelating antioxidant herb.'
   },
+  'ceylon cinnamon true': {
+    canonicalName: 'Ceylon True Cinnamon Bark (Karuvapatta)',
+    aliases: ["cinnamon","ceylon cinnamon","karuvapatta","dalchini"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 247,
+    proteinPer100g: 4,
+    carbsPer100g: 80.6,
+    fatPer100g: 1.2,
+    fiberPer100g: 53.1,
+    defaultServingDesc: '1/2 tsp (2g) = 5 kcal (Cinnamaldehyde)',
+    edibleWeightPerUnit: 2,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Ultra low coumarin true cinnamon improving cellular glucose uptake.'
+  },
 };
