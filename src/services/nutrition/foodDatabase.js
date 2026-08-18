@@ -1466,4 +1466,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Stimulates lipolysis and central nervous system alertness before morning walks.'
   },
+  'lemon water salted': {
+    canonicalName: 'Fresh Lemon Water with Himalayan Pink Salt (0 kcal)',
+    aliases: ["lemon water","lime juice salt","salted lime water","naranga vellam uppu"],
+    basis: '100g',
+    weightType: 'edible',
+    caloriesPer100g: 4,
+    proteinPer100g: 0.1,
+    carbsPer100g: 1,
+    fatPer100g: 0,
+    fiberPer100g: 0.1,
+    defaultServingDesc: '1 glass (250ml) = 10 kcal',
+    edibleWeightPerUnit: 250,
+    category: 'beverages',
+    confidence: 'verified',
+    healthTip: 'Replenishes sodium and potassium electrolytes during fasted morning hydration.'
+  },
 };
