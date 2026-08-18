@@ -1338,4 +1338,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Oil-free steamed rice noodles.'
   },
+  'rajma red kidney beans': {
+    canonicalName: 'Rajma (Red Kidney Beans) Curry',
+    aliases: ["rajma","rajma curry","red kidney beans","boiled rajma"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 127,
+    proteinPer100g: 8.7,
+    carbsPer100g: 22.8,
+    fatPer100g: 0.5,
+    fiberPer100g: 6.4,
+    defaultServingDesc: '1 bowl (150g) = 190 kcal, 13g protein',
+    edibleWeightPerUnit: null,
+    category: 'proteins',
+    confidence: 'estimated_range',
+    healthTip: 'High protein plant legume rich in resistant starch for insulin sensitivity.'
+  },
 };
