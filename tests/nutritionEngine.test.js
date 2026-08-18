@@ -440,4 +440,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(38);
     expect(res.calories).toBeLessThanOrEqual(46);
   });
+  it('Verified Calculation: calculates exact 5g ginger', async () => {
+    const res = await estimateNutrition('5g ginger');
+    expect(res.calories).toBeGreaterThanOrEqual(3);
+    expect(res.calories).toBeLessThanOrEqual(6);
+  });
 });
