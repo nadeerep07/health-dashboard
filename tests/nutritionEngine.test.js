@@ -210,4 +210,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(166);
     expect(res.calories).toBeLessThanOrEqual(184);
   });
+  it('Verified Calculation: calculates exact 100g tofu', async () => {
+    const res = await estimateNutrition('100g tofu');
+    expect(res.calories).toBeGreaterThanOrEqual(78);
+    expect(res.calories).toBeLessThanOrEqual(88);
+  });
 });
