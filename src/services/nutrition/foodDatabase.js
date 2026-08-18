@@ -1930,4 +1930,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Stimulates pancreatic lipase and bile acid secretion.'
   },
+  'fenugreek seeds uluva': {
+    canonicalName: 'Fenugreek Seeds / Uluva (Soaked)',
+    aliases: ["fenugreek","fenugreek seeds","uluva","methi seeds","soaked uluva"],
+    basis: '100g',
+    weightType: 'raw',
+    caloriesPer100g: 323,
+    proteinPer100g: 23,
+    carbsPer100g: 58.4,
+    fatPer100g: 6.4,
+    fiberPer100g: 24.6,
+    defaultServingDesc: '1 tsp soaked (5g) = 16 kcal, 1.2g fiber',
+    edibleWeightPerUnit: 5,
+    category: 'herbs_spices',
+    confidence: 'verified',
+    healthTip: 'Galactomannan soluble fiber slows carbohydrate absorption in gut.'
+  },
 };
