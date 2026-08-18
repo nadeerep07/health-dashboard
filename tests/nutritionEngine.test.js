@@ -425,4 +425,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(34);
     expect(res.calories).toBeLessThanOrEqual(40);
   });
+  it('Verified Calculation: calculates exact 100g pavakka', async () => {
+    const res = await estimateNutrition('100g pavakka');
+    expect(res.calories).toBeGreaterThanOrEqual(30);
+    expect(res.calories).toBeLessThanOrEqual(38);
+  });
 });
