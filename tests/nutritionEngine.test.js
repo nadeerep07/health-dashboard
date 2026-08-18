@@ -220,4 +220,9 @@ describe('Sanity Validation Layer', () => {
     expect(res.calories).toBeGreaterThanOrEqual(105);
     expect(res.calories).toBeLessThanOrEqual(117);
   });
+  it('Verified Calculation: calculates exact 30g soya chunks', async () => {
+    const res = await estimateNutrition('30g soya chunks');
+    expect(res.calories).toBeGreaterThanOrEqual(98);
+    expect(res.calories).toBeLessThanOrEqual(110);
+  });
 });
