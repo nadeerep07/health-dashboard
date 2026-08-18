@@ -51,10 +51,10 @@ export default function NutritionScreen({
   const [apiKeyInput, setApiKeyInput] = useState(getStoredGeminiKey());
 
   const mealCategories = [
-    { key: 'breakfast', label: 'Breakfast', icon: Sun, color: '#f59e0b', desc: '08:00 AM – 09:30 AM' },
-    { key: 'lunch', label: 'Lunch', icon: Utensils, color: '#10b981', desc: '01:00 PM – 02:30 PM' },
-    { key: 'snack', label: 'Evening Snack', icon: Coffee, color: '#38bdf8', desc: '04:30 PM – 05:30 PM' },
-    { key: 'dinner', label: 'Dinner', icon: Moon, color: '#a78bfa', desc: '08:00 PM – 09:00 PM' },
+    { key: 'breakfast', label: 'Breakfast', icon: Sun, color: 'var(--brand-primary-soft)', desc: '08:00 AM – 09:30 AM' },
+    { key: 'lunch', label: 'Lunch', icon: Utensils, color: 'var(--brand-primary)', desc: '01:00 PM – 02:30 PM' },
+    { key: 'snack', label: 'Evening Snack', icon: Coffee, color: 'var(--brand-secondary)', desc: '04:30 PM – 05:30 PM' },
+    { key: 'dinner', label: 'Dinner', icon: Moon, color: 'var(--accent-purple)', desc: '08:00 PM – 09:00 PM' },
   ];
 
   const allItems = [

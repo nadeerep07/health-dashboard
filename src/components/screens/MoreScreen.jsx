@@ -125,10 +125,10 @@ export default function MoreScreen({
               onClick={() => addWater(item.ml)}
               style={{
                 padding: '0.65rem',
-                background: 'rgba(56, 189, 248, 0.08)',
-                border: '1px solid rgba(56, 189, 248, 0.2)',
+                background: 'rgba(34, 211, 238, 0.08)',
+                border: '1px solid rgba(34, 211, 238, 0.2)',
                 borderRadius: 'var(--radius-sm)',
-                color: '#38bdf8',
+                color: 'var(--brand-secondary)',
                 fontWeight: 700,
                 fontSize: '0.8rem',
                 cursor: 'pointer',
@@ -240,7 +240,7 @@ export default function MoreScreen({
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-              <Lock size={16} color="var(--brand-primary)" />
+              <Lock size={16} color="var(--brand-primary-soft)" />
               <div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-white)' }}>
                   Device PIN Lock Screen

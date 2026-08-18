@@ -179,12 +179,12 @@ export default function DashboardHome({
             gap: '0.4rem',
             padding: '0.45rem 0.85rem',
             borderRadius: 'var(--radius-pill)',
-            background: 'rgba(245, 158, 11, 0.1)',
-            border: '1px solid rgba(245, 158, 11, 0.25)',
+            background: 'rgba(16, 185, 129, 0.08)',
+            border: '1px solid rgba(16, 185, 129, 0.25)',
           }}
         >
           <Flame size={16} color="var(--brand-primary)" />
-          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--brand-primary)', fontFamily: 'var(--font-mono)' }}>
+          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--brand-primary-soft)', fontFamily: 'var(--font-mono)' }}>
             Phase 1 • Dec 31 Goal
           </span>
         </div>
@@ -204,7 +204,7 @@ export default function DashboardHome({
                 </span>
                 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 600 }}>kg</span>
                 <span style={{ color: 'var(--text-muted)', fontSize: '1.25rem' }}>→</span>
-                <span style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 800, color: 'var(--brand-primary)', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 800, color: 'var(--brand-primary-soft)', fontFamily: 'var(--font-mono)' }}>
                   {targetWeight} kg
                 </span>
               </div>
@@ -213,7 +213,7 @@ export default function DashboardHome({
             {/* 7-Day Moving Avg Badge */}
             <div
               style={{
-                background: 'rgba(0, 0, 0, 0.35)',
+                background: 'var(--surface-secondary)',
                 border: '1px solid var(--border-medium)',
                 borderRadius: 'var(--radius-sm)',
                 padding: '0.65rem 1rem',
@@ -223,10 +223,10 @@ export default function DashboardHome({
               <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
                 7-Day Moving Avg
               </span>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-secondary)', fontFamily: 'var(--font-mono)' }}>
                 {Number(sevenDayAvg).toFixed(2)} kg
               </div>
-              <div style={{ fontSize: '0.68rem', color: '#34d399', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.2rem' }}>
+              <div style={{ fontSize: '0.68rem', color: 'var(--accent-success)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.2rem' }}>
                 <TrendingDown size={11} /> {weeklyDeltaKg < 0 ? `${weeklyDeltaKg} kg this week` : 'Stable this week'}
               </div>
             </div>
@@ -238,7 +238,7 @@ export default function DashboardHome({
               <span style={{ color: 'var(--text-secondary)' }}>
                 {remainingWeight} kg remaining to 100 kg goal
               </span>
-              <span style={{ color: 'var(--brand-primary)', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
+              <span style={{ color: 'var(--brand-primary-soft)', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
                 {journeyProgressPct}% Achieved
               </span>
             </div>
@@ -308,7 +308,7 @@ export default function DashboardHome({
               size={92}
               strokeWidth={8}
               progress={overallScore}
-              color={overallScore >= 80 ? '#10b981' : 'var(--brand-primary)'}
+              color={overallScore >= 80 ? 'var(--brand-primary)' : 'var(--brand-secondary)'}
             >
               <span style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-white)', fontFamily: 'var(--font-mono)' }}>
                 {overallScore}
@@ -321,25 +321,25 @@ export default function DashboardHome({
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem' }}>
                 <span style={{ color: 'var(--text-muted)' }}>Nutrition Deficit</span>
-                <span style={{ color: totalCaloriesConsumed <= 2100 ? '#34d399' : '#f87171', fontWeight: 700 }}>
+                <span style={{ color: totalCaloriesConsumed <= 2100 ? 'var(--brand-primary-soft)' : '#f87171', fontWeight: 700 }}>
                   {totalCaloriesConsumed} / 2100 kcal
                 </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem' }}>
                 <span style={{ color: 'var(--text-muted)' }}>Protein Target</span>
-                <span style={{ color: totalProteinConsumed >= 100 ? '#34d399' : 'var(--brand-primary)', fontWeight: 700 }}>
+                <span style={{ color: totalProteinConsumed >= 100 ? 'var(--brand-primary-soft)' : 'var(--brand-secondary)', fontWeight: 700 }}>
                   {totalProteinConsumed.toFixed(0)} / 130g
                 </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem' }}>
                 <span style={{ color: 'var(--text-muted)' }}>Daily Walk</span>
-                <span style={{ color: todayWalkKm >= 5.0 ? '#34d399' : 'var(--text-white)', fontWeight: 700 }}>
+                <span style={{ color: todayWalkKm >= 5.0 ? 'var(--brand-primary-soft)' : 'var(--text-white)', fontWeight: 700 }}>
                   {todayWalkKm.toFixed(1)} / 5.0 km
                 </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem' }}>
                 <span style={{ color: 'var(--text-muted)' }}>Water Hydration</span>
-                <span style={{ color: waterPct >= 80 ? '#34d399' : '#38bdf8', fontWeight: 700 }}>
+                <span style={{ color: waterPct >= 80 ? 'var(--brand-primary-soft)' : 'var(--brand-secondary)', fontWeight: 700 }}>
                   {waterConsumedL} / {waterTargetL} L
                 </span>
               </div>
@@ -372,7 +372,7 @@ export default function DashboardHome({
               <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
                 Calories
               </span>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-primary)', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-primary-soft)', fontFamily: 'var(--font-mono)' }}>
                 {totalCaloriesConsumed}
               </div>
               <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
@@ -384,7 +384,7 @@ export default function DashboardHome({
               <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
                 Protein
               </span>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-secondary)', fontFamily: 'var(--font-mono)' }}>
                 {totalProteinConsumed.toFixed(0)}g
               </div>
               <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
@@ -400,8 +400,8 @@ export default function DashboardHome({
       {/* 5. "Next Best Action" Dynamic Coach Banner */}
       <div
         style={{
-          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(17, 19, 25, 0.95) 100%)',
-          border: '1px solid rgba(245, 158, 11, 0.25)',
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(17, 25, 24, 0.95) 100%)',
+          border: '1px solid rgba(16, 185, 129, 0.25)',
           borderRadius: 'var(--radius-md)',
           padding: '1.15rem 1.25rem',
           display: 'flex',
@@ -424,7 +424,7 @@ export default function DashboardHome({
             <NextActionIcon size={22} />
           </div>
           <div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--brand-primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <span style={{ fontSize: '0.68rem', color: 'var(--brand-primary-soft)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Your Next Best Action
             </span>
             <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-white)', marginTop: '0.1rem' }}>

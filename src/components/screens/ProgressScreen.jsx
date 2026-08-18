@@ -116,13 +116,13 @@ export default function ProgressScreen({
           <Metric label="Current Weight" value={currentWeight.toFixed(2)} unit="kg" accentColor="var(--text-white)" />
         </Card>
         <Card variant="subtle" padding="1rem">
-          <Metric label="7-Day Moving Avg" value={current7DayAvg.toFixed(2)} unit="kg" accentColor="#38bdf8" />
+          <Metric label="7-Day Moving Avg" value={current7DayAvg.toFixed(2)} unit="kg" accentColor="var(--brand-secondary)" />
         </Card>
         <Card variant="subtle" padding="1rem">
-          <Metric label="Total Lost" value={totalLost > 0 ? `-${totalLost}` : '0.00'} unit="kg" accentColor="var(--brand-primary)" />
+          <Metric label="Total Lost" value={totalLost > 0 ? `-${totalLost}` : '0.00'} unit="kg" accentColor="var(--brand-primary-soft)" />
         </Card>
         <Card variant="subtle" padding="1rem">
-          <Metric label="To 100 kg Goal" value={remaining > 0 ? remaining : '0.00'} unit="kg" accentColor="#34d399" />
+          <Metric label="To 100 kg Goal" value={remaining > 0 ? remaining : '0.00'} unit="kg" accentColor="var(--text-secondary)" />
         </Card>
       </div>
 
@@ -131,16 +131,19 @@ export default function ProgressScreen({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           {/* Legend */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', fontSize: '0.74rem' }}>
-            <span style={{ color: 'var(--brand-primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span style={{ color: 'var(--brand-primary-soft)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--brand-primary)', display: 'inline-block' }}></span> Fasted Weigh-In
             </span>
-            <span style={{ color: '#38bdf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-              <span style={{ width: '12px', height: '2px', background: '#38bdf8', display: 'inline-block' }}></span> 7-Day Trend
+            <span style={{ color: 'var(--brand-secondary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <span style={{ width: '12px', height: '2px', background: 'var(--brand-secondary)', display: 'inline-block' }}></span> 7-Day Trend
+            </span>
+            <span style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <span style={{ width: '12px', height: '1.5px', borderTop: '1.5px dashed var(--text-muted)', display: 'inline-block' }}></span> 100 kg Goal
             </span>
           </div>
 
           {/* Time Range Filter Buttons */}
-          <div style={{ display: 'flex', background: 'var(--surface-secondary)', padding: '0.2rem', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ display: 'flex', background: 'var(--surface-secondary)', padding: '0.2rem', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-medium)' }}>
             {['7D', '30D', '90D', 'ALL'].map((r) => (
               <button
                 key={r}
@@ -167,25 +170,25 @@ export default function ProgressScreen({
         <div style={{ width: '100%', overflowX: 'auto' }}>
           <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="xMidYMid meet" style={{ width: '100%', minWidth: '320px', height: 'auto', display: 'block' }}>
             <defs>
-              <linearGradient id="goldAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.0" />
+              <linearGradient id="emeraldAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
+                <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
               </linearGradient>
             </defs>
 
-            {/* Target 100 kg Goal Line */}
-            <line x1="30" y1={targetY} x2={chartWidth - 30} y2={targetY} stroke="rgba(245, 158, 11, 0.4)" strokeDasharray="5,5" strokeWidth="1.5" />
-            <text x={chartWidth - 25} y={targetY + 4} fill="var(--brand-primary)" fontSize="10" fontWeight="bold">100 kg Goal</text>
+            {/* Target 100 kg Subtle Neutral Goal Line */}
+            <line x1="30" y1={targetY} x2={chartWidth - 85} y2={targetY} stroke="var(--border-strong)" strokeDasharray="4,4" strokeWidth="1.2" />
+            <text x={chartWidth - 80} y={targetY + 3.5} fill="var(--text-muted)" fontSize="9" fontWeight="600" fontFamily="var(--font-sans)">100 kg Goal</text>
 
             {/* Area fill */}
             {visibleLogs.length > 1 && (
               <polygon
                 points={`${getX(0)},${chartHeight - 25} ${points} ${getX(visibleLogs.length - 1)},${chartHeight - 25}`}
-                fill="url(#goldAreaGrad)"
+                fill="url(#emeraldAreaGrad)"
               />
             )}
 
-            {/* Daily Fasted Weight Polyline */}
+            {/* Daily Fasted Weight Polyline (Emerald) */}
             {visibleLogs.length > 1 && (
               <polyline
                 fill="none"
@@ -197,12 +200,12 @@ export default function ProgressScreen({
               />
             )}
 
-            {/* 7-Day Moving Average Polyline */}
+            {/* 7-Day Moving Average Polyline (Cyan/Teal) */}
             {visibleMAs.length > 1 && (
               <polyline
                 fill="none"
-                stroke="#38bdf8"
-                strokeWidth="2.5"
+                stroke="var(--brand-secondary)"
+                strokeWidth="2"
                 strokeDasharray="4,4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -216,8 +219,8 @@ export default function ProgressScreen({
               const cy = getY(log.weight);
               return (
                 <g key={log.id || idx}>
-                  <circle cx={cx} cy={cy} r="5" fill="#08090d" stroke="var(--brand-primary)" strokeWidth="2.5" />
-                  <text x={cx} y={cy - 9} fill="var(--text-white)" fontSize="9" textAnchor="middle" fontWeight="bold" fontFamily="var(--font-mono)">
+                  <circle cx={cx} cy={cy} r="4.5" fill="var(--surface-card)" stroke="var(--brand-primary)" strokeWidth="2.5" />
+                  <text x={cx} y={cy - 8} fill="var(--text-white)" fontSize="9" textAnchor="middle" fontWeight="bold" fontFamily="var(--font-mono)">
                     {Number(log.weight).toFixed(1)}
                   </text>
                   <text x={cx} y={chartHeight - 8} fill="var(--text-muted)" fontSize="8.5" textAnchor="middle">

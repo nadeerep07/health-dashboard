@@ -58,7 +58,7 @@ export default function TodayScreen({
       subtitle: todayWeight ? `${Number(todayWeight.weight).toFixed(2)} kg recorded` : 'Log your morning weight',
       icon: TrendingDown,
       completed: !!todayWeight,
-      color: 'var(--brand-primary)',
+      color: 'var(--brand-secondary)',
       actionTab: 'weight',
     },
     {
@@ -67,7 +67,7 @@ export default function TodayScreen({
       subtitle: walkKm >= 5.0 ? `✓ Target Hit (${walkKm.toFixed(1)} km)` : `${walkKm.toFixed(1)} / 5.0 km logged`,
       icon: Footprints,
       completed: walkKm >= 5.0,
-      color: '#34d399',
+      color: 'var(--brand-primary-soft)',
       actionTab: 'walk',
     },
     {

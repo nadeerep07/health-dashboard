@@ -103,7 +103,7 @@ export default function PlanScreen({
               border: 'none',
               borderRadius: 'var(--radius-xs)',
               background: activeWorkoutTab === 'A' ? 'var(--brand-primary)' : 'transparent',
-              color: activeWorkoutTab === 'A' ? '#08090d' : 'var(--text-muted)',
+              color: activeWorkoutTab === 'A' ? '#0b1110' : 'var(--text-muted)',
               cursor: 'pointer',
             }}
           >
@@ -119,7 +119,7 @@ export default function PlanScreen({
               border: 'none',
               borderRadius: 'var(--radius-xs)',
               background: activeWorkoutTab === 'B' ? 'var(--brand-primary)' : 'transparent',
-              color: activeWorkoutTab === 'B' ? '#08090d' : 'var(--text-muted)',
+              color: activeWorkoutTab === 'B' ? '#0b1110' : 'var(--text-muted)',
               cursor: 'pointer',
             }}
           >
@@ -132,7 +132,7 @@ export default function PlanScreen({
       <Card variant="gradient" padding="1.25rem">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
-            <span style={{ fontSize: '0.7rem', color: 'var(--brand-primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--brand-primary-soft)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Full Body Dumbbell Session
             </span>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-white)', marginTop: '0.1rem' }}>
@@ -144,7 +144,7 @@ export default function PlanScreen({
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <div
               style={{
-                background: 'rgba(0,0,0,0.4)',
+                background: 'var(--surface-secondary)',
                 border: '1px solid var(--border-medium)',
                 borderRadius: 'var(--radius-sm)',
                 padding: '0.45rem 0.85rem',
@@ -153,8 +153,8 @@ export default function PlanScreen({
                 gap: '0.45rem',
               }}
             >
-              <Clock size={15} color={timerRunning ? 'var(--brand-primary)' : 'var(--text-muted)'} />
-              <span style={{ fontSize: '0.9rem', fontWeight: 800, color: timerRunning ? 'var(--brand-primary)' : 'var(--text-white)', fontFamily: 'var(--font-mono)' }}>
+              <Clock size={15} color={timerRunning ? 'var(--brand-primary-soft)' : 'var(--text-muted)'} />
+              <span style={{ fontSize: '0.9rem', fontWeight: 800, color: timerRunning ? 'var(--brand-primary-soft)' : 'var(--text-white)', fontFamily: 'var(--font-mono)' }}>
                 {timerRunning ? `${timerSeconds}s Rest` : '60s Rest'}
               </span>
             </div>
