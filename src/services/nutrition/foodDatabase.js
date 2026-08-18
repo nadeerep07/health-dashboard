@@ -1418,4 +1418,20 @@ export const FOOD_DATABASE = {
     confidence: 'verified',
     healthTip: 'Complex carbohydrate root vegetable with high potassium.'
   },
+  'neenmathi kozhuva fry': {
+    canonicalName: 'Kozhuva / Netholi (Anchovy) Fry',
+    aliases: ["kozhuva fry","netholi fry","anchovy fry","fried kozhuva"],
+    basis: '100g',
+    weightType: 'cooked',
+    caloriesPer100g: 210,
+    proteinPer100g: 23.5,
+    carbsPer100g: 1.5,
+    fatPer100g: 12,
+    fiberPer100g: 0,
+    defaultServingDesc: '50g edible = 105 kcal, 11.7g protein',
+    edibleWeightPerUnit: 50,
+    category: 'seafood',
+    confidence: 'estimated_range',
+    healthTip: 'Edible with soft bones for superior bioavailable calcium absorption.'
+  },
 };
