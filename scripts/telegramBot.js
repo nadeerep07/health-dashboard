@@ -60,9 +60,15 @@ async function sendTelegramMessage(chatId, text, replyMarkup = null) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    return await res.json();
+    const data = await res.json();
+    if (!data.ok) {
+      console.error(`[Telegram Bot] Send message failed:`, data);
+    } else {
+      console.log(`[Telegram Bot] Successfully sent message to ${chatId}`);
+    }
+    return data;
   } catch (err) {
-    console.error('Error sending Telegram message:', err);
+    console.error('[Telegram Bot] Error sending Telegram message:', err);
   }
 }
 
