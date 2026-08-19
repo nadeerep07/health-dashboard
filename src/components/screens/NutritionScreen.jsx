@@ -5,6 +5,7 @@ import Badge from '../ui/Badge';
 import ProgressRing from '../ui/ProgressRing';
 import ProgressBar from '../ui/ProgressBar';
 import Modal from '../ui/Modal';
+import DateSwitcherBar from '../ui/DateSwitcherBar';
 import {
   Utensils,
   Plus,
@@ -133,6 +134,12 @@ export default function NutritionScreen({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {/* Universal Date Switcher Bar */}
+      <DateSwitcherBar
+        selectedDate={activeDate}
+        onSelectDate={onSelectDate}
+      />
+
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
@@ -145,21 +152,6 @@ export default function NutritionScreen({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <input
-            type="date"
-            value={activeDate}
-            onChange={(e) => onSelectDate && onSelectDate(e.target.value)}
-            style={{
-              padding: '0.45rem 0.75rem',
-              borderRadius: 'var(--radius-sm)',
-              background: 'var(--surface-secondary)',
-              border: '1px solid var(--border-medium)',
-              color: 'var(--text-white)',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              outline: 'none',
-            }}
-          />
           <Button variant="primary" size="sm" onClick={() => handleOpenAddModal('lunch')} icon={Sparkles}>
             + Log Meal
           </Button>

@@ -135,4 +135,60 @@ describe('Real User Daily Regression & Data Integrity Suite', () => {
     expect(result.calories).toBeLessThan(450);
     expect(result.calories).not.toBe(1148);
   });
+
+  // Date & Checklist Isolation Tests
+  it('Date & Checklist Isolation: Habits on Day 1 do not bleed into Day 2', async () => {
+    const { resolveHabitsForDate } = await import('../src/utils/storage');
+    const { shiftDate } = await import('../src/utils/dateUtils');
+
+    const day1 = '2026-08-17';
+    const day2 = shiftDate(day1, 1); // 2026-08-18
+
+    const habitsByDate = {
+      [day1]: [
+        { id: 'walk', label: 'Walk 5 KM', completed: true },
+        { id: 'water', label: 'Drink water', completed: true },
+      ]
+    };
+
+    const day1Habits = resolveHabitsForDate(habitsByDate, day1);
+    expect(day1Habits.find(h => h.id === 'walk').completed).toBe(true);
+
+    const day2Habits = resolveHabitsForDate(habitsByDate, day2);
+    // Day 2 must start with clean uncompleted checkboxes
+    expect(day2Habits.find(h => h.id === 'walk').completed).toBe(false);
+    expect(day2Habits.every(h => h.completed === false)).toBe(true);
+  });
+
+  it('Date & Water Isolation: Water logged on Day 1 is isolated from Day 2', async () => {
+    const { resolveWaterForDate } = await import('../src/utils/storage');
+    const waterByDate = {
+      '2026-08-17': { targetMl: 3500, consumedMl: 2500, history: [{ time: '10:00 AM', amount: 500 }] }
+    };
+
+    const day1Water = resolveWaterForDate(waterByDate, '2026-08-17');
+    expect(day1Water.consumedMl).toBe(2500);
+
+    const day2Water = resolveWaterForDate(waterByDate, '2026-08-18');
+    expect(day2Water.consumedMl).toBe(0);
+    expect(day2Water.history.length).toBe(0);
+  });
+
+  it('Week Workout Isolation: Workouts in Week 34 do not leak into Week 35', async () => {
+    const { resolveWorkoutsForWeek } = await import('../src/utils/storage');
+    const workoutsByWeek = {
+      '2026-W34': {
+        mon: { walk: true, workout: true },
+        tue: { walk: true }
+      }
+    };
+
+    const w34 = resolveWorkoutsForWeek(workoutsByWeek, '2026-W34');
+    expect(w34.mon.workout).toBe(true);
+
+    const w35 = resolveWorkoutsForWeek(workoutsByWeek, '2026-W35');
+    expect(w35.mon.workout).toBe(false);
+    expect(w35.mon.walk).toBe(false);
+  });
 });
+

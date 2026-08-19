@@ -1,19 +1,34 @@
 // LocalStorage helper utilities for persistent dashboard state
+import { getLocalDateString, getWeekIdentifier } from './dateUtils';
 
 const STORAGE_KEYS = {
   WEIGHT_LOGS: 'transformation_weight_logs',
   DAILY_HABITS: 'transformation_daily_habits',
+  HABITS_BY_DATE: 'transformation_habits_by_date',
   WEEKLY_WORKOUTS: 'transformation_weekly_workouts',
+  WEEKLY_WORKOUTS_BY_WEEK: 'transformation_weekly_workouts_by_week',
   WALKING_LOGS: 'transformation_walking_logs',
   SLEEP_LOGS: 'transformation_sleep_logs',
   BODY_MEASUREMENTS: 'transformation_body_measurements',
   PHOTOS: 'transformation_photos',
   NIGHT_ROUTINE: 'transformation_night_routine',
   WATER_INTAKE: 'transformation_water_intake',
+  WATER_BY_DATE: 'transformation_water_by_date',
   DASHBOARD_PIN: 'transformation_dashboard_pin',
   DEVICE_AUTH_EXPIRY: 'transformation_auth_expiry',
   FOOD_LOGS: 'transformation_food_logs',
 };
+
+// Base habit definition templates
+const DEFAULT_HABIT_TEMPLATES = [
+  { id: 'walk', label: 'Walk 5 KM', desc: 'Maintain comfortable 11:00–11:45 pace (~58–60 min)', icon: 'Footprints', completed: false },
+  { id: 'calories', label: 'Follow calorie target', desc: 'Stay within 2,000–2,200 kcal', icon: 'Flame', completed: false },
+  { id: 'protein', label: 'Hit protein target', desc: 'Aim for 120–150g protein', icon: 'Beef', completed: false },
+  { id: 'water', label: 'Drink enough water', desc: 'Target 3–4 Liters throughout the day', icon: 'Droplets', completed: false },
+  { id: 'no_sugar_drinks', label: 'No sugary drinks', desc: 'Stick to water, black coffee, tea', icon: 'Ban', completed: false },
+  { id: 'no_bakery', label: 'Avoid unnecessary bakery food', desc: 'Skip puffs, pastries, processed snacks', icon: 'Cookie', completed: false },
+  { id: 'sleep', label: 'Get adequate sleep', desc: 'Aim for 7.5–8 hours (in bed by ~11:30 PM)', icon: 'Moon', completed: false },
+];
 
 // Initial default daily food logs (Date-indexed: 'YYYY-MM-DD')
 const DEFAULT_FOOD_LOGS = {
@@ -37,21 +52,25 @@ const DEFAULT_FOOD_LOGS = {
   }
 };
 
-// Initial default water intake (in ml) - Today: 2.2 L logged
-const DEFAULT_WATER_INTAKE = {
-  targetMl: 3500,
-  consumedMl: 2200,
-  bottleSizeMl: 1000,
-  history: [
-    { id: 'w-1', time: '08:30 AM', amount: 500, label: 'Morning Wake-up Glass' },
-    { id: 'w-2', time: '11:30 AM', amount: 500, label: 'Work Session Bottle 1' },
-    { id: 'w-3', time: '02:30 PM', amount: 500, label: 'Post Lunch Bottle 2' },
-    { id: 'w-4', time: '06:30 PM', amount: 500, label: 'Post-Walk Hydration' },
-    { id: 'w-5', time: '08:45 PM', amount: 200, label: 'Evening Glass' },
-  ]
+// Initial default water intake (in ml)
+const DEFAULT_WATER_BY_DATE = {
+  '2026-08-17': {
+    targetMl: 3500,
+    consumedMl: 2200,
+    bottleSizeMl: 1000,
+    history: [
+      { id: 'w-1', time: '08:30 AM', amount: 500, label: 'Morning Wake-up Glass' },
+      { id: 'w-2', time: '11:30 AM', amount: 500, label: 'Work Session Bottle 1' },
+      { id: 'w-3', time: '02:30 PM', amount: 500, label: 'Post Lunch Bottle 2' },
+      { id: 'w-4', time: '06:30 PM', amount: 500, label: 'Post-Walk Hydration' },
+      { id: 'w-5', time: '08:45 PM', amount: 200, label: 'Evening Glass' },
+    ]
+  }
 };
 
-// Initial default weight history (Aug 17 morning weigh-in: 110.80 kg)
+const DEFAULT_WATER_INTAKE = DEFAULT_WATER_BY_DATE['2026-08-17'];
+
+// Initial default weight history
 const DEFAULT_WEIGHT_LOGS = [
   { id: 'wt-1', date: '2026-08-01', weight: 111.50, notes: 'Starting Baseline' },
   { id: 'wt-2', date: '2026-08-05', weight: 111.10, notes: 'Fasted morning weigh-in' },
@@ -61,7 +80,7 @@ const DEFAULT_WEIGHT_LOGS = [
   { id: 'wt-6', date: '2026-08-17', weight: 110.80, notes: 'Morning fasted weight (Day 1)' },
 ];
 
-// Initial default habits for today
+// Initial default habits for Day 1
 const DEFAULT_HABITS = [
   { id: 'walk', label: 'Walk 5 KM', desc: 'Maintain comfortable 11:00–11:45 pace (~58–60 min)', icon: 'Footprints', completed: true },
   { id: 'calories', label: 'Follow calorie target', desc: 'Stay within 2,000–2,200 kcal', icon: 'Flame', completed: true },
@@ -72,7 +91,21 @@ const DEFAULT_HABITS = [
   { id: 'sleep', label: 'Get adequate sleep', desc: 'Aim for 7.5–8 hours (in bed by ~11:30 PM)', icon: 'Moon', completed: false },
 ];
 
-// Initial weekly workout status
+const DEFAULT_HABITS_BY_DATE = {
+  '2026-08-17': DEFAULT_HABITS,
+};
+
+// Initial weekly workout status by Week
+const DEFAULT_WEEKLY_WORKOUT_TEMPLATE = {
+  mon: { walk: false, workout: false, title: '5 km walk + Dumbbell Workout A' },
+  tue: { walk: false, title: '5 km walk' },
+  wed: { walk: false, workout: false, title: '5 km walk + Dumbbell Workout B' },
+  thu: { walk: false, title: '5 km walk' },
+  fri: { walk: false, workout: false, title: '5 km walk + Dumbbell Workout A' },
+  sat: { walk: false, title: '5 km walk' },
+  sun: { walk: false, title: '5 km walk (Sunday session)' },
+};
+
 const DEFAULT_WEEKLY_WORKOUTS = {
   mon: { walk: true, workout: false, title: '5.4 km walk • Day 1 Done!' },
   tue: { walk: false, title: '5 km walk' },
@@ -83,7 +116,11 @@ const DEFAULT_WEEKLY_WORKOUTS = {
   sun: { walk: false, title: '5 km walk (Sunday session)' },
 };
 
-// Walking history (Aug 17: 5.40 km, 60 min, pace 11:07, 492 kcal)
+const DEFAULT_WEEKLY_WORKOUTS_BY_WEEK = {
+  '2026-W34': DEFAULT_WEEKLY_WORKOUTS,
+};
+
+// Walking history
 const DEFAULT_WALKING_LOGS = [
   { id: 'wl-1', date: '2026-08-11', day: 'Tue', distance: 5.0, duration: 58, pace: '11:36', calories: 325, notes: 'Comfortable evening pace' },
   { id: 'wl-2', date: '2026-08-12', day: 'Wed', distance: 5.2, duration: 61, pace: '11:44', calories: 338, notes: 'Extra neighborhood loop' },
@@ -139,15 +176,50 @@ export const setStoredData = (key, data) => {
   }
 };
 
+// Date-specific resolvers
+export function resolveHabitsForDate(habitsByDate, dateStr) {
+  const target = dateStr || getLocalDateString();
+  if (habitsByDate && habitsByDate[target]) {
+    return habitsByDate[target];
+  }
+  return DEFAULT_HABIT_TEMPLATES.map(h => ({ ...h, completed: false }));
+}
+
+export function resolveWaterForDate(waterByDate, dateStr, defaultTarget = 3500) {
+  const target = dateStr || getLocalDateString();
+  if (waterByDate && waterByDate[target]) {
+    return waterByDate[target];
+  }
+  return {
+    targetMl: defaultTarget,
+    consumedMl: 0,
+    bottleSizeMl: 1000,
+    history: [],
+  };
+}
+
+export function resolveWorkoutsForWeek(weeklyWorkoutsByWeek, weekKey) {
+  const target = weekKey || getWeekIdentifier();
+  if (weeklyWorkoutsByWeek && weeklyWorkoutsByWeek[target]) {
+    return weeklyWorkoutsByWeek[target];
+  }
+  return { ...DEFAULT_WEEKLY_WORKOUT_TEMPLATE };
+}
+
 export {
   STORAGE_KEYS,
+  DEFAULT_HABIT_TEMPLATES,
   DEFAULT_WEIGHT_LOGS,
   DEFAULT_HABITS,
+  DEFAULT_HABITS_BY_DATE,
   DEFAULT_WEEKLY_WORKOUTS,
+  DEFAULT_WEEKLY_WORKOUTS_BY_WEEK,
+  DEFAULT_WEEKLY_WORKOUT_TEMPLATE,
   DEFAULT_WALKING_LOGS,
   DEFAULT_SLEEP_LOGS,
   DEFAULT_MEASUREMENTS,
   DEFAULT_NIGHT_ROUTINE,
   DEFAULT_WATER_INTAKE,
+  DEFAULT_WATER_BY_DATE,
   DEFAULT_FOOD_LOGS,
 };

@@ -3,15 +3,21 @@ import {
   STORAGE_KEYS,
   DEFAULT_WEIGHT_LOGS,
   DEFAULT_HABITS,
+  DEFAULT_HABITS_BY_DATE,
   DEFAULT_WEEKLY_WORKOUTS,
+  DEFAULT_WEEKLY_WORKOUTS_BY_WEEK,
   DEFAULT_WALKING_LOGS,
   DEFAULT_SLEEP_LOGS,
   DEFAULT_MEASUREMENTS,
   DEFAULT_NIGHT_ROUTINE,
   DEFAULT_WATER_INTAKE,
+  DEFAULT_WATER_BY_DATE,
   DEFAULT_FOOD_LOGS,
   getStoredData,
-  setStoredData
+  setStoredData,
+  resolveHabitsForDate,
+  resolveWaterForDate,
+  resolveWorkoutsForWeek
 } from './utils/storage';
 
 import {
@@ -20,6 +26,7 @@ import {
   saveCloudDashboardData
 } from './utils/supabaseClient';
 
+import { getLocalDateString, getWeekIdentifier, getDayOfWeekKey } from './utils/dateUtils';
 import { calculateWeightMetrics } from './services/weightService';
 import { estimateNutrition } from './services/nutritionService';
 
@@ -45,20 +52,53 @@ export default function App() {
     return Date.now() > expiry;
   });
 
-  // Local storage reactive states
+  // Active navigation & selected date (Timezone-safe)
+  const [activeScreen, setActiveScreen] = useState('home');
+  const [selectedDate, setSelectedDate] = useState(() => getLocalDateString());
+
+  // Date-isolated persistent states
   const [weightLogs, setWeightLogs] = useState(() => getStoredData(STORAGE_KEYS.WEIGHT_LOGS, DEFAULT_WEIGHT_LOGS));
-  const [habits, setHabits] = useState(() => getStoredData(STORAGE_KEYS.DAILY_HABITS, DEFAULT_HABITS));
-  const [waterData, setWaterData] = useState(() => getStoredData(STORAGE_KEYS.WATER_INTAKE, DEFAULT_WATER_INTAKE));
-  const [weeklyWorkouts, setWeeklyWorkouts] = useState(() => getStoredData(STORAGE_KEYS.WEEKLY_WORKOUTS, DEFAULT_WEEKLY_WORKOUTS));
+  const [foodLogs, setFoodLogs] = useState(() => getStoredData(STORAGE_KEYS.FOOD_LOGS, DEFAULT_FOOD_LOGS));
   const [walkingLogs, setWalkingLogs] = useState(() => getStoredData(STORAGE_KEYS.WALKING_LOGS, DEFAULT_WALKING_LOGS));
   const [sleepLogs, setSleepLogs] = useState(() => getStoredData(STORAGE_KEYS.SLEEP_LOGS, DEFAULT_SLEEP_LOGS));
   const [nightRoutine, setNightRoutine] = useState(() => getStoredData(STORAGE_KEYS.NIGHT_ROUTINE, DEFAULT_NIGHT_ROUTINE));
   const [measurements, setMeasurements] = useState(() => getStoredData(STORAGE_KEYS.BODY_MEASUREMENTS, DEFAULT_MEASUREMENTS));
-  const [foodLogs, setFoodLogs] = useState(() => getStoredData(STORAGE_KEYS.FOOD_LOGS, DEFAULT_FOOD_LOGS));
 
-  // Active screen: 'home' | 'today' | 'nutrition' | 'progress' | 'plan' | 'more'
-  const [activeScreen, setActiveScreen] = useState('home');
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
+  // Date-isolated Habit tracking
+  const [habitsByDate, setHabitsByDate] = useState(() => {
+    const stored = getStoredData(STORAGE_KEYS.HABITS_BY_DATE, null);
+    if (stored && typeof stored === 'object' && !Array.isArray(stored)) return stored;
+    // Migrate legacy habits array if present
+    const legacy = getStoredData(STORAGE_KEYS.DAILY_HABITS, null);
+    if (legacy && Array.isArray(legacy)) {
+      return { '2026-08-17': legacy };
+    }
+    return DEFAULT_HABITS_BY_DATE;
+  });
+
+  // Date-isolated Water tracking
+  const [waterByDate, setWaterByDate] = useState(() => {
+    const stored = getStoredData(STORAGE_KEYS.WATER_BY_DATE, null);
+    if (stored && typeof stored === 'object' && !Array.isArray(stored)) return stored;
+    const legacy = getStoredData(STORAGE_KEYS.WATER_INTAKE, null);
+    if (legacy && typeof legacy === 'object') {
+      return { '2026-08-17': legacy };
+    }
+    return DEFAULT_WATER_BY_DATE;
+  });
+
+  // Week-isolated Weekly Workouts tracking
+  const [weeklyWorkoutsByWeek, setWeeklyWorkoutsByWeek] = useState(() => {
+    const stored = getStoredData(STORAGE_KEYS.WEEKLY_WORKOUTS_BY_WEEK, null);
+    if (stored && typeof stored === 'object') return stored;
+    const legacy = getStoredData(STORAGE_KEYS.WEEKLY_WORKOUTS, null);
+    if (legacy && typeof legacy === 'object') {
+      return { '2026-W34': legacy };
+    }
+    return DEFAULT_WEEKLY_WORKOUTS_BY_WEEK;
+  });
+
+  // Cloud & Modal States
   const [showSyncModal, setShowSyncModal] = useState(false);
   const [showChangePinModal, setShowChangePinModal] = useState(false);
   const [syncStatus, setSyncStatus] = useState('idle');
@@ -69,9 +109,9 @@ export default function App() {
 
   // Persistence Effects
   useEffect(() => setStoredData(STORAGE_KEYS.WEIGHT_LOGS, weightLogs), [weightLogs]);
-  useEffect(() => setStoredData(STORAGE_KEYS.DAILY_HABITS, habits), [habits]);
-  useEffect(() => setStoredData(STORAGE_KEYS.WATER_INTAKE, waterData), [waterData]);
-  useEffect(() => setStoredData(STORAGE_KEYS.WEEKLY_WORKOUTS, weeklyWorkouts), [weeklyWorkouts]);
+  useEffect(() => setStoredData(STORAGE_KEYS.HABITS_BY_DATE, habitsByDate), [habitsByDate]);
+  useEffect(() => setStoredData(STORAGE_KEYS.WATER_BY_DATE, waterByDate), [waterByDate]);
+  useEffect(() => setStoredData(STORAGE_KEYS.WEEKLY_WORKOUTS_BY_WEEK, weeklyWorkoutsByWeek), [weeklyWorkoutsByWeek]);
   useEffect(() => setStoredData(STORAGE_KEYS.WALKING_LOGS, walkingLogs), [walkingLogs]);
   useEffect(() => setStoredData(STORAGE_KEYS.SLEEP_LOGS, sleepLogs), [sleepLogs]);
   useEffect(() => setStoredData(STORAGE_KEYS.NIGHT_ROUTINE, nightRoutine), [nightRoutine]);
@@ -88,9 +128,21 @@ export default function App() {
         const cloud = await fetchCloudDashboardData();
         if (cloud) {
           if (cloud.weightLogs) setWeightLogs(cloud.weightLogs);
-          if (cloud.habits) setHabits(cloud.habits);
-          if (cloud.waterData) setWaterData(cloud.waterData);
-          if (cloud.weeklyWorkouts) setWeeklyWorkouts(cloud.weeklyWorkouts);
+          if (cloud.habitsByDate) {
+            setHabitsByDate(cloud.habitsByDate);
+          } else if (cloud.habits && Array.isArray(cloud.habits)) {
+            setHabitsByDate(prev => ({ ...prev, [getLocalDateString()]: cloud.habits }));
+          }
+          if (cloud.waterByDate) {
+            setWaterByDate(cloud.waterByDate);
+          } else if (cloud.waterData) {
+            setWaterByDate(prev => ({ ...prev, [getLocalDateString()]: cloud.waterData }));
+          }
+          if (cloud.weeklyWorkoutsByWeek) {
+            setWeeklyWorkoutsByWeek(cloud.weeklyWorkoutsByWeek);
+          } else if (cloud.weeklyWorkouts) {
+            setWeeklyWorkoutsByWeek(prev => ({ ...prev, [getWeekIdentifier()]: cloud.weeklyWorkouts }));
+          }
           if (cloud.walkingLogs) setWalkingLogs(cloud.walkingLogs);
           if (cloud.sleepLogs) setSleepLogs(cloud.sleepLogs);
           if (cloud.nightRoutine) setNightRoutine(cloud.nightRoutine);
@@ -116,11 +168,16 @@ export default function App() {
 
     syncTimeoutRef.current = setTimeout(async () => {
       setSyncStatus('syncing');
+      const todayStr = getLocalDateString();
+      const currentWeekKey = getWeekIdentifier();
       const payload = {
         weightLogs,
-        habits,
-        waterData,
-        weeklyWorkouts,
+        habitsByDate,
+        habits: resolveHabitsForDate(habitsByDate, todayStr),
+        waterByDate,
+        waterData: resolveWaterForDate(waterByDate, todayStr),
+        weeklyWorkoutsByWeek,
+        weeklyWorkouts: resolveWorkoutsForWeek(weeklyWorkoutsByWeek, currentWeekKey),
         walkingLogs,
         sleepLogs,
         nightRoutine,
@@ -138,7 +195,7 @@ export default function App() {
     }, 1500);
 
     return () => clearTimeout(syncTimeoutRef.current);
-  }, [weightLogs, habits, waterData, weeklyWorkouts, walkingLogs, sleepLogs, nightRoutine, measurements, foodLogs]);
+  }, [weightLogs, habitsByDate, waterByDate, weeklyWorkoutsByWeek, walkingLogs, sleepLogs, nightRoutine, measurements, foodLogs]);
 
   // Security handlers
   const handleUnlock = () => setIsLocked(false);
@@ -156,7 +213,7 @@ export default function App() {
 
   // Quick Action Handlers
   const handleQuickLogFood = async (foodText, category = 'lunch') => {
-    const today = selectedDate || new Date().toISOString().split('T')[0];
+    const targetDate = selectedDate || getLocalDateString();
     const now = new Date();
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -176,11 +233,11 @@ export default function App() {
       };
 
       setFoodLogs(prev => {
-        const dayData = prev[today] || { breakfast: [], lunch: [], snack: [], dinner: [] };
+        const dayData = prev[targetDate] || { breakfast: [], lunch: [], snack: [], dinner: [] };
         const currentCategory = dayData[category] || [];
         return {
           ...prev,
-          [today]: {
+          [targetDate]: {
             ...dayData,
             [category]: [newItem, ...currentCategory],
           }
@@ -200,30 +257,100 @@ export default function App() {
 
   const handleQuickLogWalk = (newLog) => {
     setWalkingLogs(prev => [newLog, ...prev]);
-    const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-    const todayId = dayNames[new Date().getDay()];
-    setWeeklyWorkouts(prev => ({
-      ...prev,
-      [todayId]: { ...prev[todayId], walk: true }
-    }));
+    const targetDate = newLog.date || selectedDate || getLocalDateString();
+    const weekKey = getWeekIdentifier(targetDate);
+    const dayId = getDayOfWeekKey(targetDate);
+    
+    setWeeklyWorkoutsByWeek(prev => {
+      const weekData = resolveWorkoutsForWeek(prev, weekKey);
+      return {
+        ...prev,
+        [weekKey]: {
+          ...weekData,
+          [dayId]: { ...weekData[dayId], walk: true }
+        }
+      };
+    });
   };
 
-  const handleQuickLogWater = (amountMl) => {
+  const handleQuickLogWater = (amountMl, dateStr = null) => {
+    const targetDate = dateStr || selectedDate || getLocalDateString();
     const now = new Date();
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const newConsumed = (waterData.consumedMl || 0) + amountMl;
-    const newHistory = [{ time: timeStr, amount: amountMl, label: `+${amountMl}ml Quick Log` }, ...(waterData.history || []).slice(0, 7)];
 
-    setWaterData({
-      ...waterData,
-      consumedMl: newConsumed,
-      history: newHistory,
+    setWaterByDate(prev => {
+      const dayWater = resolveWaterForDate(prev, targetDate);
+      const newConsumed = (dayWater.consumedMl || 0) + amountMl;
+      const newHistory = [{ time: timeStr, amount: amountMl, label: `+${amountMl}ml Intake` }, ...(dayWater.history || []).slice(0, 7)];
+      return {
+        ...prev,
+        [targetDate]: {
+          ...dayWater,
+          consumedMl: newConsumed,
+          history: newHistory,
+        }
+      };
+    });
+  };
+
+  // Habit Toggle & Reset per Date
+  const handleToggleHabit = (dateStr, habitId) => {
+    const targetDate = dateStr || selectedDate || getLocalDateString();
+    setHabitsByDate(prev => {
+      const currentList = resolveHabitsForDate(prev, targetDate);
+      const updatedList = currentList.map(h => h.id === habitId ? { ...h, completed: !h.completed } : h);
+      return {
+        ...prev,
+        [targetDate]: updatedList
+      };
+    });
+  };
+
+  const handleResetDayHabits = (dateStr) => {
+    const targetDate = dateStr || selectedDate || getLocalDateString();
+    setHabitsByDate(prev => {
+      const currentList = resolveHabitsForDate(prev, targetDate);
+      return {
+        ...prev,
+        [targetDate]: currentList.map(h => ({ ...h, completed: false }))
+      };
+    });
+  };
+
+  // Weekly workout toggles
+  const handleToggleWeeklyTask = (weekKey, dayId, taskType) => {
+    setWeeklyWorkoutsByWeek(prev => {
+      const weekData = resolveWorkoutsForWeek(prev, weekKey);
+      return {
+        ...prev,
+        [weekKey]: {
+          ...weekData,
+          [dayId]: {
+            ...weekData[dayId],
+            [taskType]: !weekData[dayId]?.[taskType]
+          }
+        }
+      };
+    });
+  };
+
+  const handleCompleteWorkout = (weekKey, workoutType) => {
+    const todayDayId = getDayOfWeekKey(selectedDate);
+    setWeeklyWorkoutsByWeek(prev => {
+      const weekData = resolveWorkoutsForWeek(prev, weekKey);
+      return {
+        ...prev,
+        [weekKey]: {
+          ...weekData,
+          [todayDayId]: { ...weekData[todayDayId], workout: true }
+        }
+      };
     });
   };
 
   // Food log modifications
   const handleAddFoodItem = (dateStr, category, newItem) => {
-    const targetDate = dateStr || new Date().toISOString().split('T')[0];
+    const targetDate = dateStr || selectedDate || getLocalDateString();
     setFoodLogs(prev => {
       const dayData = prev[targetDate] || { breakfast: [], lunch: [], snack: [], dinner: [] };
       const currentCategory = dayData[category] || [];
@@ -238,7 +365,7 @@ export default function App() {
   };
 
   const handleDeleteFoodItem = (dateStr, category, itemId) => {
-    const targetDate = dateStr || new Date().toISOString().split('T')[0];
+    const targetDate = dateStr || selectedDate || getLocalDateString();
     setFoodLogs(prev => {
       const dayData = prev[targetDate] || { breakfast: [], lunch: [], snack: [], dinner: [] };
       const updatedCat = (dayData[category] || []).filter(item => item.id !== itemId);
@@ -250,7 +377,7 @@ export default function App() {
   };
 
   const handleResetFoodLogs = (dateStr) => {
-    const targetDate = dateStr || new Date().toISOString().split('T')[0];
+    const targetDate = dateStr || selectedDate || getLocalDateString();
     setFoodLogs(prev => ({
       ...prev,
       [targetDate]: { breakfast: [], lunch: [], snack: [], dinner: [] }
@@ -259,11 +386,16 @@ export default function App() {
 
   // Export JSON Backup
   const handleExportData = () => {
+    const todayStr = getLocalDateString();
+    const currentWeekKey = getWeekIdentifier();
     const payload = {
       weightLogs,
-      habits,
-      waterData,
-      weeklyWorkouts,
+      habitsByDate,
+      habits: resolveHabitsForDate(habitsByDate, todayStr),
+      waterByDate,
+      waterData: resolveWaterForDate(waterByDate, todayStr),
+      weeklyWorkoutsByWeek,
+      weeklyWorkouts: resolveWorkoutsForWeek(weeklyWorkoutsByWeek, currentWeekKey),
       walkingLogs,
       sleepLogs,
       nightRoutine,
@@ -274,7 +406,7 @@ export default function App() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `apex100_backup_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute("download", `apex100_backup_${todayStr}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -289,9 +421,9 @@ export default function App() {
         try {
           const json = JSON.parse(event.target.result);
           if (json.weightLogs) setWeightLogs(json.weightLogs);
-          if (json.habits) setHabits(json.habits);
-          if (json.waterData) setWaterData(json.waterData);
-          if (json.weeklyWorkouts) setWeeklyWorkouts(json.weeklyWorkouts);
+          if (json.habitsByDate) setHabitsByDate(json.habitsByDate);
+          if (json.waterByDate) setWaterByDate(json.waterByDate);
+          if (json.weeklyWorkoutsByWeek) setWeeklyWorkoutsByWeek(json.weeklyWorkoutsByWeek);
           if (json.walkingLogs) setWalkingLogs(json.walkingLogs);
           if (json.sleepLogs) setSleepLogs(json.sleepLogs);
           if (json.nightRoutine) setNightRoutine(json.nightRoutine);
@@ -316,6 +448,8 @@ export default function App() {
     return <PinLockScreen onUnlock={handleUnlock} currentPin={dashboardPin} />;
   }
 
+  const currentDayWater = resolveWaterForDate(waterByDate, selectedDate);
+
   return (
     <AppLayout
       activeScreen={activeScreen}
@@ -328,9 +462,9 @@ export default function App() {
       onLogFood={handleQuickLogFood}
       onLogWeight={handleQuickLogWeight}
       onLogWalk={handleQuickLogWalk}
-      onLogWater={handleQuickLogWater}
+      onLogWater={(ml) => handleQuickLogWater(ml, selectedDate)}
       currentWeight={weightMetrics.currentWeight}
-      waterTargetMl={waterData.targetMl || 3500}
+      waterTargetMl={currentDayWater.targetMl || 3500}
       streakDays={currentChallengeDay}
       isSynced={syncStatus === 'saved' || syncStatus === 'idle'}
     >
@@ -345,14 +479,15 @@ export default function App() {
           weeklyDeltaKg={weightMetrics.weeklyDeltaKg}
           foodLogs={foodLogs}
           selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
           walkingLogs={walkingLogs}
-          waterData={waterData}
+          waterByDate={waterByDate}
+          habitsByDate={habitsByDate}
+          weeklyWorkoutsByWeek={weeklyWorkoutsByWeek}
           sleepLogs={sleepLogs}
-          habits={habits}
-          weeklyWorkouts={weeklyWorkouts}
+          onToggleHabit={handleToggleHabit}
           onNavigate={setActiveScreen}
           onOpenQuickAdd={(tab) => {
-            // Trigger Quick Add via custom event or helper
             const event = new KeyboardEvent('keydown', { key: tab === 'food' ? 'f' : tab === 'weight' ? 'w' : tab === 'walk' ? 'a' : 'h' });
             window.dispatchEvent(event);
           }}
@@ -367,11 +502,12 @@ export default function App() {
           foodLogs={foodLogs}
           weightLogs={weightLogs}
           walkingLogs={walkingLogs}
-          waterData={waterData}
+          waterByDate={waterByDate}
+          habitsByDate={habitsByDate}
+          weeklyWorkoutsByWeek={weeklyWorkoutsByWeek}
           sleepLogs={sleepLogs}
-          habits={habits}
-          weeklyWorkouts={weeklyWorkouts}
-          onToggleHabit={(id) => setHabits(prev => prev.map(h => h.id === id ? { ...h, completed: !h.completed } : h))}
+          onToggleHabit={handleToggleHabit}
+          onResetDayHabits={handleResetDayHabits}
           onOpenQuickAdd={(tab) => {
             const event = new KeyboardEvent('keydown', { key: tab === 'food' ? 'f' : tab === 'weight' ? 'w' : tab === 'walk' ? 'a' : 'h' });
             window.dispatchEvent(event);
@@ -407,30 +543,25 @@ export default function App() {
       {/* 5. SCREEN: PLAN & WORKOUTS */}
       {activeScreen === 'plan' && (
         <PlanScreen
-          weeklyWorkouts={weeklyWorkouts}
-          onToggleWeeklyTask={(dayId, taskType) => setWeeklyWorkouts(prev => ({
-            ...prev,
-            [dayId]: { ...prev[dayId], [taskType]: !prev[dayId]?.[taskType] }
-          }))}
-          onCompleteWorkout={(workoutType) => {
-            const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-            const todayId = dayNames[new Date().getDay()];
-            setWeeklyWorkouts(prev => ({
-              ...prev,
-              [todayId]: { ...prev[todayId], workout: true }
-            }));
-          }}
+          weeklyWorkoutsByWeek={weeklyWorkoutsByWeek}
+          onToggleWeeklyTask={handleToggleWeeklyTask}
+          onCompleteWorkout={handleCompleteWorkout}
         />
       )}
 
       {/* 6. SCREEN: MORE & SETTINGS */}
       {activeScreen === 'more' && (
         <MoreScreen
-          waterData={waterData}
-          onUpdateWater={setWaterData}
+          waterData={currentDayWater}
+          onUpdateWater={(updatedWater) => {
+            setWaterByDate(prev => ({
+              ...prev,
+              [selectedDate]: updatedWater
+            }));
+          }}
           sleepLogs={sleepLogs}
-          habits={habits}
-          onToggleHabit={(id) => setHabits(prev => prev.map(h => h.id === id ? { ...h, completed: !h.completed } : h))}
+          habits={resolveHabitsForDate(habitsByDate, selectedDate)}
+          onToggleHabit={(id) => handleToggleHabit(selectedDate, id)}
           onOpenSyncModal={() => setShowSyncModal(true)}
           onOpenPinModal={() => setShowChangePinModal(true)}
           onExportData={handleExportData}
@@ -447,9 +578,9 @@ export default function App() {
         onResetDefaults={() => {
           if (window.confirm('Reset all metrics to default transformation baseline?')) {
             setWeightLogs(DEFAULT_WEIGHT_LOGS);
-            setHabits(DEFAULT_HABITS);
-            setWaterData(DEFAULT_WATER_INTAKE);
-            setWeeklyWorkouts(DEFAULT_WEEKLY_WORKOUTS);
+            setHabitsByDate(DEFAULT_HABITS_BY_DATE);
+            setWaterByDate(DEFAULT_WATER_BY_DATE);
+            setWeeklyWorkoutsByWeek(DEFAULT_WEEKLY_WORKOUTS_BY_WEEK);
             setWalkingLogs(DEFAULT_WALKING_LOGS);
             setSleepLogs(DEFAULT_SLEEP_LOGS);
             setNightRoutine(DEFAULT_NIGHT_ROUTINE);

@@ -11,13 +11,19 @@ import {
   Sparkles,
   Flame,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Footprints,
 } from 'lucide-react';
+import { getLocalDateString, getWeekIdentifier, getWeekDays, shiftDate } from '../../utils/dateUtils';
+import { resolveWorkoutsForWeek } from '../../utils/storage';
 
 /**
  * Screen 5: Plan & Workout Execution Screen
+ * Features multi-week schedule isolation and dumbbell exercise tracking
  */
 export default function PlanScreen({
-  weeklyWorkouts = {},
+  weeklyWorkoutsByWeek = {},
   onToggleWeeklyTask,
   onCompleteWorkout,
 }) {
@@ -25,6 +31,10 @@ export default function PlanScreen({
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
   const [completedExercises, setCompletedExercises] = useState({});
+  const [selectedWeekDate, setSelectedWeekDate] = useState(() => getLocalDateString());
+
+  const weekInfo = getWeekDays(selectedWeekDate);
+  const currentWeekWorkouts = resolveWorkoutsForWeek(weeklyWorkoutsByWeek, weekInfo.weekKey);
 
   useEffect(() => {
     let interval = null;
@@ -50,6 +60,20 @@ export default function PlanScreen({
     }));
   };
 
+  const handlePrevWeek = () => {
+    setSelectedWeekDate(prev => shiftDate(prev, -7));
+  };
+
+  const handleNextWeek = () => {
+    setSelectedWeekDate(prev => shiftDate(prev, 7));
+  };
+
+  const handleCurrentWeek = () => {
+    setSelectedWeekDate(getLocalDateString());
+  };
+
+  const isCurrentWeek = weekInfo.weekKey === getWeekIdentifier();
+
   const workoutAExercises = [
     { id: 'a-1', name: 'Goblet Squats', sets: '3 Sets', reps: '12 Reps', weight: '5 kg DB', muscle: 'Quads & Glutes' },
     { id: 'a-2', name: 'Dumbbell Floor Press', sets: '3 Sets', reps: '10-12 Reps', weight: '2x 5 kg DB', muscle: 'Chest & Triceps' },
@@ -69,14 +93,14 @@ export default function PlanScreen({
   const currentExercises = activeWorkoutTab === 'A' ? workoutAExercises : workoutBExercises;
   const allCurrentDone = currentExercises.every((e) => completedExercises[e.id]);
 
-  const days = [
-    { id: 'mon', label: 'Mon', focus: 'Workout A + 5km Walk' },
-    { id: 'tue', label: 'Tue', focus: '5km Walk + Recovery' },
-    { id: 'wed', label: 'Wed', focus: 'Workout B + 5km Walk' },
-    { id: 'thu', label: 'Thu', focus: '5km Walk + Core' },
-    { id: 'fri', label: 'Fri', focus: 'Workout A + 5km Walk' },
-    { id: 'sat', label: 'Sat', focus: '5km Walk + Stretch' },
-    { id: 'sun', label: 'Sun', focus: 'Active Recovery Walk' },
+  const daysPlan = [
+    { id: 'mon', label: 'Mon', focus: 'Workout A + 5km Walk', hasWorkout: true, type: 'Workout A' },
+    { id: 'tue', label: 'Tue', focus: '5km Walk + Recovery', hasWorkout: false },
+    { id: 'wed', label: 'Wed', focus: 'Workout B + 5km Walk', hasWorkout: true, type: 'Workout B' },
+    { id: 'thu', label: 'Thu', focus: '5km Walk + Core', hasWorkout: false },
+    { id: 'fri', label: 'Fri', focus: 'Workout A + 5km Walk', hasWorkout: true, type: 'Workout A' },
+    { id: 'sat', label: 'Sat', focus: '5km Walk + Stretch', hasWorkout: false },
+    { id: 'sun', label: 'Sun', focus: 'Active Recovery Walk', hasWorkout: false },
   ];
 
   return (
@@ -128,7 +152,166 @@ export default function PlanScreen({
         </div>
       </div>
 
-      {/* Interactive Workout Card */}
+      {/* 1. Week Selector Bar */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          padding: '0.65rem 0.95rem',
+          background: 'var(--surface-card)',
+          border: '1px solid var(--border-medium)',
+          borderRadius: 'var(--radius-md)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button
+            type="button"
+            onClick={handlePrevWeek}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '30px',
+              height: '30px',
+              borderRadius: 'var(--radius-xs)',
+              background: 'var(--surface-secondary)',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-white)',
+              cursor: 'pointer',
+            }}
+            title="Previous Week"
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Calendar size={16} color="var(--brand-primary-soft)" />
+            <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-white)' }}>
+              {weekInfo.weekKey} ({weekInfo.startDate} to {weekInfo.endDate})
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleNextWeek}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '30px',
+              height: '30px',
+              borderRadius: 'var(--radius-xs)',
+              background: 'var(--surface-secondary)',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-white)',
+              cursor: 'pointer',
+            }}
+            title="Next Week"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+
+        {!isCurrentWeek && (
+          <Button variant="secondary" size="sm" onClick={handleCurrentWeek} icon={RotateCcw}>
+            Current Week
+          </Button>
+        )}
+      </div>
+
+      {/* 2. Interactive Weekly Workout Schedule */}
+      <Card variant="default" padding="1.25rem">
+        <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-white)', marginBottom: '0.85rem' }}>
+          Weekly Checklist ({weekInfo.weekKey})
+        </h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+          {daysPlan.map((d) => {
+            const dayStatus = currentWeekWorkouts[d.id] || { walk: false, workout: false };
+            return (
+              <div
+                key={d.id}
+                style={{
+                  background: (dayStatus.walk || dayStatus.workout) ? 'rgba(245, 158, 11, 0.06)' : 'var(--surface-secondary)',
+                  border: (dayStatus.walk || dayStatus.workout) ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.75rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--brand-primary)', textTransform: 'uppercase' }}>
+                    {d.label}
+                  </span>
+                  {d.hasWorkout && (
+                    <Badge variant="gold" size="sm">
+                      {d.type}
+                    </Badge>
+                  )}
+                </div>
+
+                <div style={{ fontSize: '0.76rem', color: 'var(--text-white)', lineHeight: 1.2 }}>
+                  {d.focus}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginTop: 'auto' }}>
+                  {/* Walk toggle */}
+                  <div
+                    onClick={() => onToggleWeeklyTask && onToggleWeeklyTask(weekInfo.weekKey, d.id, 'walk')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.35rem 0.55rem',
+                      background: dayStatus.walk ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.03)',
+                      borderRadius: 'var(--radius-xs)',
+                      cursor: 'pointer',
+                      fontSize: '0.72rem',
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: dayStatus.walk ? '#34d399' : 'var(--text-muted)', fontWeight: 600 }}>
+                      <Footprints size={12} /> 5km Walk
+                    </span>
+                    <div className={`custom-checkbox ${dayStatus.walk ? 'checked' : ''}`} style={{ width: '16px', height: '16px' }}>
+                      <CheckCircle2 size={12} strokeWidth={3} />
+                    </div>
+                  </div>
+
+                  {/* Workout toggle if applicable */}
+                  {d.hasWorkout && (
+                    <div
+                      onClick={() => onToggleWeeklyTask && onToggleWeeklyTask(weekInfo.weekKey, d.id, 'workout')}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.35rem 0.55rem',
+                        background: dayStatus.workout ? 'rgba(168, 85, 247, 0.15)' : 'rgba(255,255,255,0.03)',
+                        borderRadius: 'var(--radius-xs)',
+                        cursor: 'pointer',
+                        fontSize: '0.72rem',
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: dayStatus.workout ? '#c084fc' : 'var(--text-muted)', fontWeight: 600 }}>
+                        <Dumbbell size={12} /> Dumbbell Session
+                      </span>
+                      <div className={`custom-checkbox ${dayStatus.workout ? 'checked' : ''}`} style={{ width: '16px', height: '16px' }}>
+                        <CheckCircle2 size={12} strokeWidth={3} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* 3. Interactive Workout Exercise Checklist */}
       <Card variant="gradient" padding="1.25rem">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
@@ -230,8 +413,8 @@ export default function PlanScreen({
               fullWidth
               size="lg"
               onClick={() => {
-                if (onCompleteWorkout) onCompleteWorkout(activeWorkoutTab);
-                alert(`Workout ${activeWorkoutTab} marked as complete! Fantastic effort! 🔥`);
+                if (onCompleteWorkout) onCompleteWorkout(weekInfo.weekKey, activeWorkoutTab);
+                alert(`Workout ${activeWorkoutTab} marked as complete for ${weekInfo.weekKey}! Fantastic effort! 🔥`);
               }}
               icon={CheckCircle2}
             >
@@ -239,33 +422,6 @@ export default function PlanScreen({
             </Button>
           </div>
         )}
-      </Card>
-
-      {/* Weekly Schedule Strip */}
-      <Card variant="default" padding="1.25rem">
-        <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-white)', marginBottom: '0.85rem' }}>
-          7-Day Weekly Structure
-        </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem' }}>
-          {days.map((d) => (
-            <div
-              key={d.id}
-              style={{
-                background: 'var(--surface-secondary)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '0.65rem',
-              }}
-            >
-              <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--brand-primary)', textTransform: 'uppercase' }}>
-                {d.label}
-              </span>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-white)', marginTop: '0.2rem', lineHeight: 1.3 }}>
-                {d.focus}
-              </div>
-            </div>
-          ))}
-        </div>
       </Card>
     </div>
   );

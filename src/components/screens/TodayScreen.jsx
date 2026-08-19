@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
+import DateSwitcherBar from '../ui/DateSwitcherBar';
 import {
   Calendar,
   CheckCircle2,
@@ -15,10 +16,14 @@ import {
   Sparkles,
   Plus,
   Flame,
+  RotateCcw,
 } from 'lucide-react';
+import { getLocalDateString, getDayOfWeekKey, getWeekIdentifier } from '../../utils/dateUtils';
+import { resolveHabitsForDate, resolveWaterForDate, resolveWorkoutsForWeek } from '../../utils/storage';
 
 /**
  * Screen 2: Today Screen (Consolidated Daily Compliance Ledger)
+ * Fully isolated by date
  */
 export default function TodayScreen({
   selectedDate,
@@ -26,15 +31,24 @@ export default function TodayScreen({
   foodLogs = {},
   weightLogs = [],
   walkingLogs = [],
-  waterData = { consumedMl: 0, targetMl: 3500 },
+  waterByDate = {},
+  habitsByDate = {},
+  weeklyWorkoutsByWeek = {},
   sleepLogs = [],
-  habits = [],
-  weeklyWorkouts = {},
   onToggleHabit,
+  onResetDayHabits,
   onOpenQuickAdd,
   onNavigate,
 }) {
-  const activeDate = selectedDate || new Date().toISOString().split('T')[0];
+  const activeDate = selectedDate || getLocalDateString();
+  const currentHabits = resolveHabitsForDate(habitsByDate, activeDate);
+  const currentWater = resolveWaterForDate(waterByDate, activeDate);
+  
+  const activeWeekKey = getWeekIdentifier(activeDate);
+  const activeWeekWorkouts = resolveWorkoutsForWeek(weeklyWorkoutsByWeek, activeWeekKey);
+  const activeDayKey = getDayOfWeekKey(activeDate);
+  const isWorkoutDone = !!activeWeekWorkouts[activeDayKey]?.workout;
+
   const activeMeals = foodLogs[activeDate] || { breakfast: [], lunch: [], snack: [], dinner: [] };
   const allFoods = [
     ...(activeMeals.breakfast || []),
@@ -48,7 +62,7 @@ export default function TodayScreen({
   const todayWeight = weightLogs.find(w => w.date === activeDate);
   const todayWalks = walkingLogs.filter(w => w.date === activeDate);
   const walkKm = todayWalks.reduce((s, w) => s + (Number(w.distance) || 0), 0);
-  const waterL = ((waterData.consumedMl || 0) / 1000).toFixed(1);
+  const waterL = ((currentWater.consumedMl || 0) / 1000).toFixed(1);
 
   // Daily checklist items
   const ledgerItems = [
@@ -84,16 +98,16 @@ export default function TodayScreen({
       title: '3.5L Daily Hydration',
       subtitle: `${waterL} / 3.5 L consumed`,
       icon: Droplets,
-      completed: (waterData.consumedMl || 0) >= 3000,
+      completed: (currentWater.consumedMl || 0) >= 3000,
       color: '#38bdf8',
       actionTab: 'water',
     },
     {
       id: 'workout',
       title: 'Dumbbell Routine (Mon, Wed, Fri)',
-      subtitle: 'Upper body & Core progressive overload',
+      subtitle: isWorkoutDone ? '✓ Dumbbell session completed' : 'Upper body & Core progressive overload',
       icon: Dumbbell,
-      completed: false,
+      completed: isWorkoutDone,
       color: '#a855f7',
       screen: 'plan',
     },
@@ -103,43 +117,18 @@ export default function TodayScreen({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-      {/* Header & Date Selector */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-white)' }}>
-            Today's Adherence Ledger
-          </h2>
-          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            Daily transformation checklist & accountability
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <input
-            type="date"
-            value={activeDate}
-            onChange={(e) => onSelectDate && onSelectDate(e.target.value)}
-            style={{
-              padding: '0.45rem 0.75rem',
-              borderRadius: 'var(--radius-sm)',
-              background: 'var(--surface-secondary)',
-              border: '1px solid var(--border-medium)',
-              color: 'var(--text-white)',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              fontFamily: 'var(--font-sans)',
-              outline: 'none',
-            }}
-          />
-        </div>
-      </div>
+      {/* Universal Date Switcher Bar */}
+      <DateSwitcherBar
+        selectedDate={activeDate}
+        onSelectDate={onSelectDate}
+      />
 
       {/* Progress Summary Card */}
       <Card variant="gradient">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
             <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
-              Daily Completion
+              Daily Completion ({activeDate})
             </span>
             <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)', marginTop: '0.1rem' }}>
               {completedCount} of {ledgerItems.length} Complete
@@ -151,41 +140,51 @@ export default function TodayScreen({
         </div>
       </Card>
 
-      {/* Ledger Items List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+      {/* Ledger Items Checklist */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         {ledgerItems.map((item) => {
           const Icon = item.icon;
           return (
             <Card
               key={item.id}
-              variant="interactive"
-              padding="0.9rem 1.15rem"
+              variant="default"
+              padding="1rem 1.25rem"
+              style={{
+                background: item.completed ? 'rgba(16, 185, 129, 0.06)' : 'var(--surface-card)',
+                borderColor: item.completed ? 'rgba(16, 185, 129, 0.3)' : 'var(--border-medium)',
+                cursor: 'pointer',
+              }}
               onClick={() => {
-                if (item.actionTab) {
+                if (item.actionTab && onOpenQuickAdd) {
                   onOpenQuickAdd(item.actionTab);
-                } else if (item.screen) {
+                } else if (item.screen && onNavigate) {
                   onNavigate(item.screen);
                 }
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
                   <div
                     style={{
-                      background: item.completed ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                      color: item.completed ? '#34d399' : item.color,
-                      padding: '0.55rem',
+                      width: '40px',
+                      height: '40px',
                       borderRadius: 'var(--radius-sm)',
+                      background: item.completed ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-secondary)',
+                      color: item.completed ? '#34d399' : item.color,
                       display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
-                    <Icon size={18} />
+                    <Icon size={20} />
                   </div>
+
                   <div>
-                    <h4 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-white)' }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-white)' }}>
                       {item.title}
-                    </h4>
-                    <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
+                    </h3>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
                       {item.subtitle}
                     </p>
                   </div>
@@ -193,9 +192,14 @@ export default function TodayScreen({
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   {item.completed ? (
-                    <CheckCircle2 size={20} color="#10b981" />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#34d399', fontWeight: 700, fontSize: '0.82rem' }}>
+                      <CheckCircle2 size={20} strokeWidth={2.5} />
+                      <span>Done</span>
+                    </div>
                   ) : (
-                    <Circle size={20} color="var(--border-medium)" />
+                    <Button variant="secondary" size="sm">
+                      Log
+                    </Button>
                   )}
                 </div>
               </div>
@@ -203,6 +207,82 @@ export default function TodayScreen({
           );
         })}
       </div>
+
+      {/* Daily Non-Negotiable Habits for Active Date */}
+      <Card variant="default" padding="1.25rem">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div>
+            <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-white)' }}>
+              Non-Negotiable Habits ({activeDate})
+            </h3>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+              Checkboxes automatically stay isolated to this specific date
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onResetDayHabits && onResetDayHabits(activeDate)}
+              icon={RotateCcw}
+              title="Reset habits for this day only"
+            >
+              Reset Day
+            </Button>
+            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--brand-primary)', fontFamily: 'var(--font-mono)' }}>
+              {currentHabits.filter(h => h.completed).length}/{currentHabits.length}
+            </span>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
+          {currentHabits.map((habit) => (
+            <div
+              key={habit.id}
+              onClick={() => onToggleHabit && onToggleHabit(activeDate, habit.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0.75rem 0.95rem',
+                borderRadius: 'var(--radius-sm)',
+                background: habit.completed ? 'rgba(245, 158, 11, 0.08)' : 'var(--surface-secondary)',
+                border: habit.completed ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid var(--border-subtle)',
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div className={`custom-checkbox ${habit.completed ? 'checked' : ''}`}>
+                  <CheckCircle2 size={16} strokeWidth={3} />
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: '0.86rem',
+                      fontWeight: 700,
+                      color: habit.completed ? 'var(--brand-primary-soft)' : 'var(--text-white)',
+                      textDecoration: habit.completed ? 'line-through' : 'none',
+                    }}
+                  >
+                    {habit.label}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    {habit.desc}
+                  </div>
+                </div>
+              </div>
+
+              {habit.completed && (
+                <Badge variant="success" size="sm">
+                  Completed
+                </Badge>
+              )}
+            </div>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 }

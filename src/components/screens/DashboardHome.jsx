@@ -5,6 +5,7 @@ import Badge from '../ui/Badge';
 import ProgressRing from '../ui/ProgressRing';
 import ProgressBar from '../ui/ProgressBar';
 import Metric from '../ui/Metric';
+import DateSwitcherBar from '../ui/DateSwitcherBar';
 import {
   Sparkles,
   TrendingDown,
@@ -19,10 +20,12 @@ import {
   ArrowRight,
   Plus,
 } from 'lucide-react';
+import { getLocalDateString, getDayOfWeekKey, getWeekIdentifier } from '../../utils/dateUtils';
+import { resolveHabitsForDate, resolveWaterForDate, resolveWorkoutsForWeek } from '../../utils/storage';
 
 /**
  * Screen 1: Dashboard Home (Daily Transformation Coach)
- * Inspires confidence and clarity in < 5 seconds
+ * Inspires confidence and clarity in < 5 seconds with day-to-day isolation
  */
 export default function DashboardHome({
   userName = 'Nidhu',
@@ -33,15 +36,25 @@ export default function DashboardHome({
   weeklyDeltaKg = -0.60,
   foodLogs = {},
   selectedDate,
+  onSelectDate,
   walkingLogs = [],
-  waterData = { consumedMl: 0, targetMl: 3500 },
+  waterByDate = {},
+  habitsByDate = {},
+  weeklyWorkoutsByWeek = {},
   sleepLogs = [],
-  habits = [],
-  weeklyWorkouts = {},
+  onToggleHabit,
   onNavigate,
   onOpenQuickAdd,
 }) {
-  const todayStr = selectedDate || new Date().toISOString().split('T')[0];
+  const todayStr = selectedDate || getLocalDateString();
+  const currentHabits = resolveHabitsForDate(habitsByDate, todayStr);
+  const currentWater = resolveWaterForDate(waterByDate, todayStr);
+  
+  const currentWeekKey = getWeekIdentifier(todayStr);
+  const currentWeekWorkouts = resolveWorkoutsForWeek(weeklyWorkoutsByWeek, currentWeekKey);
+  const todayDayId = getDayOfWeekKey(todayStr);
+  const isWorkoutDone = !!currentWeekWorkouts[todayDayId]?.workout;
+
   const activeMeals = foodLogs[todayStr] || { breakfast: [], lunch: [], snack: [], dinner: [] };
   const allFoods = [
     ...(activeMeals.breakfast || []),
@@ -67,17 +80,9 @@ export default function DashboardHome({
   const walkPct = Math.min(Math.round((todayWalkKm / walkGoalKm) * 100), 100);
 
   // Water calculations
-  const waterConsumedL = ((waterData.consumedMl || 0) / 1000).toFixed(1);
-  const waterTargetL = ((waterData.targetMl || 3500) / 1000).toFixed(1);
-  const waterPct = Math.min(Math.round(((waterData.consumedMl || 0) / (waterData.targetMl || 3500)) * 100), 100);
-
-  // Workouts
-  const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-  const todayDayId = dayNames[new Date().getDay()];
-  const isWorkoutDone = !!weeklyWorkouts[todayDayId]?.workout;
-
-  // Sleep
-  const recentSleep = sleepLogs.length > 0 ? sleepLogs[sleepLogs.length - 1] : { hours: 7.5 };
+  const waterConsumedL = ((currentWater.consumedMl || 0) / 1000).toFixed(1);
+  const waterTargetL = ((currentWater.targetMl || 3500) / 1000).toFixed(1);
+  const waterPct = Math.min(Math.round(((currentWater.consumedMl || 0) / (currentWater.targetMl || 3500)) * 100), 100);
 
   // Calculate Unified Adherence Score /100
   const scoreNutrition = Math.min(caloriePct, 100) * 0.25; // 25 max
@@ -105,11 +110,11 @@ export default function DashboardHome({
         actionTab: 'walk',
       };
     }
-    if ((waterData.consumedMl || 0) < 3000) {
+    if ((currentWater.consumedMl || 0) < 3000) {
       return {
         icon: Droplets,
         color: '#38bdf8',
-        title: `Hydrate: ${(((waterData.targetMl || 3500) - (waterData.consumedMl || 0)) / 1000).toFixed(1)}L water to daily target`,
+        title: `Hydrate: ${(((currentWater.targetMl || 3500) - (currentWater.consumedMl || 0)) / 1000).toFixed(1)}L water to daily target`,
         subtitle: 'Drink 500 ml before your next meal',
         actionLabel: '+500ml Water',
         actionTab: 'water',
@@ -125,7 +130,7 @@ export default function DashboardHome({
         actionTab: 'food',
       };
     }
-    if (!isWorkoutDone) {
+    if (!isWorkoutDone && (todayDayId === 'mon' || todayDayId === 'wed' || todayDayId === 'fri')) {
       return {
         icon: Dumbbell,
         color: '#a855f7',
@@ -148,310 +153,287 @@ export default function DashboardHome({
   const nextAction = getNextBestAction();
   const NextActionIcon = nextAction.icon;
 
-  // Date formatted nicely
-  const todayFormatted = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  });
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* 1. Header with Greeting & Date */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {/* 0. Universal Date Switcher Bar */}
+      <DateSwitcherBar
+        selectedDate={todayStr}
+        onSelectDate={onSelectDate}
+      />
+
+      {/* 1. Header Greeting & Hero Status */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            {todayFormatted}
-          </span>
-          <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', fontWeight: 800, color: 'var(--text-white)', lineHeight: 1.2, marginTop: '0.15rem' }}>
-            Good morning, {userName}
-          </h1>
-          <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginTop: '0.2rem' }}>
-            "One day at a time."
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-white)', letterSpacing: '-0.02em' }}>
+              Welcome Back, {userName}!
+            </h1>
+            <span style={{ fontSize: '1.2rem' }}>🔥</span>
+          </div>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+            Target: <b>100.0 KG</b> by Dec 31 • Consistency beats intensity
           </p>
         </div>
 
-        {/* Quick 100-Day Streak Pill */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            padding: '0.45rem 0.85rem',
-            borderRadius: 'var(--radius-pill)',
-            background: 'rgba(16, 185, 129, 0.08)',
-            border: '1px solid rgba(16, 185, 129, 0.25)',
-          }}
-        >
-          <Flame size={16} color="var(--brand-primary)" />
-          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--brand-primary-soft)', fontFamily: 'var(--font-mono)' }}>
-            Phase 1 • Dec 31 Goal
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Badge variant={overallScore >= 80 ? 'success' : overallScore >= 50 ? 'gold' : 'neutral'} size="lg">
+            Score: {overallScore}/100
+          </Badge>
         </div>
       </div>
 
-      {/* 2. Primary Transformation Hero (Weight & 7-Day Trend) */}
+      {/* 2. Hero Transformation Trajectory Card */}
       <Card variant="gradient" padding="1.5rem">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Primary Weight Target
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', alignItems: 'center' }}>
+          {/* Main Weight Progress */}
+          <div>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--brand-primary-soft)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Weight Transformation
+            </span>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginTop: '0.2rem' }}>
+              <span style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--text-white)', fontFamily: 'var(--font-mono)', letterSpacing: '-0.03em' }}>
+                {Number(currentWeight).toFixed(2)}
               </span>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginTop: '0.25rem' }}>
-                <span style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
-                  {currentWeight.toFixed(2)}
-                </span>
-                <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 600 }}>kg</span>
-                <span style={{ color: 'var(--text-muted)', fontSize: '1.25rem' }}>→</span>
-                <span style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 800, color: 'var(--brand-primary-soft)', fontFamily: 'var(--font-mono)' }}>
-                  {targetWeight} kg
-                </span>
-              </div>
+              <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: 700 }}>
+                KG
+              </span>
             </div>
 
-            {/* 7-Day Moving Avg Badge */}
-            <div
-              style={{
-                background: 'var(--surface-secondary)',
-                border: '1px solid var(--border-medium)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '0.65rem 1rem',
-                textAlign: 'right',
-              }}
-            >
-              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
-                7-Day Moving Avg
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.78rem', color: '#34d399', fontWeight: 700 }}>
+                <TrendingDown size={14} />
+                <span>{lostSoFar > 0 ? `-${lostSoFar.toFixed(2)} kg lost` : 'Baseline set'}</span>
+              </div>
+              <span style={{ color: 'var(--text-muted)' }}>•</span>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                {remainingWeight} kg to goal (100.0)
               </span>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-secondary)', fontFamily: 'var(--font-mono)' }}>
-                {Number(sevenDayAvg).toFixed(2)} kg
-              </div>
-              <div style={{ fontSize: '0.68rem', color: 'var(--accent-success)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.2rem' }}>
-                <TrendingDown size={11} /> {weeklyDeltaKg < 0 ? `${weeklyDeltaKg} kg this week` : 'Stable this week'}
-              </div>
             </div>
           </div>
 
-          {/* Restrained Journey Progress Bar */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', fontWeight: 600 }}>
-              <span style={{ color: 'var(--text-secondary)' }}>
-                {remainingWeight} kg remaining to 100 kg goal
-              </span>
-              <span style={{ color: 'var(--brand-primary-soft)', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
-                {journeyProgressPct}% Achieved
+          {/* 7-Day Trend SMA & Pace */}
+          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>7-Day Rolling SMA</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-white)', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
+                {sevenDayAvg.toFixed(2)} kg
               </span>
             </div>
-            <ProgressBar progress={parseFloat(journeyProgressPct)} height={10} color="var(--brand-gradient)" />
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>Dec 31 Trajectory</span>
+              <span style={{ fontSize: '0.75rem', color: '#34d399', fontWeight: 700 }}>
+                🟢 On Track (~0.55 kg/wk)
+              </span>
+            </div>
+            <ProgressBar value={Number(journeyProgressPct)} height={6} variant="brand" />
           </div>
         </div>
       </Card>
 
-      {/* 3. Quick Action 1-Tap Pills */}
-      <div style={{ display: 'flex', gap: '0.6rem', overflowX: 'auto', paddingBottom: '0.2rem' }}>
-        {[
-          { label: '+ Food', icon: Utensils, tab: 'food', color: 'var(--brand-primary)' },
-          { label: '+ Weight', icon: TrendingDown, tab: 'weight', color: '#38bdf8' },
-          { label: '+ Walk', icon: Footprints, tab: 'walk', color: '#34d399' },
-          { label: '+ Water', icon: Droplets, tab: 'water', color: '#60a5fa' },
-        ].map((btn) => {
-          const Icon = btn.icon;
-          return (
-            <button
-              key={btn.tab}
-              type="button"
-              onClick={() => onOpenQuickAdd(btn.tab)}
-              style={{
-                flex: '1 0 auto',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.45rem',
-                padding: '0.6rem 0.9rem',
-                borderRadius: 'var(--radius-sm)',
-                background: 'var(--surface-card)',
-                border: '1px solid var(--border-subtle)',
-                color: 'var(--text-primary)',
-                fontWeight: 700,
-                fontSize: '0.8rem',
-                cursor: 'pointer',
-                transition: 'all var(--transition-fast)',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.borderColor = btn.color)}
-              onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border-subtle)')}
-            >
-              <Icon size={15} color={btn.color} />
-              <span>{btn.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 4. Today's Adherence & Core Pillars Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
-        {/* Card A: Today's Adherence Score */}
-        <Card variant="default">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <div>
-              <h3 style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-white)' }}>
-                Today's Adherence
-              </h3>
-              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Compliance across 5 core pillars</p>
+      {/* 3. Daily Compliance Pillars (4 Core Cards) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+        {/* Pillar 1: Nutrition & Calories */}
+        <Card variant="default" padding="1.1rem" onClick={() => onNavigate('nutrition')} style={{ cursor: 'pointer' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ background: 'rgba(245, 158, 11, 0.15)', color: 'var(--brand-primary)', padding: '0.4rem', borderRadius: 'var(--radius-xs)', display: 'flex' }}>
+                <Utensils size={16} />
+              </div>
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-white)' }}>Calories</span>
             </div>
-            <Badge variant={overallScore >= 80 ? 'success' : overallScore >= 50 ? 'warning' : 'neutral'}>
-              {overallScore >= 80 ? '🔥 On Track' : 'In Progress'}
+            <Badge variant={totalCaloriesConsumed <= calorieBudget ? 'success' : 'warning'} size="sm">
+              {caloriesRemaining} kcal left
             </Badge>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-            <ProgressRing
-              size={92}
-              strokeWidth={8}
-              progress={overallScore}
-              color={overallScore >= 80 ? 'var(--brand-primary)' : 'var(--brand-secondary)'}
-            >
-              <span style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-white)', fontFamily: 'var(--font-mono)' }}>
-                {overallScore}
+          <div style={{ marginTop: '0.85rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.35rem' }}>
+              <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)' }}>
+                {totalCaloriesConsumed}
               </span>
-              <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
-                Score
-              </span>
-            </ProgressRing>
-
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Nutrition Deficit</span>
-                <span style={{ color: totalCaloriesConsumed <= 2100 ? 'var(--brand-primary-soft)' : '#f87171', fontWeight: 700 }}>
-                  {totalCaloriesConsumed} / 2100 kcal
-                </span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Protein Target</span>
-                <span style={{ color: totalProteinConsumed >= 100 ? 'var(--brand-primary-soft)' : 'var(--brand-secondary)', fontWeight: 700 }}>
-                  {totalProteinConsumed.toFixed(0)} / 130g
-                </span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Daily Walk</span>
-                <span style={{ color: todayWalkKm >= 5.0 ? 'var(--brand-primary-soft)' : 'var(--text-white)', fontWeight: 700 }}>
-                  {todayWalkKm.toFixed(1)} / 5.0 km
-                </span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Water Hydration</span>
-                <span style={{ color: waterPct >= 80 ? 'var(--brand-primary-soft)' : 'var(--brand-secondary)', fontWeight: 700 }}>
-                  {waterConsumedL} / {waterTargetL} L
-                </span>
-              </div>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>/ 2,100 kcal</span>
             </div>
+            <ProgressBar value={caloriePct} height={6} variant={caloriePct > 100 ? 'danger' : 'brand'} />
           </div>
         </Card>
 
-        {/* Card B: Today's Nutrition Consumed vs Remaining */}
-        <Card variant="default">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
-            <div>
-              <h3 style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-white)' }}>
-                Today's Nutrition
-              </h3>
-              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{allFoods.length} items logged today</p>
+        {/* Pillar 2: Protein Target */}
+        <Card variant="default" padding="1.1rem" onClick={() => onNavigate('nutrition')} style={{ cursor: 'pointer' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', padding: '0.4rem', borderRadius: 'var(--radius-xs)', display: 'flex' }}>
+                <Flame size={16} />
+              </div>
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-white)' }}>Protein</span>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate('nutrition')}
-              icon={ChevronRight}
-              iconPosition="right"
-            >
-              Details
-            </Button>
+            <Badge variant={totalProteinConsumed >= 120 ? 'success' : 'neutral'} size="sm">
+              {proteinRemaining.toFixed(0)}g needed
+            </Badge>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.85rem' }}>
-            <div style={{ background: 'var(--surface-secondary)', padding: '0.75rem', borderRadius: 'var(--radius-sm)' }}>
-              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
-                Calories
+          <div style={{ marginTop: '0.85rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.35rem' }}>
+              <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)' }}>
+                {totalProteinConsumed.toFixed(1)}
               </span>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-primary-soft)', fontFamily: 'var(--font-mono)' }}>
-                {totalCaloriesConsumed}
-              </div>
-              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                {caloriesRemaining} kcal remaining
-              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>/ 130g</span>
             </div>
+            <ProgressBar value={proteinPct} height={6} variant="secondary" />
+          </div>
+        </Card>
 
-            <div style={{ background: 'var(--surface-secondary)', padding: '0.75rem', borderRadius: 'var(--radius-sm)' }}>
-              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
-                Protein
-              </span>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-secondary)', fontFamily: 'var(--font-mono)' }}>
-                {totalProteinConsumed.toFixed(0)}g
+        {/* Pillar 3: Walking Distance */}
+        <Card variant="default" padding="1.1rem" onClick={() => onNavigate('today')} style={{ cursor: 'pointer' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '0.4rem', borderRadius: 'var(--radius-xs)', display: 'flex' }}>
+                <Footprints size={16} />
               </div>
-              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                {proteinRemaining > 0 ? `${proteinRemaining.toFixed(0)}g remaining` : 'Target Met! 🎉'}
-              </span>
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-white)' }}>5.0 KM Walk</span>
             </div>
+            <Badge variant={todayWalkKm >= 5.0 ? 'success' : 'gold'} size="sm">
+              {todayWalkKm >= 5.0 ? '✓ Goal Met' : `${(5.0 - todayWalkKm).toFixed(1)} km left`}
+            </Badge>
           </div>
 
-          <ProgressBar progress={caloriePct} height={6} color="var(--brand-primary)" />
+          <div style={{ marginTop: '0.85rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.35rem' }}>
+              <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)' }}>
+                {todayWalkKm.toFixed(1)}
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>/ 5.0 km</span>
+            </div>
+            <ProgressBar value={walkPct} height={6} variant="success" />
+          </div>
+        </Card>
+
+        {/* Pillar 4: Water Hydration */}
+        <Card variant="default" padding="1.1rem" onClick={() => onNavigate('more')} style={{ cursor: 'pointer' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '0.4rem', borderRadius: 'var(--radius-xs)', display: 'flex' }}>
+                <Droplets size={16} />
+              </div>
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-white)' }}>Hydration</span>
+            </div>
+            <Badge variant={(currentWater.consumedMl || 0) >= 3000 ? 'success' : 'neutral'} size="sm">
+              {waterPct}% Target
+            </Badge>
+          </div>
+
+          <div style={{ marginTop: '0.85rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.35rem' }}>
+              <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-white)', fontFamily: 'var(--font-mono)' }}>
+                {waterConsumedL}
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>/ {waterTargetL} L</span>
+            </div>
+            <ProgressBar value={waterPct} height={6} variant="info" />
+          </div>
         </Card>
       </div>
 
-      {/* 5. "Next Best Action" Dynamic Coach Banner */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(17, 25, 24, 0.95) 100%)',
-          border: '1px solid rgba(16, 185, 129, 0.25)',
-          borderRadius: 'var(--radius-md)',
-          padding: '1.15rem 1.25rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1rem',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          <div
-            style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              color: nextAction.color,
-              padding: '0.65rem',
-              borderRadius: 'var(--radius-sm)',
-              display: 'flex',
+      {/* 4. Intelligent Next Best Action Banner */}
+      <Card variant="accent" padding="1.25rem">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'rgba(0,0,0,0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: nextAction.color,
+                flexShrink: 0,
+              }}
+            >
+              <NextActionIcon size={22} />
+            </div>
+            <div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--brand-primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Recommended Next Step
+              </span>
+              <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: 'var(--text-white)', marginTop: '0.1rem' }}>
+                {nextAction.title}
+              </h3>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
+                {nextAction.subtitle}
+              </p>
+            </div>
+          </div>
+
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => {
+              if (nextAction.actionTab && onOpenQuickAdd) {
+                onOpenQuickAdd(nextAction.actionTab);
+              } else if (nextAction.screen) {
+                onNavigate(nextAction.screen);
+              }
             }}
+            icon={ArrowRight}
           >
-            <NextActionIcon size={22} />
-          </div>
+            {nextAction.actionLabel}
+          </Button>
+        </div>
+      </Card>
+
+      {/* 5. Daily Habits Quick Ledger for Selected Date */}
+      <Card variant="default" padding="1.25rem">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--brand-primary-soft)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Your Next Best Action
+            <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-white)' }}>
+              Daily Habits Checklist ({todayStr})
+            </h3>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+              Non-negotiable transformation foundation
             </span>
-            <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-white)', marginTop: '0.1rem' }}>
-              {nextAction.title}
-            </h4>
-            <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
-              {nextAction.subtitle}
-            </p>
           </div>
+          <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--brand-primary)', fontFamily: 'var(--font-mono)' }}>
+            {currentHabits.filter(h => h.completed).length} / {currentHabits.length} Complete
+          </span>
         </div>
 
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={() => {
-            if (nextAction.actionTab) {
-              onOpenQuickAdd(nextAction.actionTab);
-            } else if (nextAction.screen) {
-              onNavigate(nextAction.screen);
-            }
-          }}
-          icon={ArrowRight}
-          iconPosition="right"
-        >
-          {nextAction.actionLabel}
-        </Button>
-      </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.6rem' }}>
+          {currentHabits.map((habit) => (
+            <div
+              key={habit.id}
+              onClick={() => onToggleHabit && onToggleHabit(todayStr, habit.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0.65rem 0.85rem',
+                borderRadius: 'var(--radius-sm)',
+                background: habit.completed ? 'rgba(245, 158, 11, 0.08)' : 'var(--surface-secondary)',
+                border: habit.completed ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid var(--border-subtle)',
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <div className={`custom-checkbox ${habit.completed ? 'checked' : ''}`}>
+                  <CheckCircle2 size={14} strokeWidth={3} />
+                </div>
+                <span
+                  style={{
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    color: habit.completed ? 'var(--brand-primary-soft)' : 'var(--text-white)',
+                    textDecoration: habit.completed ? 'line-through' : 'none',
+                  }}
+                >
+                  {habit.label}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 }
